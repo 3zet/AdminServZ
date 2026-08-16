@@ -3,7 +3,7 @@ class OnlineConfig {
 	/********************* ONLINE CONFIGURATION *********************/
 	
 	const ACTIVATE = true; // Activate the online configuration
-	const PASSWORD = 'c9a24cbd2e0f505a9a3e7c593f5359a9'; // Checking password. This password is generated in MD5
+	const PASSWORD = '0b28a5799a32c687dad2c5183718ceac'; // Checking password. This password is generated in MD5
 	const ADDRESS = ''; // Checking address. Can be localhost or IP address
 	const ADD_ONLY = false; // Add only server. Unable to modify or delete
 	const ADMINLEVEL = true; // Activate the admin level configuration
@@ -13,9 +13,9 @@ class AdminServConfig {
 	/********************* OPTIONAL CONFIGURATION *********************/
 
 	/* GENERAL */
-	const TITLE = '3z,.net'; // The comma seperates the color
-	const SUBTITLE = 'Servers Controller'; // if null it's hidden
-	const LOGO = '3z.png'; // if null it's hidden
+	const TITLE = 'AdminServ,Z'; // The comma seperates the color
+	const SUBTITLE = 'For maniaplanet servers'; // if null it's hidden
+	const LOGO = 'logo.png'; // if null it's hidden
 	const DEFAULT_THEME = 'green'; // The first theme to be loaded
 	const DEFAULT_LANGUAGE = 'auto'; // Can be language code (fr, en, etc) or auto = automatic detection
 	const USE_DISPLAYSERV = true; // Show DisplayServ tool on connection page

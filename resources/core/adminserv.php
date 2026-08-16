@@ -1,6 +1,6 @@
 <?php
 define('ADMINSERV_TIMER', false);
-define('ADMINSERV_VERSION', '2.1.2-tm2020');
+define('ADMINSERV_VERSION', '3.0');
 
 /**
  * Helper: true for ManiaPlanet and TM2020 (everything except TmForever)

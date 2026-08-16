@@ -46,7 +46,7 @@
 	}
 	else if( isset($_POST['editMatchset']) && isset($_POST['matchset']) && count($_POST['matchset']) > 0 ){
 		AdminServLogs::add('action', 'Edit matchsettings: '.$_POST['matchset'][0]);
-		// Redirection sur la page de création d'un matchsettings
+		// Redirect to the matchsettings creation page
 		Utils::redirection(false, '?p=maps-creatematchset'.$data['hasDirectory'].'&f='.$_POST['matchset'][0]);
 	}
 	else if( isset($_POST['deleteMatchset']) && isset($_POST['matchset']) && count($_POST['matchset']) > 0 ){

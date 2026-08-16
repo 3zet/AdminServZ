@@ -3,7 +3,7 @@
 	require_once '../class/tmnick.class.php';
 	
 	// ISSET
-	if( isset($_GET['t']) ){ $text = stripslashes($_GET['t']); }else{ $text = null; }
+	if( isset($_GET['t']) ){ $text = stripslashes((string) $_GET['t']); }else{ $text = null; }
 	
 	// DATA
 	$out = null;

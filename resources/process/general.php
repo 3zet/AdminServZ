@@ -108,20 +108,11 @@
 	else if( isset($_POST['ForceScores']) && isset($_POST['ScoreTeamBlue']) && isset($_POST['ScoreTeamRed']) ){
 		$scoreTeamBlue = intval($_POST['ScoreTeamBlue']);
 		$scoreTeamRed = intval($_POST['ScoreTeamRed']);
-		$scores = array(
-			array(
-				'PlayerId' => 0,
-				'Score' => $scoreTeamBlue
-			),
-			array(
-				'PlayerId' => 1,
-				'Score' => $scoreTeamRed
-			)
-		);
+		$scores = [['PlayerId' => 0, 'Score' => $scoreTeamBlue], ['PlayerId' => 1, 'Score' => $scoreTeamRed]];
 		if( !$client->query('ForceScores', $scores, true) ){
 			AdminServ::error();
 		}else{
-			$action = '[Admin] '.Utils::t('The scores have been modified : $00fblue team $fffhas !scoreTeamBlue and $f00red team $fffhas !scoreTeamRed', array('!scoreTeamBlue' => $scoreTeamBlue, '!scoreTeamRed' => $scoreTeamRed));
+			$action = '[Admin] '.Utils::t('The scores have been modified : $00fblue team $fffhas !scoreTeamBlue and $f00red team $fffhas !scoreTeamRed', ['!scoreTeamBlue' => $scoreTeamBlue, '!scoreTeamRed' => $scoreTeamRed]);
 			if( !$client->query('ChatSendServerMessage', $action) ){
 				AdminServ::error();
 			}
@@ -140,15 +131,14 @@
 	}
 	
 	
-	// Info serveur
+	// Server info
 	$data['serverInfo'] = AdminServ::getCurrentServerInfo();
 	$data['isTeamGameMode'] = AdminServ::checkDisplayTeamMode($data['serverInfo']['srv']['gameModeId'], $data['serverInfo']['srv']['gameModeScriptName']);
-	// Si on est en mode équipe, on force l'affichage en mode détail
+	// If we're in team mode, force detail-mode display
 	if($data['isTeamGameMode']){
 		$_SESSION['adminserv']['mode']['general'] = 'detail';
 	}
 	if( defined('IS_RELAY') && IS_RELAY ){
-		// @deprecated $mainServerLogin = AdminServ::getMainServerLoginFromRelay();
 		$data['mainServerLogin'] = null;
 	}
 ?>

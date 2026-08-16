@@ -12,7 +12,7 @@
 		// Server > Server
 		if( isset($_POST['serverToServerAmout']) && isset($_POST['serverToServerLogin']) ){
 			$serverToServerAmout = intval($_POST['serverToServerAmout']);
-			$serverToServerLogin = trim($_POST['serverToServerLogin']);
+			$serverToServerLogin = trim((string) $_POST['serverToServerLogin']);
 			
 			if($serverToServerAmout > 0 && $serverToServerLogin != Utils::t('Server login') ){
 				if( !$client->query('Pay', $serverToServerLogin, $serverToServerAmout, Utils::t('Transfered by AdminServ')) ){
@@ -28,9 +28,9 @@
 		// Server > Player
 		if( isset($_POST['serverToPlayerAmount']) && isset($_POST['serverToPlayerLogin']) ){
 			$serverToPlayerAmount = intval($_POST['serverToPlayerAmount']);
-			$serverToPlayerMessage = trim($_POST['serverToPlayerMessage']);
-			$serverToPlayerLogin = trim($_POST['serverToPlayerLogin']);
-			$serverToPlayerLogin2 = trim($_POST['serverToPlayerLogin2']);
+			$serverToPlayerMessage = trim((string) $_POST['serverToPlayerMessage']);
+			$serverToPlayerLogin = trim((string) $_POST['serverToPlayerLogin']);
+			$serverToPlayerLogin2 = trim((string) $_POST['serverToPlayerLogin2']);
 			
 			if( $serverToPlayerAmount > 0 ){
 				// Message
@@ -56,7 +56,7 @@
 		// Server < Player
 		if( isset($_POST['playerToServerAmount']) && isset($_POST['playerToServerLogin']) ){
 			$playerToServerAmount = intval($_POST['playerToServerAmount']);
-			$playerToServerLogin = trim($_POST['playerToServerLogin']);
+			$playerToServerLogin = trim((string) $_POST['playerToServerLogin']);
 			
 			if( $playerToServerAmount > 0 ){
 				if( !$client->query('SendBill', $playerToServerLogin, $playerToServerAmount, Utils::t('Confirmation of the transfer by AdminServ'), SERVER_LOGIN) ){
@@ -76,7 +76,7 @@
 	/* GET */
 	$client->addCall('GetServerPlanets');
 	if( isset($_SESSION['adminserv']['transfer_billid']) && $_SESSION['adminserv']['transfer_billid'] != null){
-		$client->addCall('GetBillState', array($_SESSION['adminserv']['transfer_billid']) );
+		$client->addCall('GetBillState', [$_SESSION['adminserv']['transfer_billid']] );
 	}
 	
 	if( !$client->multiquery() ){
@@ -98,7 +98,6 @@
 		}
 	}
 	
-	// Players
 	$playerCount = AdminServ::getNbPlayers();
 	$getPlayerListUI = AdminServUI::getPlayerList();
 	

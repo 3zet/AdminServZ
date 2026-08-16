@@ -1,27 +1,20 @@
 <?php
-	// ENREGISTREMENT
+	// SAVE
 	if (isset($_POST['savelevel'])) {
 		// Variables
-		$levelName = Str::replaceSpecialChars( htmlspecialchars(addslashes($_POST['addLevelName'])), false);
+		$levelName = Str::replaceSpecialChars( htmlspecialchars(addslashes((string) $_POST['addLevelName'])), false);
 		$levelType = $_POST['addLevelType'];
-		$levelAccess = array();
+		$levelAccess = [];
 		if ($_POST['selectedAccessSortList']) {
-			$levelAccess = explode(',', $_POST['selectedAccessSortList']);
+			$levelAccess = explode(',', (string) $_POST['selectedAccessSortList']);
 		}
-		$levelPermission = array();
+		$levelPermission = [];
 		if ($_POST['selectedPermissionSortList']) {
-			$levelPermission = explode(',', $_POST['selectedPermissionSortList']);
+			$levelPermission = explode(',', (string) $_POST['selectedPermissionSortList']);
 		}
-		$levelData = array(
-			'name' => $levelName,
-			'adminlevel' => array(
-				'type' => $levelType
-			),
-			'access' => $levelAccess,
-			'permission' => $levelPermission,
-		);
+		$levelData = ['name' => $levelName, 'adminlevel' => ['type' => $levelType], 'access' => $levelAccess, 'permission' => $levelPermission];
 		
-		// Édition
+		// Edit
 		if($args['id'] !== -1){
 			if( ($result = AdminServAdminLevel::saveConfig($levelData, $args['id'])) !== true ){
 				AdminServ::error( Utils::t('Unable to modify the admin level.').' ('.$result.')');
@@ -33,7 +26,7 @@
 				Utils::redirection(false, '?p=config-adminlevel');
 			}
 		}
-		// Ajout
+		// Add
 		else{
 			if( ($result = AdminServAdminLevel::saveConfig($levelData)) !== true ){
 				AdminServ::error( Utils::t('Unable to add the admin level.').' ('.$result.')');
@@ -48,41 +41,19 @@
 	}
 	
 	
-	// LECTURE
+	// READ
 	$defaultAccess = AdminServAdminLevel::getDefaultAccess();
 	$defaultPermission = AdminServAdminLevel::getDefaultPermission();
-	$data = array(
-		'name' => null,
-		'types' => AdminServAdminLevel::getDefaultType(),
-		'adminlevel' => array(
-			'type' => null,
-		),
-		'access' => array(
-			'default' => array(),
-			'selected' => $defaultAccess,
-		),
-		'permission' => array(
-			'default' => array(),
-			'selected' => $defaultPermission,
-		)
-	);
+	$data = ['name' => null, 'types' => AdminServAdminLevel::getDefaultType(), 'adminlevel' => ['type' => null], 'access' => ['default' => [], 'selected' => $defaultAccess], 'permission' => ['default' => [], 'selected' => $defaultPermission]];
 	if($args['id'] !== -1){
 		define('IS_LEVEL_EDITION', true);
 		$data['name'] = AdminServAdminLevel::getName($args['id']);
 		if($data['name']){
 			$levelData = AdminServAdminLevel::getData($data['name']);
 			
-			$data['adminlevel'] = array(
-				'type' => $levelData['adminlevel']['type'],
-			);
-			$data['access'] = array(
-				'default' => array_diff($defaultAccess, $levelData['access']),
-				'selected' => $levelData['access'],
-			);
-			$data['permission'] = array(
-				'default' => array_diff($defaultPermission, $levelData['permission']),
-				'selected' => $levelData['permission'],
-			);
+			$data['adminlevel'] = ['type' => $levelData['adminlevel']['type']];
+			$data['access'] = ['default' => array_diff($defaultAccess, $levelData['access']), 'selected' => $levelData['access']];
+			$data['permission'] = ['default' => array_diff($defaultPermission, $levelData['permission']), 'selected' => $levelData['permission']];
 		}
 	}
 ?>

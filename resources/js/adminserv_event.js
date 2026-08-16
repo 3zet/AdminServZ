@@ -3,11 +3,7 @@ $(document).ready(function(){
 	/**
 	* Global
 	*/
-	$('#theme, #lang').hover(function(){
-		$(this).css('height', $(this).find('ul').height()+'px');
-	}, function(){
-		$(this).css('height', $(this).find('ul li:first-child').height()+'px');
-	});
+	// Theme/lang: handled by settings-popover.js
 	$('#footer-inner a').click(function(event){
 		event.preventDefault();
 		window.open( $(this).attr('href') );
@@ -22,25 +18,25 @@ $(document).ready(function(){
 		* Serveurs
 		*/
 		if( $('body').hasClass('section-config-servers') ){
-			// Clic sur les lignes
+			// Click on lines
 			$('#serverList').on('click', 'tr', function(){
 				if( !$(this).hasClass('no-line') && !$(this).hasClass('table-separation') ){
-					// Si la ligne est déjà sélectionnée, on l'enlève
+					// If the line is already selected, remove it
 					if( $(this).hasClass('selected') ){
 						$('#serverList tr').removeClass('selected');
 						$(this).find('td.checkbox input').prop('checked', false);
 					}
-					// Sinon, on l'ajoute
+					// Otherwise, add it
 					else{
 						$('#serverList tr').removeClass('selected');
 						$(this).addClass('selected').find('td.checkbox input').prop('checked', true);
 					}
 				}
 				
-				// Mise à jour du nb de lignes sélectionnées
+				// Update the selected-lines count
 				$('.cadre').updateNbSelectedLines();
 			});
-			// Supprimer un serveur
+			// Delete a server
 			$('#deleteserver').click(function(){
 				if( !confirm( $(this).data('confirm-text') ) ){
 					return false;
@@ -55,7 +51,7 @@ $(document).ready(function(){
 			});
 		}
 		else if( $('body').hasClass('section-config-serversorder') ){
-			// Tri manuel
+			// Manual sort
 			$('#sortableServersList').sortable({
 				placeholder: 'ui-state-highlight',
 				revert: true,
@@ -76,25 +72,25 @@ $(document).ready(function(){
 			});
 		}
 		else if( $('body').hasClass('section-config-adminlevel') ){
-			// Clic sur les lignes
+			// Click on lines
 			$('#levelList').on('click', 'tr', function(){
 				if( !$(this).hasClass('no-line') && !$(this).hasClass('table-separation') ){
-					// Si la ligne est déjà sélectionnée, on l'enlève
+					// If the line is already selected, remove it
 					if( $(this).hasClass('selected') ){
 						$('#levelList tr').removeClass('selected');
 						$(this).find('td.checkbox input').prop('checked', false);
 					}
-					// Sinon, on l'ajoute
+					// Otherwise, add it
 					else{
 						$('#levelList tr').removeClass('selected');
 						$(this).addClass('selected').find('td.checkbox input').prop('checked', true);
 					}
 				}
 				
-				// Mise à jour du nb de lignes sélectionnées
+				// Update the selected-lines count
 				$('.cadre').updateNbSelectedLines();
 			});
-			// Supprimer un niveau admin
+			// Delete an admin level
 			$('#deletelevel').click(function(){
 				if( !confirm( $(this).data('confirm-text') ) ){
 					return false;
@@ -138,7 +134,7 @@ $(document).ready(function(){
 			});
 		}
 		else if( $('body').hasClass('section-config-levelsorder') ){
-			// Tri manuel
+			// Manual sort
 			$('#sortableLevelsList').sortable({
 				placeholder: 'ui-state-highlight',
 				revert: true,
@@ -177,7 +173,7 @@ $(document).ready(function(){
 			}
 		});
 		
-		// Connexion
+		// Connection
 		$(document).keypress(function(event){
 			if(event.keyCode == 13){
 				$('#connection form').submit();
@@ -189,7 +185,7 @@ $(document).ready(function(){
 	*/
 	else{
 		/**
-		* Nouveau dossier
+		* New folder
 		*/
 		$('#newfolder').click(function(event){
 			event.preventDefault();
@@ -222,7 +218,7 @@ $(document).ready(function(){
 		
 		
 		/**
-		* Option du dossier
+		* Folder option
 		*/
 		$('.path').scrollLeft(1000);
 		$('.folders .option-folder-list h3').click(function(){
@@ -283,7 +279,7 @@ $(document).ready(function(){
 		
 		
 		/**
-		* Scroll doux
+		* Smooth scroll
 		*/
 		$('a[href^="#"]').click(function(event){
 			event.preventDefault();
@@ -295,10 +291,10 @@ $(document).ready(function(){
 		
 		
 		/**
-		* Général
+		* General
 		*/
 		if( $('body').hasClass('section-index') ){
-			// Infos serveur
+			// Server info
 			setInterval(function(){
 				getCurrentServerInfo(getMode(), getCurrentSort() );
 			}, 10000);
@@ -307,35 +303,35 @@ $(document).ready(function(){
 			$('#checkAll').click(function(){
 				$('#playerlist').checkAll( $(this).attr('checked') );
 				
-				// Mise à jour du nb de lignes sélectionnées
+				// Update the selected-lines count
 				$('.cadre.right').updateNbSelectedLines();
 			});
 			
-			// Clic sur les lignes
+			// Click on lines
 			$('#playerlist').on('click', 'tr', function(){
 				if( !$(this).hasClass('no-line') && !$(this).hasClass('table-separation') ){
-					// Si la ligne est déjà sélectionnée, on l'enlève
+					// If the line is already selected, remove it
 					if( $(this).hasClass('selected') ){
 						$(this).removeClass('selected').find('td.checkbox input').prop('checked', false);
 					}
-					// Sinon, on l'ajoute
+					// Otherwise, add it
 					else{
 						$(this).addClass('selected').find('td.checkbox input').prop('checked', true);
 					}
 					
-					// Mise à jour du nb de lignes sélectionnées
+					// Update the selected-lines count
 					$('.cadre.right').updateNbSelectedLines();
 					$('.cadre.right').updateCheckAll( $('#checkAll') );
 				}
 			});
 			
-			// Mode détail
+			// Detail mode
 			$('#detailMode').click(function(event){
 				event.preventDefault();
 				$('#playerlist').setDetailMode();
 			});
 			
-			// Tris
+			// Sorts
 			$('#playerlist table th a').click(function(event){
 				event.preventDefault();
 				$('#playerlist').addClass('loading');
@@ -377,7 +373,7 @@ $(document).ready(function(){
 					}
 				}
 			});
-			// Désactiver le ratio vote
+			// Disable the ratio vote
 			$('#resetCallVoteRatio').click(function(event){
 				event.preventDefault();
 				$(this).fadeOut().attr('hidden', true);
@@ -393,7 +389,7 @@ $(document).ready(function(){
 					$('#ClientInputsMaxLatencyValue').fadeIn('fast').removeAttr('hidden').parent('td').find('.returnDefaultValue').fadeIn('fast').removeAttr('hidden');
 				}
 			});
-			// Revenir à la valeur par défaut
+			// Return to the default value
 			$('#resetClientInputsMaxLarency').click(function(event){
 				event.preventDefault();
 				$(this).fadeOut().attr('hidden', true);
@@ -403,7 +399,7 @@ $(document).ready(function(){
 			});
 			
 			
-			// Gestion des options serveur
+			// Server options management
 			$('.srvopts_importexport input[name="srvoptsImportExport"]').click(function(){
 				var type = $(this).val();
 				
@@ -443,7 +439,7 @@ $(document).ready(function(){
 				}
 			});
 			
-			// Revenir à la valeur par défaut
+			// Return to the default value
 			$('.returnDefaultValue').click(function(event){
 				event.preventDefault();
 				$(this).fadeOut().attr('hidden', true);
@@ -451,7 +447,7 @@ $(document).ready(function(){
 				$(this).parent('td').parent('tr').find('td.next select').fadeIn('fast').find('option').removeAttr('selected').find('option:first').select().removeAttr('hidden');
 			});
 			
-			// Infos équipes
+			// Team info
 			$('#colorPickerTeam1').css('backgroundColor', $('#teamInfo1ColorHex').val());
 			$('#colorPickerTeam1').ColorPicker({
 				color: $('#teamInfo1ColorHex').val(),
@@ -489,13 +485,67 @@ $(document).ready(function(){
 				}
 			});
 			
-			// Script settings
-			$('#getScriptSettings').click(function(event){
-				event.preventDefault();
-				getScriptSettings();
+			// Script Settings -- inline (TM2020): load on page start
+			getScriptSettings();
+
+			// Script Settings -- inline save
+			$(document).on('click', '#inlineScriptSettingsSaveBtn', function(){
+				setScriptSettings();
 			});
-			
-			// Affichage sec -> min
+
+			// Script Manager (TM2020)
+			$('#openScriptManager').click(function(event){
+				event.preventDefault();
+				openScriptManager();
+			});
+
+			// Script Manager — upload button
+			$(document).on('click', '#scriptUploadBtn', function(){
+				scriptUpload_send();
+			});
+
+			// Script Manager -- click on the upload zone
+			$(document).on('click', '#scriptUploadZone', function(){
+				$('#scriptUploadInput').trigger('click');
+			});
+
+			// Script Manager -- drag & drop on the upload zone
+			$(document).on('dragover', '#scriptUploadZone', function(e){
+				e.preventDefault();
+				$(this).addClass('dragover');
+			});
+			$(document).on('dragleave drop', '#scriptUploadZone', function(e){
+				e.preventDefault();
+				$(this).removeClass('dragover');
+				if( e.type === 'drop' ){
+					var files = e.originalEvent.dataTransfer.files;
+					if( files && files.length > 0 ){
+						$('#scriptUploadInput')[0].files = files;
+						$('#scriptUploadZone .script-upload-hint').text(files[0].name);
+					}
+				}
+			});
+
+			// Script Manager -- file change in input
+			$(document).on('change', '#scriptUploadInput', function(){
+				var f = this.files && this.files[0];
+				if( f ){ $('#scriptUploadZone .script-upload-hint').text(f.name); }
+			});
+
+			// Script Manager -- save in editor
+			$(document).on('click', '#scriptEditorSaveBtn', function(){
+				scriptEditor_save();
+			});
+
+			// Script Manager -- Ctrl+S in textarea
+			$(document).on('keydown', '#scriptEditorContent', function(e){
+				if( (e.ctrlKey || e.metaKey) && e.key === 's' ){
+					e.preventDefault();
+					scriptEditor_save();
+				}
+			});
+
+			// Display sec -> min
 			$('#NextTimeAttackLimit, #NextLapsTimeLimit, #hotSeatTimeLimit').click(function(){
 				$(this).parent('td').parent('tr').find('td.preview').html('['+secToMin( $(this).val() )+' min]');
 			});
@@ -514,7 +564,7 @@ $(document).ready(function(){
 			* Create MatchSettings
 			*/
 			if( $('body').hasClass('section-maps-creatematchset') ){
-				// Nom du matchSetting
+				// MatchSetting name
 				$('#matchSettingName').keyup(function(event){
 					var key = event.keyCode;
 					if(key != 13 && key != 37 && key != 39){
@@ -522,13 +572,13 @@ $(document).ready(function(){
 					}
 				});
 				
-				// Importer tout le dossier
+				// Import the whole folder
 				$('#mapImport').click(function(){
 					$('.creatematchset .maps').addClass('loading');
 					matchset_mapImport();
 				});
 				
-				// Faire une sélection
+				// Make a selection
 				$('#mapImportSelection').click(function(){
 					$('.creatematchset .maps').addClass('loading');
 					matchset_mapImportSelection();
@@ -543,33 +593,33 @@ $(document).ready(function(){
 					}
 				});
 				
-				// Clic sur les lignes
+				// Click on lines
 				$('#mapImportSelectionDialog').on('click', 'tr', function(){
-					// Si la ligne est déjà sélectionnée, on l'enlève
+					// If the line is already selected, remove it
 					if( $(this).hasClass('selected') ){
 						$(this).removeClass('selected').find('td.checkbox input').prop('checked', false);
 					}
-					// Sinon, on l'ajoute
+					// Otherwise, add it
 					else{
 						$(this).addClass('selected').find('td.checkbox input').prop('checked', true);
 					}
-					// Mise à jour du CheckAll
+					// Update the CheckAll
 					$('#mapImportSelectionDialog').updateCheckAll( $('#checkAllMapImport') );
 				});
 				
-				// Voir la sélection du matchsettings
+				// View the matchsettings selection
 				$('#mapSelection').click(function(){
 					$('.creatematchset .maps').addClass('loading');
 					matchset_mapSelection();
 				});
 				
-				// Enlever une map de la sélection
+				// Remove a map from the selection
 				$('#mapSelectionDialog').on('click', 'tr a', function(event){
 					event.preventDefault();
 					matchset_mapSelection( parseInt($(this).parent('td').parent('tr')[0].sectionRowIndex) );
 				});
 				
-				// Nom du MatchSettings
+				// MatchSettings name
 				$('#matchSettingName').click(function(){
 					$(this).select();
 				});
@@ -593,15 +643,36 @@ $(document).ready(function(){
 			}
 		}
 		/**
+		* Results (live standings)
+		*/
+		else if( $('body').hasClass('section-results') ){
+			var resultsInterval = setInterval(function(){
+				getResults();
+			}, 5000);
+			
+			// Toggle auto-refresh on status click
+			$('#resultsAutoRefresh').click(function(){
+				var $el = $(this);
+				if(resultsInterval){
+					clearInterval(resultsInterval);
+					resultsInterval = null;
+					$el.text( $el.data('off') );
+				} else {
+					resultsInterval = setInterval(function(){ getResults(); }, 5000);
+					$el.text( $el.data('on') );
+				}
+			});
+		}
+		/**
 		* Chat
 		*/
 		else if( $('body').hasClass('section-chat') ){
 			var hideServerLines = 0;
 			
-			// Clique sur "Masquer les lignes du serveur"
+			// Click on "Hide server lines"
 			$('.title-detail a').click(function(event){
 				event.preventDefault();
-				// Valeur
+				// Value
 				hideServerLines = $(this).data('val');
 				if(hideServerLines == 0){
 					hideServerLines = 1;
@@ -612,17 +683,16 @@ $(document).ready(function(){
 				getChatServerLines(hideServerLines);
 				$(this).data('val', hideServerLines);
 				
-				// Texte
 				var text = $(this).text();
 				$(this).text( $(this).data('txt') ).data('txt', text);
 			});
 			
-			// Affichage toutes les 3s
+			// Display every 3s
 			setInterval(function(){
 				getChatServerLines(hideServerLines);
 			}, 3000);
 			
-			// Ajout d'un message
+			// Add a message
 			$('#chatNickname, #chatMessage').click(function(){
 				var text = $(this).val();
 				var defaultText = $(this).data('default-value');
@@ -659,7 +729,7 @@ $(document).ready(function(){
 		*/
 		else if( $('body').hasClass('section-maps-list') ){
 			var mapList = $('#maplist');
-			// Mise à jour de la liste
+			// Update the list
 			setInterval(function(){
 				getMapList(getMode());
 			}, 10000);
@@ -671,29 +741,29 @@ $(document).ready(function(){
 					mapList.find('tr.current').removeClass('selected');
 				}
 				
-				// Mise à jour du nb de lignes sélectionnées
+				// Update the selected-lines count
 				$('.maps .list').updateNbSelectedLines();
 			});
 			
-			// Clic sur les lignes
+			// Click on lines
 			mapList.on('click', 'tr', function(){
 				if( !$(this).hasClass('current') && !$(this).hasClass('no-line') && !$(this).hasClass('table-separation') ){
-					// Si la ligne est déjà sélectionnée, on l'enlève
+					// If the line is already selected, remove it
 					if( $(this).hasClass('selected') ){
 						$(this).removeClass('selected').find('td.checkbox input').prop('checked', false);
 					}
-					// Sinon, on l'ajoute
+					// Otherwise, add it
 					else{
 						$(this).addClass('selected').find('td.checkbox input').prop('checked', true);
 					}
 					
-					// Mise à jour du nb de lignes sélectionnées
+					// Update the selected-lines count
 					$('.maps .list').updateNbSelectedLines();
 					$('.maps .list').updateCheckAll( $('#checkAll') );
 				}
 			});
 			
-			// Mode détail
+			// Detail mode
 			$('#detailMode').click(function(event){
 				event.preventDefault();
 				mapList.setDetailMode();
@@ -706,7 +776,7 @@ $(document).ready(function(){
 			//Upload
 			var uploader = initializeUploader();
 			
-			// Mode de transfert
+			// Transfer mode
 			$('.transferMode li').click(function(){
 				$('.transferMode li').removeClass('selected');
 				$('.options-checkbox li')
@@ -740,27 +810,27 @@ $(document).ready(function(){
 			$('#checkAll').click(function(){
 				$('#maplist').checkAll( $(this).prop('checked') );
 				
-				// Mise à jour du nb de lignes sélectionnées
+				// Update the selected-lines count
 				$('.maps .local').updateNbSelectedLines();
 			});
 			
-			// Clic sur les lignes
+			// Click on lines
 			$('#maplist').on('click', 'tr', function(){
 				if( !$(this).hasClass('no-line') && !$(this).hasClass('table-separation') ){
-					// Si la ligne est déjà sélectionnée, on l'enlève
+					// If the line is already selected, remove it
 					if( $(this).hasClass('selected') ){
 						$(this).removeClass('selected').find('td.checkbox input').prop('checked', false);
 					}
-					// Sinon, on l'ajoute
+					// Otherwise, add it
 					else{
 						$(this).addClass('selected').find('td.checkbox input').prop('checked', true);
 					}
 					
-					// Mise à jour du nb de lignes sélectionnées
+					// Update the selected-lines count
 					$('.maps .local').updateNbSelectedLines();
 					$('.maps .local').updateCheckAll( $('#checkAll') );
 					
-					// Vérifie s'il reste des formulaires ouvert et les ferme quand il y 0 lignes sélectionnées
+					// Check if any forms are still open and close them when 0 lines are selected
 					if( $('#maplist tr.selected').length == 0 ){
 						if( $('.selected-files-label').hasClass('optHover') ){
 							slideUpRenameForm();
@@ -770,7 +840,7 @@ $(document).ready(function(){
 				}
 			});
 			
-			// Renommer
+			// Rename
 			$('#renameMap').click(function(){
 				if( !$('#maplist tr.selected').hasClass('onserver') ){
 					if( $(this).hasClass('active') ){
@@ -794,7 +864,7 @@ $(document).ready(function(){
 				slideUpRenameForm();
 			});
 			
-			// Déplacer
+			// Move
 			$('#moveMap').click(function(){
 				if( !$('#maplist tr.selected').hasClass('onserver') ){
 					if( $(this).hasClass('active') ){
@@ -818,7 +888,7 @@ $(document).ready(function(){
 				slideUpMoveForm();
 			});
 			
-			// Supprimer
+			// Delete
 			$('#deleteMap').click(function(){
 				if( !$('#maplist tr.selected').hasClass('onserver') ){
 					return confirm( $(this).data('confirm') );
@@ -840,27 +910,27 @@ $(document).ready(function(){
 			$('input#checkAll').click(function(){
 				$('#matchsetlist').checkAll( $(this).prop('checked') );
 				
-				// Mise à jour du nb de lignes sélectionnées
+				// Update the selected-lines count
 				$('.maps .matchset').updateNbSelectedLines();
 			});
 			
-			// Clic sur les lignes
+			// Click on lines
 			$('#matchsetlist').on('click', 'tr', function(){
 				if( !$(this).hasClass('no-line') && !$(this).hasClass('table-separation') ){
-					// Si la ligne est déjà sélectionnée, on l'enlève
+					// If the line is already selected, remove it
 					if( $(this).hasClass('selected') ){
 						$(this).removeClass('selected').find('td.checkbox input').prop('checked', false);
 					}
-					// Sinon, on l'ajoute
+					// Otherwise, add it
 					else{
 						$(this).addClass('selected').find('td.checkbox input').prop('checked', true);
 					}
 					
-					// Mise à jour du nb de lignes sélectionnées
+					// Update the selected-lines count
 					$('.maps .matchset').updateNbSelectedLines();
 					$('.maps .matchset').updateCheckAll( $('input#checkAll') );
 					
-					// Édition si une seule ligne sélectionné
+					// Edit if a single line is selected
 					if( $('.selected-files-count').text().replace('(', '').replace(')', '') > 1 ){
 						$('#editMatchset').attr('hidden', true);
 					}
@@ -876,14 +946,14 @@ $(document).ready(function(){
 		* Maps-order
 		*/
 		else if( $('body').hasClass('section-maps-order') ){
-			// Tri automatique
+			// Automatic sort
 			$('.autoSortMode li').click(function(){
 				$('#sortableMapList').addClass('loading');
 				$(this).children('input').prop('checked', true);
 				$('.autoSortMode li').removeClass('selected').find('span.ui-icon').removeClass('active');
 				$(this).addClass('ui-state-default selected').find('.icon .ui-icon-arrowthick-1-n').addClass('active');
 				
-				// Tri
+				// Sort
 				setMapsOrderSort($(this).children('input').val(), 'asc');
 			});
 			$('.autoSortMode li span.ui-icon').click(function(){
@@ -899,13 +969,12 @@ $(document).ready(function(){
 					var order = 'desc';
 				}
 				
-				// Tri
 				setMapsOrderSort($(this).parent('.icon').parent('li').children('input').val(), order);
 				
 				return false;
 			});
 			
-			// Tri manuel
+			// Manual sort
 			$('#sortableMapList').sortable({
 				placeholder: 'ui-state-highlight',
 				revert: true,
@@ -929,7 +998,6 @@ $(document).ready(function(){
 		* Guest-Ban
 		*/
 		else if( $('body').hasClass('section-guestban') ){
-			// CleanList
 			$('a.cleanList').click(function(){
 				var out = false;
 				var lines = $(this).parents('.title-detail').parent('div').find('tbody tr:not(.no-line)');
@@ -966,41 +1034,41 @@ $(document).ready(function(){
 				$('#playlists').updateNbSelectedLines();
 			});
 			
-			// Clic sur les lignes
+			// Click on lines
 			$('#banlist, #blacklist, #guestlist, #ignorelist').on('click', 'tr', function(){
 				if( !$(this).hasClass('no-line') && !$(this).hasClass('table-separation') ){
-					// Si la ligne est déjà sélectionnée, on l'enlève
+					// If the line is already selected, remove it
 					if( $(this).hasClass('selected') ){
 						$(this).removeClass('selected').find('td.checkbox input').prop('checked', false);
 					}
-					// Sinon, on l'ajoute
+					// Otherwise, add it
 					else{
 						$(this).addClass('selected').find('td.checkbox input').prop('checked', true);
 					}
 					
-					// Mise à jour du nb de lignes sélectionnées
+					// Update the selected-lines count
 					$('.cadre.left').updateNbSelectedLines();
 					$('.cadre.left').updateCheckAll( $(this).parent('tbody').parent('table').parent('div').find('input[type=checkbox]') );
 				}
 			});
 			$('#playlists').on('click', 'tr', function(){
 				if( !$(this).hasClass('no-line') && !$(this).hasClass('table-separation') ){
-					// Si la ligne est déjà sélectionnée, on l'enlève
+					// If the line is already selected, remove it
 					if( $(this).hasClass('selected') ){
 						$(this).removeClass('selected').find('td.checkbox input').prop('checked', false);
 					}
-					// Sinon, on l'ajoute
+					// Otherwise, add it
 					else{
 						$(this).addClass('selected').find('td.checkbox input').prop('checked', true);
 					}
 					
-					// Mise à jour du nb de lignes sélectionnées
+					// Update the selected-lines count
 					$('#playlists').updateNbSelectedLines();
 					$('#playlists').updateCheckAll( $('#playlists #checkAllPlaylists') );
 				}
 			});
 			
-			// Ajouter
+			// Add
 			$('#addPlayerList').change(function(){
 				if( $(this).val() == 'more' ){
 					$(this).hide().attr('hidden', true);
@@ -1018,7 +1086,7 @@ $(document).ready(function(){
 				}
 			});
 			
-			// Créer une playlist
+			// Create a playlist
 			$('#clickNewPlaylist').click(function(event){
 				event.preventDefault();
 				var selector = $('#form-new-playlist');

@@ -1,23 +1,23 @@
 <?php
 
 /**
-* Classe pour la gestion de la configuration serveur
+* Class for server config management
 */
 class AdminServServerConfig {
 	
 	/**
-	* Constantes
+	* Constants
 	*/
-	private static $CONFIG_PATH = './config/';
-	private static $CONFIG_FILENAME = 'servers.cfg.php';
-	private static $CONFIG_START_TEMPLATE = "<?php\nclass ServerConfig {\n\tpublic static \$SERVERS = array(\n\t\t/********************* SERVER CONFIGURATION *********************/\n\t\t\n";
-	private static $CONFIG_END_TEMPLATE =  "\t);\n}\n?>";
+	private static string $CONFIG_PATH = './config/';
+	private static string $CONFIG_FILENAME = 'servers.cfg.php';
+	private static string $CONFIG_START_TEMPLATE = "<?php\nclass ServerConfig {\n\tpublic static \$SERVERS = array(\n\t\t/********************* SERVER CONFIGURATION *********************/\n\t\t\n";
+	private static string $CONFIG_END_TEMPLATE =  "\t);\n}\n?>";
 	
 	
 	/**
-	* Détermine si il y a au moins un serveur disponible
+	* Determine if at least one server is available
 	*
-	* @param string $serverName -> Tester si le serveur est présent
+	* @param string $serverName -> Test if the server exists
 	* @return bool
 	*/
 	public static function hasServer($serverName = null){
@@ -46,9 +46,9 @@ class AdminServServerConfig {
 	
 	
 	/**
-	* Récupère les données d'un serveur
+	* Get a server's data
 	*
-	* @param string $serverName -> Le nom du serveur dans la config
+	* @param string $serverName -> The server name in the config
 	* @return array
 	*/
 	public static function getServer($serverName){
@@ -71,17 +71,16 @@ class AdminServServerConfig {
 	
 	
 	/**
-	* Retourne l'identifiant du serveur dans la config
-	*
-	* @param  string $serverName -> Le nom du serveur dans la config
-	* @return int
-	*/
-	public static function getServerId($serverName){
+     * Return the server's identifier in the config
+     *
+     * @param  string $serverName -> The server name in the config
+     */
+    public static function getServerId($serverName): int{
 		$id = 0;
 		$servers = ServerConfig::$SERVERS;
 		$countServers = count($servers);
 		
-		// On cherche la position du serveur à partir de son nom
+		// Look for the server's position from its name
 		if( $countServers > 0 ){
 			foreach($servers as $server_name => $server_values){
 				if($server_name == $serverName){
@@ -93,7 +92,7 @@ class AdminServServerConfig {
 			}
 		}
 		
-		// Si l'id = le nb total de serveur -> pas trouvé
+		// If id = total number of servers -> not found
 		if($id == $countServers ){
 			return -1;
 		}
@@ -104,9 +103,9 @@ class AdminServServerConfig {
 	
 	
 	/**
-	* Retourne le nom du serveur dans la config
+	* Return the server name in the config
 	*
-	* @param  int $serverId -> L'id du serveur dans la config
+	* @param  int $serverId -> The server's id in the config
 	* @return string
 	*/
 	public static function getServerName($serverId){
@@ -131,11 +130,11 @@ class AdminServServerConfig {
 	
 	
 	/**
-	* Créer le template d'un serveur
+	* Create the server template
 	*
 	* @param array $serverData -> assoc array(name, address, port, mapsbasepath, matchsettings, adminlevel => array(SuperAdmin, Admin, User));
 	*/
-	public static function getServerTemplate($serverData){
+	public static function getServerTemplate(array $serverData): string{
 		$out = "\t\t'".$serverData['name']."' => array(\n"
 			."\t\t\t'address'\t\t=> '".$serverData['address']."',\n"
 			."\t\t\t'port'\t\t\t=> ".$serverData['port'].",\n"
@@ -148,7 +147,7 @@ class AdminServServerConfig {
 			foreach($serverData['adminlevel'] as $admLvlId => $admLvlValue){
 				$out .= "'$admLvlId' => ";
 				if( is_array($serverData['adminlevel'][$admLvlId]) ){
-					$out .= "'".implode("', '", str_replace(' ', '', $serverData['adminlevel'][$admLvlId]))."'";
+					$out .= "array('".implode("', '", str_replace(' ', '', $serverData['adminlevel'][$admLvlId]))."')";
 				}
 				else{
 					$out .= "'".$serverData['adminlevel'][$admLvlId]."'";
@@ -159,28 +158,27 @@ class AdminServServerConfig {
 				}
 				$adminlevelId++;
 			}
-		$out .= ")\n\t\t),\n";
 		
-		return $out;
+		return $out . ")\n\t\t),\n";
 	}
 	
 	
 	/**
-	* Sauvegarde le mot de passe de la configuration serveur
+	* Save the server config password
 	*
-	* @param string $filename -> Le chemin vers le fichier de config
-	* @param string $password -> Le mot de passe à écrire
+	* @param string $filename -> Path to the config file
+	* @param string $password -> The password to write
 	* @return true or text error
 	*/
 	public static function savePasswordConfig($filename, $password){
 		$out = false;
 		$seek = null;
 		
-		// Récupération du pointeur
+		// Retrieve pointer
 		$search = 'const PASSWORD = \'';
 		$seek = File::getSeekFromString($filename, $search, true);
 		
-		// Écriture dans le fichier
+		// Write to file
 		if($seek !== null){
 			if( ($result = File::saveAtSeek($filename, $password, $seek)) !== true ){
 				$out = $result;
@@ -195,51 +193,42 @@ class AdminServServerConfig {
 	
 	
 	/**
-	* Sauvegarde le fichier de configuration des serveurs
+	* Save the servers config file
 	*
 	* @param array $serverData -> assoc array(name, address, port, matchsettings, adminlevel => array(SuperAdmin, Admin, User));
-	* @param int   $editServer -> Id du serveur à éditer
-	* @param array $serverList -> Liste des serveurs de la config
+	* @param int   $editServer -> Id of the server to edit
+	* @param array $serverList -> List of servers from the config
 	* @return bool or string error
 	*/
-	public static function saveServerConfig($serverData = array(), $editServer = -1, $serverList = array() ){
-		// Liste des serveurs
+	public static function saveServerConfig(array $serverData = [], $editServer = -1, $serverList = [] ){
+		// List of servers
 		if( isset($serverList) && count($serverList) > 0 ){
 			$servers = $serverList;
 		}else{
 			$servers = ServerConfig::$SERVERS;
 		}
 		
-		// Template
 		$fileTemplate = self::$CONFIG_START_TEMPLATE;
 		$i = 0;
 		foreach($servers as $serverName => $serverValues){
-			// Édition
+			// Edit
 			if($i == $editServer && isset($serverData) && count($serverData) > 0 ){
 				$fileTemplate .= self::getServerTemplate($serverData);
 			}
 			else{
-				// Récupération des données des serveurs existant
-				$getServerValues = array(
-					'name' => $serverName,
-					'address' => $serverValues['address'],
-					'port' => $serverValues['port'],
-                    'ds_pw' => $serverValues['ds_pw'],
-					'mapsbasepath' => isset($serverValues['mapsbasepath']) ? $serverValues['mapsbasepath'] : '',
-					'matchsettings' => $serverValues['matchsettings'],
-					'adminlevel' => array()
-				);
+				// Retrieve existing server data
+				$getServerValues = ['name' => $serverName, 'address' => $serverValues['address'], 'port' => $serverValues['port'], 'ds_pw' => $serverValues['ds_pw'], 'mapsbasepath' => $serverValues['mapsbasepath'] ?? '', 'matchsettings' => $serverValues['matchsettings'], 'adminlevel' => []];
 				foreach($serverValues['adminlevel'] as $admLvlId => $admLvlValue){
 					$getServerValues['adminlevel'][$admLvlId] = $admLvlValue;
 				}
 				
-				// Ajout des données au template
+				// Add data to the template
 				$fileTemplate .= self::getServerTemplate($getServerValues);
 			}
 			$i++;
 		}
 		
-		// Ajout d'un nouveau
+		// Add a new one
 		if($editServer === -1 && isset($serverData) && count($serverData) > 0 ){
 			if( self::getServerId($serverData['name']) === -1 ){
 				$fileTemplate .= self::getServerTemplate($serverData);
@@ -250,7 +239,6 @@ class AdminServServerConfig {
 		}
 		$fileTemplate .= self::$CONFIG_END_TEMPLATE;
 		
-		// Enregistrement
 		return File::save(self::$CONFIG_PATH.self::$CONFIG_FILENAME, $fileTemplate, false);
 	}
 }

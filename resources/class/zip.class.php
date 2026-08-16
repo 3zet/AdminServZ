@@ -2,15 +2,15 @@
 /**
 * Class Zip
 *
-* Méthodes de traitement pour les archives ZIP
+* Processing methods for ZIP archives
 */
 class Zip extends ZipArchive {
 	
 	/**
-	* Créer une archive ZIP
+	* Create a ZIP archive
 	*
-	* @param string $filename -> Nom de l'archive
-	* @param array  $struct   -> Tableau des données de l'archive :
+	* @param string $filename -> Archive name
+	* @param array  $struct   -> Array of archive data:
 	*  $struct = array(
 	*    'dirname' => array(
 	*       'dirname2' => array(
@@ -20,7 +20,7 @@ class Zip extends ZipArchive {
 	*     ),
 	*     'file1.txt'
 	*  );
-	* @return true si réussi, sinon false
+	* @return true if successful, otherwise false
 	*/
 	public function create($filename, $struct, &$errorMsg = null){
 		$out = false;
@@ -37,11 +37,11 @@ class Zip extends ZipArchive {
 	
 	
 	/**
-	* Ajoute les données de la structure dans une archive ZIP
+	* Add the structure's data into a ZIP archive
 	*
-	* @param string $filename -> Nom de l'archive
-	* @param array  $struct   -> Tableau des données de l'archive
-	* @return true si réussi, sinon false
+	* @param string $filename -> Archive name
+	* @param array  $struct   -> Array of archive data
+	* @return true if successful, otherwise false
 	*/
 	public function add($filename, $struct, &$errorMsg = null){
 		$out = false;
@@ -61,10 +61,10 @@ class Zip extends ZipArchive {
 	
 	
 	/**
-	* Extrait une archive dans un dossier
+	* Extract an archive into a folder
 	*
-	* @param string $filename -> Chemin de l'archive
-	* @param string $path     -> Chemin d'extraction
+	* @param string $filename -> Archive path
+	* @param string $path     -> Extraction path
 	*/
 	public function extract($filename, $path, &$errorMsg = null){
 		$out = false;
@@ -85,23 +85,22 @@ class Zip extends ZipArchive {
 	
 	
 	/**
-	* Liste et créer la structure des données
+	* List and build the data structure
 	*
-	* @param object $object -> L'instance de ZipArchive
-	* @param array  $struct -> Tableau des données de l'archive
-	* @param string $path   -> Le chemin à partir de la racine de la structure
+	* @param object $object -> The ZipArchive instance
+	* @param array  $struct -> Array of archive data
+	* @param string $path   -> Path from the root of the structure
 	*/
-	private function _checkStructure($object, $struct, $path = null){
-		if( count($struct) > 0 ){
-			foreach($struct as $folder => $file){
+	private function _checkStructure($object, array $struct, $path = null): void{
+		foreach($struct as $folder => $file){
 				if( is_string($folder) ){
 					$object->addEmptyDir($path.$folder);
 					self::_checkStructure($object, $struct[$folder], $path.$folder.'/');
 				}
 				else{
 					$filename = null;
-					if( strstr($file, '/') ){
-						$pathinfo = pathinfo($file);
+					if( strstr((string) $file, '/') ){
+						$pathinfo = pathinfo((string) $file);
 						$filename = $pathinfo['basename'];
 					}
 					
@@ -112,22 +111,21 @@ class Zip extends ZipArchive {
 					}
 				}
 			}
-		}
 	}
 	
 	
 	/**
-	* Retourne le message d'erreur de ZipArchive correspondant au code erreur
+	* Return the ZipArchive error message matching the error code
 	*
-	* @param int $errorCode -> Le code d'erreur
+	* @param int $errorCode -> The error code
 	* @return string
 	*/
-	private function _getErrorMsg($errorCode){
+	private function _getErrorMsg(int|array|float|string|bool|null $errorCode): ?string{
 		$out = null;
 		
 		switch($errorCode){
 			case ZIPARCHIVE::ER_EXISTS:
-				$out = 'Le fichier existe déjà.';
+				$out = 'The file already exists.';
 				break;
 			case ZIPARCHIVE::ER_INCONS:
 				$out = 'L\'archive ZIP est inconsistante.';
@@ -136,7 +134,7 @@ class Zip extends ZipArchive {
 				$out = 'Argument invalide.';
 				break;
 			case ZIPARCHIVE::ER_MEMORY:
-				$out = 'Erreur de mémoire.';
+				$out = 'Memory error.';
 				break;
 			case ZIPARCHIVE::ER_NOENT:
 				$out = 'Le fichier n\'existe pas.';

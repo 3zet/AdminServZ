@@ -12,7 +12,7 @@
 	AdminServ::getClass();
 	
 	// DATA
-	$out = array();
+	$out = [];
 	if( AdminServ::initialize() ){
 		$path = AdminServ::getMapsDirectoryPath();
 		$out = Folder::getArborescence($path, AdminServConfig::$MAPS_HIDDEN_FOLDERS, substr_count($path, '/'));

@@ -15,7 +15,7 @@
 	// DATA
 	$out = null;
 	if($sort != null && $list != null){
-		$list = json_decode($list, true);
+		$list = json_decode((string) $list, true);
 		
 		switch($sort){
 			case 'name':
@@ -34,11 +34,7 @@
 		if($order == 'desc'){
 			$list['lst'] = array_reverse($list['lst']);
 		}
-		$out = array(
-			'cid' => $list['cid'],
-			'lst' => $list['lst'],
-			'nbm' => $list['nbm'],
-		);
+		$out = ['cid' => $list['cid'], 'lst' => $list['lst'], 'nbm' => $list['nbm']];
 	}
 	
 	// OUT

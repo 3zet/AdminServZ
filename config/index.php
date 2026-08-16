@@ -9,18 +9,18 @@
 	AdminServ::getClass();
 	AdminServUI::lang();
 	
-	// On vérifie qu'une configuration existe
+	// Check that a config exists
 	if( class_exists('ServerConfig') ){
-		// Si on autorise la configuration en ligne
+		// If online configuration is allowed
 		if( OnlineConfig::ACTIVATE === true ){
-			// Si il y a déjà un serveur configuré
+			// If a server is already configured
 			if( AdminServServerConfig::hasServer() ){
 				$allowRedirect = false;
-				if( OnlineConfig::ADDRESS == null && OnlineConfig::PASSWORD == null ){
+				if( OnlineConfig::PASSWORD == null ){
 					$allowRedirect = true;
 				}
 				else{
-					// Test adresse IP
+					// Test adress IP
 					if(OnlineConfig::ADDRESS != null){
 						if(OnlineConfig::ADDRESS === 'localhost'){
 							if( Utils::isLocalhostIP() ){
@@ -40,9 +40,8 @@
 						}
 					}
 					// Test password
-					if(OnlineConfig::PASSWORD != null){
-						if( isset($_POST['configcheckpassword']) ){
-							if(md5($_POST['checkPassword']) === OnlineConfig::PASSWORD){
+					if( isset($_POST['configcheckpassword']) ){
+							if(md5((string) $_POST['checkPassword']) === OnlineConfig::PASSWORD){
 								$allowRedirect = true;
 							}
 							else{
@@ -50,7 +49,7 @@
 							}
 						}
 						else{
-							// Suppression des sessions existante et démarrage d'une nouvelle
+							// Remove existing sessions and start a new one
 							session_unset();
 							session_destroy();
 							session_start();
@@ -59,17 +58,16 @@
 							$_SESSION['adminserv']['check_password'] = true;
 							Utils::redirection(false, '..');
 						}
-					}
 				}
 			
-				// Redirection vers les pages
+				// Redirect to the pages
 				if($allowRedirect){
 					session_unset();
 					session_destroy();
 					session_start();
 					$_SESSION['adminserv']['allow_config_servers'] = true;
 					
-					if( OnlineConfig::ADD_ONLY === true || AdminServServerConfig::hasServer() === false ){
+					if( AdminServServerConfig::hasServer() === false ){
 						Utils::redirection(false, '../?p=config-addserver');
 					}
 					else{
@@ -81,10 +79,10 @@
 					Utils::redirection(false, '..');
 				}
 			}
-			// Sinon on créer le mot de passe
+			// Otherwise create the password
 			else{
 				if( isset($_POST['configsavepassword']) ){
-					$password = md5($_POST['savePassword']);
+					$password = md5((string) $_POST['savePassword']);
 					if( ($result = AdminServServerConfig::savePasswordConfig('./adminserv.cfg.php', $password)) !== true ){
 						AdminServ::error( Utils::t('Unable to save password.').' ('.$result.')');
 						Utils::redirection(false, '..');
@@ -98,7 +96,7 @@
 					}
 				}
 				else{
-					// Création du mot de passe
+					// Create the password
 					$_SESSION['adminserv']['get_password'] = true;
 					Utils::redirection(false, '..');
 				}
@@ -110,6 +108,6 @@
 		}
 	}
 	else{
-		Utils::redirection(false, '../?error='.urlencode( Utils::t('The servers configuration file isn\'t recognized by AdminServ.') ) );
+		Utils::redirection(false, '../?error='.urlencode( (string) Utils::t('The servers configuration file isn\'t recognized by AdminServ.') ) );
 	}
 ?>

@@ -1,7 +1,19 @@
 <?php
+    ob_start();
     // FIX FOR MAPBROWSER BY TOFFE
-    foreach ($_GET as $key => $value) { if(stristr($value, "../")) $_GET[$key] = str_replace("../", "", $value); }
-    foreach ($_POST as $key => $value) { if(stristr($value, "../")) $_POST[$key] = str_replace("../", "", $value); }
+    function adminserv_strip_dotdot(&$value){
+        if( is_array($value) ){
+            foreach($value as $k => &$v){ adminserv_strip_dotdot($v); }
+            unset($v);
+        }
+        elseif( is_string($value) && stristr($value, "../") ){
+            $value = str_replace("../", "", $value);
+        }
+    }
+    foreach ($_GET as $key => &$value) { adminserv_strip_dotdot($value); }
+    unset($value);
+    foreach ($_POST as $key => &$value) { adminserv_strip_dotdot($value); }
+    unset($value);
 	// INCLUDES
 	session_start();
 	require_once 'config/adminserv.cfg.php';
@@ -26,16 +38,14 @@
 	
 	// THEME
 	define('USER_THEME', AdminServUI::theme($args['theme']));
+	// DARK MODE body class
+	$GLOBALS['body_class'] = (str_ends_with(USER_THEME, '-dark') ? 'dark' : '');
 	
 	// LANG
 	define('USER_LANG', AdminServUI::lang($args['lang']));
 	
-	// VÉRIFICATION DES DROITS
-	$checkRightsList = array(
-		'./config/adminserv.cfg.php' => 666,
-		'./config/servers.cfg.php' => 666,
-		'./config/adminlevel.cfg.php' => 666,
-	);
+	// PERMISSION CHECK
+	$checkRightsList = ['./config/adminserv.cfg.php' => 666, './config/servers.cfg.php' => 666, './config/adminlevel.cfg.php' => 666];
 	if( in_array(true, AdminServConfig::$LOGS) ){
 		if (!Utils::isWinServer()) {
 			$checkRightsList['./logs/'] = 777;

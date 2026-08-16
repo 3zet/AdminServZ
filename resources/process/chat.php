@@ -1,21 +1,11 @@
 <?php
-	// LECTURE
+	// READ
 	$data['serverLines'] = AdminServ::getChatServerLines();
 	
 	$lastNicknameUsed = Utils::readCookieData('adminserv_user', 2);
 	$data['nickname'] = ($lastNicknameUsed != null) ? $lastNicknameUsed : Utils::t('Nickname');
 	
-	$colorList = array(
-		'$ff0' => Utils::t('Color'),
-		'$000' => Utils::t('Black'),
-		'$f00' => Utils::t('Red'),
-		'$0f0' => Utils::t('Green'),
-		'$00f' => Utils::t('Blue'),
-		'$f80' => Utils::t('Orange'),
-		'$f0f' => Utils::t('Pink'),
-		'$888' => Utils::t('Grey'),
-		'$fff' => Utils::t('White')
-	);
+	$colorList = ['$ff0' => Utils::t('Color'), '$000' => Utils::t('Black'), '$f00' => Utils::t('Red'), '$0f0' => Utils::t('Green'), '$00f' => Utils::t('Blue'), '$f80' => Utils::t('Orange'), '$f0f' => Utils::t('Pink'), '$888' => Utils::t('Grey'), '$fff' => Utils::t('White')];
 	$data['colorOptions'] = null;
 	$lastColorUsed = Utils::readCookieData('adminserv_user', 3);
 	foreach($colorList as $colorCode => $colorName){

@@ -1,14 +1,13 @@
 <?php
 class AdminLevelConfig {
-	public static $ADMINLEVELS = array(
+	public static $ADMINLEVELS = [
 		/********************* ADMINLEVELS CONFIGURATION *********************/
-		
-		'SuperAdmin' => array(
-			'adminlevel' => array(
-				'type' => 'SuperAdmin',
-			),
-			'access' => array(
+
+		'SuperAdmin' => [
+			'adminlevel' => ['type' => 'SuperAdmin'],
+			'access' => [
 				'server_options',
+				'results',
 				'game_infos',
 				'chat',
 				'maps_list',
@@ -20,8 +19,8 @@ class AdminLevelConfig {
 				'link_access_server',
 				'plugins_list',
 				'guest_ban',
-			),
-			'permission' => array(
+			],
+			'permission' => [
 				'speed_admin',
 				'switch_server',
 				'player_kick',
@@ -75,14 +74,13 @@ class AdminLevelConfig {
 				'guestban_playlist_save',
 				'guestban_playlist_load',
 				'guestban_playlist_delete',
-			),
-		),
-		'Admin' => array(
-			'adminlevel' => array(
-				'type' => 'Admin',
-			),
-			'access' => array(
+			],
+		],
+		'Admin' => [
+			'adminlevel' => ['type' => 'Admin'],
+			'access' => [
 				'server_options',
+				'results',
 				'game_infos',
 				'chat',
 				'maps_list',
@@ -94,8 +92,8 @@ class AdminLevelConfig {
 				'link_access_server',
 				'plugins_list',
 				'guest_ban',
-			),
-			'permission' => array(
+			],
+			'permission' => [
 				'speed_admin',
 				'switch_server',
 				'player_kick',
@@ -141,20 +139,13 @@ class AdminLevelConfig {
 				'guestban_playlist_new',
 				'guestban_playlist_save',
 				'guestban_playlist_load',
-			),
-		),
-		'User' => array(
-			'adminlevel' => array(
-				'type' => 'User',
-			),
-			'access' => array(
-				'chat',
-				'maps_list',
-				'link_access_server',
-			),
-			'permission' => array(
-			),
-		),
-	);
+			],
+		],
+		'User' => [
+			'adminlevel' => ['type' => 'User'],
+			'access' => ['results', 'chat', 'maps_list', 'link_access_server'],
+			'permission' => [],
+		],
+	];
 }
 ?>

@@ -1,0 +1,631 @@
+/* ============================================================
+   AdminServ — dark.css
+   Activated by the "dark" class on <body>.
+   Overrides global.css for dark theme variants.
+   ============================================================ */
+
+/* ---- Base ------------------------------------------------ */
+body.dark {
+	color: #bbb;
+	background: #111;
+}
+body.dark a {
+	color: inherit;
+}
+
+/* ---- Header ---------------------------------------------- */
+body.dark header {
+	background: #1a1a1a;
+	border-bottom: 1px solid #2a2a2a;
+}
+body.dark #header-color-line {
+	/* height 3px z global.css */
+	opacity: .8;
+}
+
+body.dark #title {
+	color: #ccc;
+}
+body.dark #subtitle {
+	color: #666;
+}
+body.dark .logo-title a:hover #title {
+	color: #eee;
+}
+body.dark .speed-admin ul {
+	background: #1a1a1a;
+	border-color: #2a2a2a;
+}
+
+body.dark #switchServerList {
+	color: #aaa;
+	background: #222;
+	border-color: #3a3a3a;
+	box-shadow: none;
+}
+body.dark #switchServerList:hover {
+	background: #2a2a2a;
+}
+body.dark #error {
+	background-color: #6a1810;
+	color: #f0b0b0;
+}
+body.dark #info {
+	background-color: #38380e;
+	color: #ddd;
+}
+
+/* ---- Nawigacja ------------------------------------------- */
+body.dark .horizontal-nav,
+body.dark #connection {
+	background: #111;
+}
+body.dark #connection-inner,
+body.dark .menu-principal {
+	background: #181818;
+	border-color: #2a2a2a;
+}
+body.dark .button.light {
+	color: #aaa;
+	background-color: #252525;
+	border-color: #3a3a3a;
+}
+body.dark .button.light:hover,
+body.dark .button.light.active {
+	color: #fff;
+	background-color: #383838;
+	border-color: #555;
+}
+/* In title-detail (bar above the table) -- light text on dark background */
+body.dark .title-detail .button.light,
+body.dark .title-detail a {
+	color: #bbb;
+}
+body.dark .title-detail .button.light:hover,
+body.dark .title-detail a:hover {
+	color: #fff;
+}
+body.dark .button.dark {
+	color: #e8e8e8;
+	background-color: #3a5a2a;
+	border-color: #4a7a36;
+	box-shadow: 0 4px 0 #2a4a1e !important;
+}
+body.dark .button.dark:hover,
+body.dark .button.dark.active {
+	color: #aaa;
+	background-color: #222;
+	border-color: #333;
+	box-shadow: 0 4px 0 #1a1a1a !important;
+}
+/* Przyciski akcji w options bar (Kick, Ban itp.) */
+body.dark .options .button.dark,
+body.dark .selected-files-option .button.dark {
+	color: #ddd;
+	background-color: #333;
+	border-color: #484848;
+	box-shadow: 0 3px 0 #1a1a1a !important;
+}
+body.dark .options .button.dark:hover,
+body.dark .selected-files-option .button.dark:hover {
+	color: #fff;
+	background-color: #444;
+	border-color: #666;
+}
+
+/* ---- Pola formularza ------------------------------------- */
+body.dark input.text,
+body.dark textarea,
+body.dark select {
+	color: #999;
+	background: #1e1e1e;
+	border-color: #333;
+	box-shadow: 4px 0 0 rgba(255,255,255,.03);
+}
+body.dark input.text:hover,
+body.dark input.text:focus,
+body.dark textarea:hover,
+body.dark textarea:focus,
+body.dark select:hover,
+body.dark select:focus {
+	color: #ddd;
+	background: #252525;
+}
+body.dark input[readonly="readonly"]:focus,
+body.dark input[readonly="readonly"]:hover {
+	color: #666;
+	background: #1e1e1e;
+}
+
+/* ---- Content ----------------------------------------------- */
+body.dark #content {
+	background: #111;
+}
+body.dark .cadre {
+	background: #181818;
+	border-color: #282828;
+}
+body.dark .cadre.right {
+	background: #161616;
+	border-color: #252525;
+}
+body.dark .content {
+	background: #1e1e1e;
+	border-color: #282828;
+}
+body.dark .content p a {
+	color: #999;
+}
+
+/* ---- Titles ------------------------------------------------- */
+body.dark h1 {
+	text-shadow: 1px 1px 3px #000;
+	/* background: color1 z theme.php */
+}
+body.dark h2,
+body.dark h3 {
+	border-bottom-color: #2a2a2a;
+	/* color: color1 z theme.php */
+}
+body.dark .title-detail {
+	color: #ccc;
+}
+body.dark .title-detail a {
+	color: #ccc;
+}
+body.dark .title-detail a:hover {
+	text-shadow: 1px 1px 5px #000;
+}
+
+/* ---- Tabele ---------------------------------------------- */
+body.dark th {
+	color: #d04030;
+	background: #1e1e1e;
+}
+body.dark th a {
+	color: #d04030;
+}
+body.dark tbody tr:hover {
+	background: #222;
+	border-color: #2e2e2e;
+}
+body.dark tbody tr.recent {
+	background: #25250c;
+}
+body.dark tbody tr.current,
+body.dark tbody tr.current:hover {
+	background: #25250c;
+}
+body.dark tbody tr.selected {
+	/* background: color2 z theme.php */
+	opacity: .85;
+}
+body.dark .section-index .cadre.left tbody tr:hover,
+body.dark fieldset tbody tr:hover {
+	background: none;
+}
+body.dark td.key {
+	color: #555;
+}
+body.dark td.value {
+	border-left-color: #333;
+}
+body.dark td.info {
+	color: #444;
+}
+
+/* ---- Options --------------------------------------------- */
+body.dark .options {
+	background: #252525;
+	box-shadow: -4px 0 0 #0e0e0e;
+}
+body.dark .options .nb-line {
+	color: #ccc;
+}
+body.dark .selected-files-label span {
+	color: #bbb;
+}
+body.dark .selected-files-label.locked span {
+	color: #444;
+	border-color: #444;
+}
+body.dark .selected-files-label span.selected-files-title {
+	border-bottom-color: #333;
+}
+body.dark .option-form {
+	background: rgba(255,255,255,.03);
+}
+body.dark .option-form li .rename-map-name {
+	color: #999;
+	background: #252525;
+}
+body.dark .option-form li .rename-map-arrow {
+	border-left-color: #252525;
+}
+body.dark .option-form .form-input-submit {
+	border-top-color: #2a2a2a;
+}
+body.dark #form-move-map label,
+body.dark #moveFolderForm label {
+	color: #999;
+	background: #252525;
+}
+body.dark .options-radio-inline li {
+	background: #1e1e1e;
+	border-color: #2e2e2e;
+	color: #999;
+}
+body.dark .options-radio-inline li .icon .ui-icon.active,
+body.dark .options-radio-inline li .icon .ui-icon:hover {
+	background-color: #2e2e2e;
+	border-color: #3a3a3a;
+}
+
+/* ---- Fieldset -------------------------------------------- */
+body.dark fieldset {
+	background: #181818;
+	border-color: #2a2a2a;
+}
+body.dark fieldset legend {
+	background: #1e1e1e;
+	border-color: #2a2a2a;
+	/* box-shadow color1 z theme.php */
+}
+
+/* ---- Footer ---------------------------------------------- */
+body.dark footer {
+	background: #141414;
+	border-top-color: #222;
+}
+body.dark #footer-inner,
+body.dark #footer-inner a {
+	color: #3a3a3a;
+}
+
+/* ---- Mapy: menu pionowe ---------------------------------- */
+body.dark .menu .vertical-nav li a,
+body.dark .folders .folder-list li a {
+	color: #555;
+	border-bottom-color: #252525;
+}
+body.dark .menu .vertical-nav li a.active,
+body.dark .menu .vertical-nav li a:hover {
+	color: #eee;
+	/* background color1 z theme.php */
+}
+body.dark .folders .folder-list li a.active,
+body.dark .folders .folder-list li a:hover {
+	background: #252510;
+}
+body.dark .folders .folder-list .no-result {
+	color: #444;
+}
+body.dark .folders .option-folder-list a:hover {
+	background-color: #252525;
+}
+
+/* ---- Sortable -------------------------------------------- */
+body.dark .ui-sortable li {
+	color: #777;
+}
+body.dark .adminlevelSortableList .ui-sortable {
+	background: #1a1a1a;
+	border-color: #252525;
+}
+body.dark .adminlevelSortableList .ui-sortable:after {
+	border-color: transparent #2e2e2e transparent transparent;
+}
+body.dark .adminlevelSortableList #selectedAccess.ui-sortable:after,
+body.dark .adminlevelSortableList #selectedPermission.ui-sortable:after {
+	border-color: transparent transparent transparent #2e2e2e;
+}
+
+/* ---- Chat ------------------------------------------------ */
+body.dark .section-chat .options input.text,
+body.dark .section-chat .options select {
+	color: #777;
+	box-shadow: 4px 0 0 #2e2e2e;
+}
+body.dark .section-chat .options input.text:hover,
+body.dark .section-chat .options select:hover,
+body.dark .section-chat .options input.text:focus,
+body.dark .section-chat .options select:focus {
+	color: #ccc;
+}
+
+/* ---- Script settings dialog ------------------------------ */
+body.dark #getScriptSettingsDialog {
+	color: #999;
+}
+body.dark #dialogScriptSettings tbody td {
+	border-bottom-color: #252525;
+}
+body.dark #dialogScriptSettings tbody td.first {
+	border-right-color: #333;
+}
+
+/* ---- Miniatura mapy -------------------------------------- */
+body.dark #map_thumbnail {
+	background: #1a1a1a;
+	border-color: #2a2a2a;
+}
+
+/* ---- Kolory GameMode / wersji ---------------------------- */
+body.dark .rounds     { color: #d4a020; }
+body.dark .timeattack { color: #d84030; }
+body.dark .team       { color: #88bb28; }
+body.dark .laps       { color: #68a818; }
+body.dark .stunts     { color: #7848d8; }
+body.dark .cup        { color: #d87028; }
+body.dark .script,
+body.dark .other      { color: #666; }
+body.dark .maniaplanet { color: #4488dd; }
+body.dark .tmforever  { color: #cc4040; }
+body.dark .trackmania { color: #5599dd; }
+
+/* ---- jQuery UI dark -------------------------------------- */
+body.dark .ui-widget {
+	background: #181818;
+	border-color: #2a2a2a;
+	color: #bbb;
+}
+body.dark .ui-widget-header {
+	background: #1e1e1e;
+	border-color: #2a2a2a;
+	color: #bbb;
+}
+body.dark .ui-widget-content {
+	background: #181818;
+	border-color: #2a2a2a;
+	color: #bbb;
+}
+body.dark .ui-state-default,
+body.dark .ui-widget-content .ui-state-default {
+	background: #252525;
+	border-color: #333;
+	color: #999;
+}
+body.dark .ui-state-hover,
+body.dark .ui-widget-content .ui-state-hover,
+body.dark .ui-state-focus,
+body.dark .ui-widget-content .ui-state-focus {
+	background: #2e2e2e;
+	border-color: #3a3a3a;
+	color: #ddd;
+}
+body.dark .ui-state-active,
+body.dark .ui-widget-content .ui-state-active {
+	background: #2e2e2e;
+	border-color: #3a3a3a;
+	color: #ddd;
+}
+body.dark .ui-dialog {
+	background: #181818;
+	border-color: #2a2a2a;
+}
+body.dark .ui-dialog .ui-dialog-titlebar {
+	background: #1e1e1e;
+	border-bottom-color: #2a2a2a;
+	color: #bbb;
+}
+body.dark .ui-dialog .ui-dialog-content {
+	background: #181818;
+	color: #bbb;
+}
+body.dark .ui-dialog .ui-dialog-buttonpane {
+	background: #161616;
+	border-top-color: #2a2a2a;
+}
+body.dark .ui-button {
+	background: #252525;
+	border-color: #333;
+	color: #999;
+}
+body.dark .ui-button:hover {
+	background: #2e2e2e;
+	color: #ddd;
+}
+body.dark .ui-progressbar {
+	background: #252525;
+	border-color: #333;
+}
+body.dark .ui-slider {
+	background: #252525;
+	border-color: #333;
+}
+body.dark .ui-slider-handle {
+	background: #3a3a3a;
+	border-color: #4a4a4a;
+}
+
+/* ---- Fileuploader ---------------------------------------- */
+body.dark .qq-upload-button {
+	background: #252525;
+	color: #999;
+	border-color: #333;
+}
+body.dark .qq-upload-button:hover {
+	background: #2e2e2e;
+	color: #ddd;
+}
+body.dark .qq-upload-list li {
+	color: #777;
+}
+body.dark .qq-upload-list li.qq-upload-success {
+	color: #60a858;
+}
+body.dark .qq-upload-list li.qq-upload-fail {
+	color: #c06060;
+}
+
+/* ---- ColorSelector --------------------------------------- */
+body.dark .colorSelector {
+	border-color: #333;
+}
+body.dark .colorpicker {
+	background: #252525;
+}
+
+/* ---- Guest/Ban ------------------------------------------- */
+body.dark .section-guestban .addPlayer {
+	background: #1a1a1a;
+}
+
+/* ---- DisplayServ widget — automatycznie ds-dark ---------- */
+body.dark #displayserv,
+body.dark .displayserv-widget {
+	/* ds-dark class added by JS or directly */
+}
+
+/* ---- title-detail i linki akcji — dark mode -------------- */
+body.dark .title-detail a {
+	background: rgba(0,0,0,.45);
+	color: #ddd !important;
+	border-radius: 4px;
+	padding: 2px 7px;
+	opacity: 1 !important;
+	transition: background .15s, color .15s;
+}
+body.dark .title-detail a:hover {
+	background: rgba(0,0,0,.65);
+	color: #fff !important;
+}
+body.dark .title-detail li {
+	border-right-color: rgba(255,255,255,.12);
+}
+/* Checkbox w title-detail — plain, bez pilla */
+.title-detail input[type="checkbox"] {
+	width: 14px;
+	height: 14px;
+	margin: 0;
+	float: none;
+	vertical-align: middle;
+	cursor: pointer;
+}
+.title-detail li.last {
+	display: inline-flex;
+	align-items: center;
+	padding: 0 2px;
+	height: auto;
+	background: none;
+	border: none;
+}
+/* Linki akcji poza title-detail */
+body.dark a.cleanList,
+body.dark a#detailMode,
+body.dark a#scrollToCurrentMap,
+body.dark a#clickNewPlaylist,
+body.dark a#getScriptSettings {
+	display: inline-block;
+	padding: 2px 7px;
+	border-radius: 4px;
+	background: rgba(0,0,0,.4);
+	color: #ccc !important;
+	text-decoration: none;
+	transition: background .15s, color .15s;
+}
+body.dark a.cleanList:hover,
+body.dark a#detailMode:hover,
+body.dark a#scrollToCurrentMap:hover,
+body.dark a#clickNewPlaylist:hover,
+body.dark a#getScriptSettings:hover {
+	background: rgba(0,0,0,.6);
+	color: #fff !important;
+}
+
+/* ---- Theme selector ----------------------------------------- */
+/* Aktywny motyw — ramka */
+body.dark .theme-color-active {
+	outline: 2px solid #fff;
+	outline-offset: 1px;
+}
+
+
+/* ---- Settings button & popover dark ---------------------- */
+body.dark .settings-btn {
+	color: #666;
+	background: #141414;
+	border-color: #2a2a2a;
+}
+body.dark .settings-btn:hover,
+body.dark .settings-btn.active {
+	color: #ddd;
+	background: #222;
+}
+body.dark .settings-popover {
+	background: #141414;
+	border-color: #2a2a2a;
+	box-shadow: 0 8px 28px rgba(0,0,0,.55);
+}
+body.dark .settings-section-title {
+	color: #444;
+	border-bottom-color: #252525;
+}
+body.dark .settings-popover .theme-color-active,
+body.dark .settings-popover ul li a.active {
+	outline-color: #fff;
+}
+body.dark .speed-admin ul {
+	background: #1a1a1a;
+	border-color: #2a2a2a;
+}
+
+/* ---- Color pickers in GameInfos ------------------------------ */
+body.dark .section-gameinfos .colorSelector {
+	border-color: #333;
+}
+
+/* ---- Results — dark mode ----------------------------------- */
+body.dark .results-rank { color: #777; }
+body.dark #resultsTable tr:nth-child(2) td.results-rank { color: #d4a017; }
+body.dark #resultsAutoRefresh {
+	background: rgba(0,0,0,.45);
+	color: #ddd;
+}
+body.dark #resultsAutoRefresh:hover {
+	background: rgba(0,0,0,.65);
+}
+
+/* ---- Script Manager — dark mode -------------------------------- */
+body.dark .script-upload-zone {
+	background: #1e1e1e;
+	border-color: #3a3a3a;
+	color: #aaa;
+}
+body.dark .script-upload-zone:hover,
+body.dark .script-upload-zone.dragover {
+	background: #252525;
+	border-color: #5a8fc2;
+	color: #ccc;
+}
+body.dark #scriptEditorContent {
+	background: #161616;
+	color: #d4d4d4;
+	border-color: #3a3a3a;
+}
+body.dark .script-result-msg.script-ok { color: #5cb85c; }
+body.dark .script-result-msg.script-err { color: #d9534f; }
+body.dark .script-result-msg.script-warn { color: #e8a838; }
+body.dark #scriptManagerDialog .form-hint { color: #888; }
+
+/* ---- Script Settings inline — dark mode ----------------------- */
+body.dark .script-setting-row {
+	border-bottom-color: #2a2a2a;
+}
+body.dark .script-setting-key { color: #bbb; }
+body.dark .script-setting-desc { color: #666; }
+body.dark .gameinfos_script_settings_inline .script-settings-name { color: #666; }
+
+/* ---- sset-table dark mode ------------------------------------ */
+body.dark .sset-script-desc { background: #1a1a1a; border-color: #333; color: #777; }
+body.dark .sset-th          { background: #1e1e1e; border-color: #333; color: #aaa; }
+body.dark .sset-row         { border-color: #222; }
+body.dark .sset-row:hover   { background: #1c1c1c; }
+body.dark .sset-name   { color: #ccc; }
+body.dark .sset-default { background: #252525; color: #666; }
+body.dark .sset-desc    { color: #666; }
+body.dark .sset-reset        { color: #555; }
+body.dark .sset-reset:hover  { color: #5a8fc2; }
+body.dark .sset-reset-all        { color: #555; }
+body.dark .sset-reset-all:hover  { color: #5a8fc2; }
+body.dark .sset-actions { border-color: #2a2a2a; }

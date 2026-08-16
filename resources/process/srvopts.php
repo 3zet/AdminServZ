@@ -12,7 +12,7 @@
 				$srvConfigDirectory = $gameDataDirectory.'Config/';
 				$srvoptsConfigDirectory = $srvConfigDirectory.'AdminServ/ServerOptions/';
 				if( !Utils::isWinServer() ){
-					AdminServ::checkRights(array($srvConfigDirectory => 777));
+					AdminServ::checkRights([$srvConfigDirectory => 777]);
 				}
 				
 				if( !file_exists($srvoptsConfigDirectory) ){
@@ -21,32 +21,32 @@
 					}
 				}
 				
-				$data['srvoptsConfigFiles'] = Folder::read($srvoptsConfigDirectory, array(), array(), intval(AdminServConfig::RECENT_STATUS_PERIOD * 3600) );
+				$data['srvoptsConfigFiles'] = Folder::read($srvoptsConfigDirectory, [], [], intval(AdminServConfig::RECENT_STATUS_PERIOD * 3600) );
 			}
 		}
 	}
 	
 	
-	// ENREGISTREMENT
+	// SAVE
 	if( isset($_POST['savesrvopts']) ){
-		// Récupération des données
+		// Retrieve the data
 		$struct = AdminServ::getServerOptionsStruct();
 		$ChangeAuthPassword = null;
 		if( isset($_POST['ChangeAuthPassword']) && $_POST['ChangeAuthPassword'] != null ){
 			$ChangeAuthLevel = $_POST['ChangeAuthLevel'];
-			$ChangeAuthPassword = trim($_POST['ChangeAuthPassword']);
+			$ChangeAuthPassword = trim((string) $_POST['ChangeAuthPassword']);
 		}
 		$srvoptsImportExport = false;
 		if( array_key_exists('srvoptsImportExport', $_POST) ){
 			$srvoptsImportExport = $_POST['srvoptsImportExport'];
 		}
 		
-		// Enregistrement
+		// Save
 		if($ChangeAuthPassword){
 			if(USER_ADMINLEVEL === $ChangeAuthLevel){
 				$_SESSION['adminserv']['password'] = $ChangeAuthPassword;
 			}
-			AdminServ::info( Utils::t('You changed the password "!authLevel", remember it at the next connection!', array('!authLevel' => $ChangeAuthLevel)) );
+			AdminServ::info( Utils::t('You changed the password "!authLevel", remember it at the next connection!', ['!authLevel' => $ChangeAuthLevel]) );
 			AdminServLogs::add('action', 'Change authentication password for '.$ChangeAuthLevel.' level');
 		}
 		elseif($srvoptsImportExport){
@@ -73,7 +73,7 @@
 	}
 	
 	
-	// LECTURE
+	// READ
 	$data['srvOpt'] = AdminServ::getServerOptions();
 	$data['adminLevels'] = AdminServAdminLevel::getServerList();
 ?>

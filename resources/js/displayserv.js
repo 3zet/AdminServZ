@@ -1,193 +1,223 @@
+/* ============================================================
+   AdminServ — displayserv.js  (redesign)
+   ============================================================ */
 (function($){
-	$.fn.displayServ = function(options){
-		var selector = $(this);
-		
-		// Options
-		var settings = {
-			config: 'config/servers.cfg.php',
-			resources: 'resources/',
-			timeout: 3,
-			refresh: 30,
-			color: '',
-			links: {
-				join: true,
-				spectate: true,
-				addfavourite: false
-			}
-		}
-		$.extend(settings, options);
-		settings.refresh = parseInt(settings.refresh * 1000);
-		if(settings.refresh < 10000){
-			settings.refresh = 10000;
-		}
-		if(settings.color){
-			settings.color = ' style="color: '+settings.color+';"';
-		}
-		
-		// Refresh
-		selector.initialize(settings);
-		setInterval(function(){
-			selector.initialize(settings);
-		}, settings.refresh);
-	};
+
+  $.fn.displayServ = function(options){
+    var selector = $(this);
+
+    var settings = {
+      config:         'config/servers.cfg.php',
+      resources:      'resources/',
+      timeout:        3,
+      refresh:        30,
+      color:          '',
+      links: {
+        join:         true,
+        spectate:     true,
+        addfavourite: false
+      }
+    };
+    $.extend(true, settings, options);
+    settings.refresh = parseInt(settings.refresh * 1000);
+    if(settings.refresh < 10000){ settings.refresh = 10000; }
+
+    selector.initialize(settings);
+    setInterval(function(){ selector.initialize(settings); }, settings.refresh);
+  };
+
 })(jQuery);
 
+
 (function($){
-	$.fn.initialize = function(settings){
-		var selector = $(this);
-		
-		// 1ère étape - Initialiser DisplayServ en créant le html
-		$.getJSON(settings.resources+'ajax/ds_initialize.php', {cfg: settings.config}, function(data){
-			if(data != null){
-				var out = '<ul class="ds-servers-list loading">';
-					if(data.servers){
-						for(var i = 0; i < data.servers; i++){
-							out += '<li id="ds-server-'+i+'" class="ds-server">'
-								+ '<table>'
-									+ '<tr class="ds-header">'
-										+ '<th class="first"'+settings.color+'>'+data.label.server+' n°'+(i+1)+'</th>'
-										+ '<th class="middle"></th>'
-										+ '<th class="last"'+settings.color+'>'+data.label.players+'</th>'
-									+ '</tr>'
-									+ '<tr class="ds-space"><td colspan="3"></td></tr>'
-									+ '<tr class="ds-content">'
-										+ '<td class="ds-part-left">'
-											+ '<ul>'
-												+ '<li>'+data.label.name+'</li>'
-												+ '<li>'+data.label.login+'</li>'
-												+ '<li>'+data.label.connect+'</li>'
-												+ '<li>'+data.label.status+'</li>'
-												+ '<li>'+data.label.gamemode+'</li>'
-												+ '<li>'+data.label.currentmap+'</li>'
-												+ '<li>'+data.label.players+'</li>'
-											+ '</ul>'
-										+ '</td>'
-										+ '<td class="ds-part-middle">'
-											+ '<ul>'
-												+ '<li class="ds-server-name"></li>'
-												+ '<li class="ds-server-login"></li>'
-												+ '<li class="ds-server-connect"></li>'
-												+ '<li class="ds-server-protocol"></li>'
-												+ '<li class="ds-server-status"></li>'
-												+ '<li class="ds-server-gamemode"></li>'
-												+ '<li class="ds-server-currentmap"></li>'
-												+ '<li class="ds-server-players-count"></li>'
-											+ '</ul>'
-										+ '</td>'
-										+ '<td class="ds-part-right">'
-											+ '<div class="ds-servers-players-list"></div>'
-										+ '</td>'
-									+ '</tr>'
-								+ '</table>'
-								+ '<div class="ds-server-join-wrap">'
-										+ '<ul>';
-											if(settings.links.addfavourite){
-												out += '<li class="ds-server-favourite"><a href=".">'+data.label.addfavourite+'</a></li>';
-											}
-											if(settings.links.spectate){
-												out += '<li class="ds-server-spectate"><a href=".">'+data.label.accessserverspectate+'</a></li>';
-											}
-											if(settings.links.join){
-												out += '<li class="ds-server-join"><a href=".">'+data.label.accessserverplayer+'</a></li>';
-											}
-										out += '</ul>'
-								+ '</div>'
-							+ '</li>';
-						}
-					}
-				out += '</ul>';
-				
-				// Affichage
-				selector.find('.ds-servers-list').remove();
-				selector.html(out);
-				
-				// Calcul de la taille max
-				var maxsize = selector.find('.ds-servers-list').width();
-				if(maxsize < 380){
-					selector.find('.ds-servers-list').addClass("max-width-380");
-					if(settings.links.addfavourite){
-						selector.find('.ds-servers-list .ds-server-favourite').remove();
-					}
-					if(settings.links.spectate){
-						selector.find('.ds-servers-list .ds-server-spectate').remove();
-					}
-				}
-				else if(maxsize < 580){
-					selector.find('.ds-servers-list').addClass('max-width-580');
-					if(settings.links.addfavourite){
-						selector.find('.ds-servers-list .ds-server-favourite').remove();
-					}
-				}
-				
-				// 2ème étape - Récupérer les données serveur
-				$.getJSON(settings.resources+'ajax/ds_getservers.php', {cfg: settings.config, rsc: settings.resources}, function(data){
-					if(data != null){
-						if(data.servers){
-							for(var i = 0; i < data.servers.length; i++){
-								var serverId = $('#ds-server-'+i);
-								
-								// Server infos
-								if(data.servers[i].error){
-									serverId.find('.ds-server-name').html(data.servers[i].error);
-									serverId.find('.ds-server-join-wrap').remove();
-								}
-								else{
-									serverId.find('.ds-server-name').html(data.servers[i].name);
-									serverId.find('.ds-server-login').html(data.servers[i].serverlogin);
-									serverId.find('.ds-server-connect').html(data.servers[i].version.name);
-									serverId.find('.ds-server-connect').addClass(data.servers[i].version.name.toLowerCase());
-									serverId.find('.ds-server-status').html(data.servers[i].status);
-									serverId.find('.ds-server-gamemode').html(data.servers[i].gamemode);
-									serverId.find('.ds-server-gamemode').addClass(data.servers[i].gamemode.toLowerCase());
-									var envImg = '';
-									if(data.servers[i].map.env.filename != null){
-										var envImg = ' <img src="'+data.servers[i].map.env.filename+'" alt="('+data.servers[i].map.env.name+')" title="'+data.servers[i].map.env.name+'" />';
-									}
-									serverId.find('.ds-server-currentmap').html(data.servers[i].map.name + envImg);
-									serverId.find('.ds-server-players-count').html(data.players[i].count.current+' / '+data.players[i].count.max);
-									
-									// Join
-									var title = '';
-									if(data.servers[i].version.title){
-										title += '@'+data.servers[i].version.title;
-									}
-									if(settings.links.join){
-										serverId.find('.ds-server-join a').attr('href', data.servers[i].version.protocol+'://#join='+data.servers[i].serverlogin+title);
-									}
-									if(settings.links.spectate){
-										serverId.find('.ds-server-spectate a').attr('href', data.servers[i].version.protocol+'://#spectate='+data.servers[i].serverlogin+title);
-									}
-									if(settings.links.addfavourite){
-										serverId.find('.ds-server-favourite a').attr('href', data.servers[i].version.protocol+'://#addfavourite='+data.servers[i].serverlogin+title);
-									}
-									
-									// Players
-									var playerListTable = '<table>';
-										if(data.players[i].count.current > 0){
-											$.each(data.players[i].list, function(idPlayer, dataPlayer){
-												var teamSpan = '';
-												if(data.servers[i].gamemode == 'Team'){
-													teamSpan = '<span class="team_'+dataPlayer.teamId+'" title="'+dataPlayer.teamName+'">&nbsp;</span>';
-												}
-												playerListTable += '<tr>'
-													+ '<td>'+teamSpan+dataPlayer.name+'</td>'
-													+ '<td>'+dataPlayer.status+'</td>'
-												+ '</tr>';
-											});
-										}
-										else{
-											playerListTable += '<td class="no-player" colspan="2">'+data.players[i].list+'</td>';
-										}
-									playerListTable += '</table>';
-									serverId.find('.ds-servers-players-list').html(playerListTable);
-								}
-							}
-						}
-						
-						selector.find('.ds-servers-list').removeClass('loading');
-					}
-				});
-			}
-		});
-	};
+
+  $.fn.initialize = function(settings){
+    var selector = $(this);
+
+    $.getJSON(settings.resources + 'ajax/ds_initialize.php', {cfg: settings.config}, function(data){
+      if(!data) return;
+
+      var html = '<ul class="ds-servers-list loading">';
+
+      if(data.servers){
+        for(var i = 0; i < data.servers; i++){
+
+          var footerHtml = '';
+          if(settings.links.join || settings.links.spectate || settings.links.addfavourite){
+            footerHtml += '<div class="ds-footer">';
+            if(settings.links.join){
+              footerHtml += '<a class="ds-action ds-server-join" href="#" title="'+data.label.accessserverplayer+'">'
+                + '<span class="ds-action-icon">&#9654;</span>'
+                + '<span class="ds-action-label">'+data.label.accessserverplayer+'</span>'
+                + '</a>';
+            }
+            if(settings.links.spectate){
+              footerHtml += '<a class="ds-action ds-server-spectate" href="#" title="'+data.label.accessserverspectate+'">'
+                + '<span class="ds-action-icon">&#9673;</span>'
+                + '<span class="ds-action-label">'+data.label.accessserverspectate+'</span>'
+                + '</a>';
+            }
+            if(settings.links.addfavourite){
+              footerHtml += '<a class="ds-action ds-server-favourite" href="#" title="'+data.label.addfavourite+'">'
+                + '<span class="ds-action-icon">&#9733;</span>'
+                + '<span class="ds-action-label">'+data.label.addfavourite+'</span>'
+                + '</a>';
+            }
+            footerHtml += '</div>';
+          }
+
+          html += '<li id="ds-server-' + i + '" class="ds-server">'
+            + '<div class="ds-card-head">'
+              + '<span class="ds-dot offline"></span>'
+              + '<span class="ds-title">'+data.label.server+' '+(i+1)+'</span>'
+              + '<span class="ds-version-badge">...</span>'
+            + '</div>'
+            + '<div class="ds-body">'
+              + '<div class="ds-info">'
+                + '<div class="ds-row"><span class="ds-label">'+data.label.login+'</span><span class="ds-val mono ds-server-login">&mdash;</span></div>'
+                + '<div class="ds-row"><span class="ds-label">'+data.label.status+'</span><span class="ds-val ds-server-status">&mdash;</span></div>'
+                + '<div class="ds-row"><span class="ds-label">'+data.label.gamemode+'</span><span class="ds-val ds-server-gamemode">&mdash;</span></div>'
+                + '<div class="ds-row"><span class="ds-label">'+data.label.currentmap+'</span><span class="ds-val ds-server-currentmap">&mdash;</span></div>'
+              + '</div>'
+              + '<hr class="ds-divider">'
+              + '<div class="ds-players">'
+                + '<div class="ds-players-header">'
+                  + '<span class="ds-players-label">'+data.label.players+'</span>'
+                  + '<span class="ds-players-count ds-server-players-count">&mdash;</span>'
+                + '</div>'
+                + '<div class="ds-player-list"></div>'
+              + '</div>'
+            + '</div>'
+            + footerHtml
+          + '</li>';
+        }
+      }
+      html += '</ul>';
+
+      // Replace content only if something changed, or on first load
+      if(selector.find('.ds-servers-list').length === 0){
+        selector.html(html);
+      } else {
+        selector.find('.ds-servers-list').addClass('loading');
+      }
+
+      // Fetch data
+      $.getJSON(settings.resources + 'ajax/ds_getservers.php', {cfg: settings.config, rsc: settings.resources}, function(data){
+        if(!data) return;
+
+        if(data.servers){
+          for(var i = 0; i < data.servers.length; i++){
+            var $card = $('#ds-server-' + i);
+            var srv   = data.servers[i];
+
+            if(srv.error){
+              $card.addClass('ds-server-offline');
+              $card.find('.ds-dot').removeClass('online').addClass('offline');
+              $card.find('.ds-title').text(srv.error);
+              $card.find('.ds-version-badge').text('offline').removeClass().addClass('ds-version-badge');
+              $card.find('.ds-body').html(
+                '<div class="ds-info ds-info-offline">'
+                + '<span class="ds-offline-msg">' + (srv.error || 'Offline') + '</span>'
+                + '</div>'
+              );
+              $card.find('.ds-footer').remove();
+              continue;
+            }
+
+            $card.removeClass('ds-server-offline');
+
+            // --- Version ---
+            var vname  = (srv.version && srv.version.name)     ? srv.version.name     : '';
+            var vtitle = (srv.version && srv.version.title)    ? srv.version.title    : '';
+            var vproto = (srv.version && srv.version.protocol) ? srv.version.protocol : 'maniaplanet';
+
+            var vLabel = vname;
+            var vClass = vname.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if(vname === 'Trackmania')   { vLabel = 'TM 2020'; }
+            else if(vname === 'ManiaPlanet'){ vLabel = 'ManiaPlanet'; }
+            else if(vname === 'TmForever'){ vLabel = 'TmForever'; }
+
+            $card.find('.ds-dot').removeClass('offline').addClass('online');
+            $card.find('.ds-title').html(srv.name || '');
+            $card.find('.ds-version-badge')
+              .text(vLabel)
+              .removeClass()
+              .addClass('ds-version-badge ' + vClass);
+
+            // --- Info ---
+            $card.find('.ds-server-login').text(srv.serverlogin || '');
+            $card.find('.ds-server-status').html('<span class="ds-status-dot"></span>' + (srv.status || ''));
+
+            // GameMode -- color by mode
+            var gm    = srv.gamemode || '';
+            var gmLow = gm.toLowerCase();
+            var gmClass = 'ds-mode-other';
+            if(gmLow.indexOf('timeattack') >= 0)  gmClass = 'ds-mode-ta';
+            else if(gmLow.indexOf('rounds') >= 0) gmClass = 'ds-mode-rounds';
+            else if(gmLow.indexOf('team') >= 0)   gmClass = 'ds-mode-team';
+            else if(gmLow.indexOf('laps') >= 0)   gmClass = 'ds-mode-laps';
+            else if(gmLow.indexOf('stunts') >= 0) gmClass = 'ds-mode-stunts';
+            else if(gmLow.indexOf('cup') >= 0)    gmClass = 'ds-mode-cup';
+            else if(gmLow.indexOf('script') >= 0) gmClass = 'ds-mode-script';
+
+            $card.find('.ds-server-gamemode').text(gm).attr('class', 'ds-val ds-server-gamemode ' + gmClass);
+
+            // Map + environment
+            var envHtml = '';
+            if(srv.map && srv.map.env){
+              if(srv.map.env.filename){
+                envHtml = '<img class="ds-env-img" src="' + srv.map.env.filename
+                  + '" alt="' + srv.map.env.name + '" title="' + srv.map.env.name + '">';
+              } else if(srv.map.env.name){
+                envHtml = '<span class="ds-map-env">' + srv.map.env.name + '</span>';
+              }
+            }
+            $card.find('.ds-server-currentmap').html((srv.map && srv.map.name ? srv.map.name : '') + envHtml);
+
+            // Join / spectate / favourite links
+            var titleSuffix = vtitle ? '@' + vtitle : '';
+            if(settings.links.join){
+              $card.find('.ds-server-join').attr('href', vproto + '://#join=' + srv.serverlogin + titleSuffix);
+            }
+            if(settings.links.spectate){
+              $card.find('.ds-server-spectate').attr('href', vproto + '://#spectate=' + srv.serverlogin + titleSuffix);
+            }
+            if(settings.links.addfavourite){
+              $card.find('.ds-server-favourite').attr('href', vproto + '://#addfavourite=' + srv.serverlogin + titleSuffix);
+            }
+
+            // --- Players ---
+            var pl = data.players[i];
+            if(pl){
+              $card.find('.ds-server-players-count').text(pl.count.current + ' / ' + pl.count.max);
+
+              var listHtml = '';
+              if(pl.count.current > 0 && typeof pl.list === 'object'){
+                $.each(pl.list, function(idx, p){
+                  var teamDot = '';
+                  if(gm === 'Team'){
+                    var dotClass = 'ds-team-dot ds-team-' + (p.teamId !== undefined ? p.teamId : -1);
+                    teamDot = '<span class="' + dotClass + '" title="' + (p.teamName || '') + '"></span>';
+                  }
+                  var specBadge = (p.status && p.status.toLowerCase().indexOf('spec') >= 0)
+                    ? '<span class="ds-player-spec">spec</span>' : '';
+                  listHtml += '<div class="ds-player-row">'
+                    + teamDot
+                    + '<span class="ds-player-name">' + p.name + '</span>'
+                    + specBadge
+                    + '</div>';
+                });
+              } else if(typeof pl.list === 'string'){
+                listHtml = '<div class="ds-no-player">' + pl.list + '</div>';
+              }
+              $card.find('.ds-player-list').html(listHtml);
+            }
+          }
+        }
+
+        selector.find('.ds-servers-list').removeClass('loading');
+      });
+    });
+  };
+
 })(jQuery);

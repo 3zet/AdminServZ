@@ -1,12 +1,13 @@
-<section class="cadre">
+<section class="cadre section-gameinfos">
 	<h1><?php echo Utils::t('Game information'); ?></h1>
 	<form method="post" action="?p=<?php echo USER_PAGE; ?>">
 		<div class="content gameinfos">
-			<?php if (AdminServAdminLevel::hasPermission(array('gameinfos_general_gamemode', 'gameinfos_general_warmup', 'gameinfos_general_options'))): ?>
+
+			<?php if (AdminServAdminLevel::hasPermission(['gameinfos_general_gamemode','gameinfos_general_warmup','gameinfos_general_options'])): ?>
 				<?php echo AdminServUI::getTemplate('gameinfos-general'); ?>
 			<?php endif; ?>
-			
-			<?php if (SERVER_VERSION_NAME == 'ManiaPlanet' && AdminServ::checkDisplayTeamMode($data['gameInfos']['next']['GameMode'], $data['gameInfos']['next']['ScriptName']) && AdminServAdminLevel::hasPermission('gameinfos_teams_options')): ?>
+
+			<?php if (isMpApi() && AdminServ::checkDisplayTeamMode($data['gameInfos']['next']['GameMode'] ?? 0, $data['gameInfos']['next']['ScriptName'] ?? null) && AdminServAdminLevel::hasPermission('gameinfos_teams_options')): ?>
 				<fieldset class="gameinfos_teaminfos">
 					<legend><img src="<?php echo AdminServConfig::$PATH_RESOURCES; ?>images/16/players.png" alt="" /><?php echo Utils::t('Team infos'); ?></legend>
 					<table>
@@ -43,19 +44,21 @@
 					</table>
 				</fieldset>
 			<?php endif; ?>
-			
+
 			<?php if (AdminServAdminLevel::hasPermission('gameinfos_gamemode_options')): ?>
 				<?php echo AdminServUI::getTemplate('gameinfos-gamemode'); ?>
 			<?php endif; ?>
+
 		</div>
-		
+
 		<?php if (SERVER_MATCHSET && AdminServAdminLevel::hasPermission('maps_matchsettings_save')): ?>
 			<div class="fleft options-checkbox">
-				<input class="text inline" type="checkbox" name="SaveCurrentMatchSettings" id="SaveCurrentMatchSettings"<?php if (AdminServConfig::AUTOSAVE_MATCHSETTINGS === true): echo ' checked="checked"'; endif; ?> value="" /><label for="SaveCurrentMatchSettings" title="<?php echo SERVER_MATCHSET; ?>"><?php echo Utils::t('Save the current MatchSettings'); ?></label>
+				<input class="text inline" type="checkbox" name="SaveCurrentMatchSettings" id="SaveCurrentMatchSettings" checked="checked" value="" />
+				<label for="SaveCurrentMatchSettings" title="<?php echo SERVER_MATCHSET; ?>"><?php echo Utils::t('Save the current MatchSettings'); ?></label>
 			</div>
 		<?php endif; ?>
 		<div class="fright save">
-			<input class="button light" type="submit" name="savegameinfos" id="savegameinfos" value="<?php echo Utils::t('Save'); ?>" />
+			<input class="button dark" type="submit" name="savegameinfos" id="savegameinfos" value="<?php echo Utils::t('Save'); ?>" />
 		</div>
 	</form>
 </section>

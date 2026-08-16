@@ -2,25 +2,21 @@
 	// ACTIONS
 	if( isset($_POST['save']) && isset($_POST['list']) && $_POST['list'] != null ){
 		$adminLevelList = AdminLevelConfig::$ADMINLEVELS;
-		$list = explode(',', $_POST['list']);
+		$list = explode(',', (string) $_POST['list']);
 		
-		$newAdminLevelList = array();
+		$newAdminLevelList = [];
 		foreach($list as $listLevelName){
-			$newAdminLevelList[$listLevelName] = array(
-				'adminlevel' => $adminLevelList[$listLevelName]['adminlevel'],
-				'access' => $adminLevelList[$listLevelName]['access'],
-				'permission' => $adminLevelList[$listLevelName]['permission'],
-			);
+			$newAdminLevelList[$listLevelName] = ['adminlevel' => $adminLevelList[$listLevelName]['adminlevel'], 'access' => $adminLevelList[$listLevelName]['access'], 'permission' => $adminLevelList[$listLevelName]['permission']];
 		}
 		
-		AdminServAdminLevel::saveConfig(array(), -1, $newAdminLevelList);
+		AdminServAdminLevel::saveConfig([], -1, $newAdminLevelList);
 		AdminServLogs::add('action', 'Order admin level list');
 		Utils::redirection(false, '?p='.USER_PAGE);
 	}
 	
 	
 	// LEVELLIST
-	$data['levels'] = array();
+	$data['levels'] = [];
 	if (AdminServAdminLevel::hasLevel()) {
 		$data['levels'] = AdminLevelConfig::$ADMINLEVELS;
 	}

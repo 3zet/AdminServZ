@@ -1,198 +1,1061 @@
-#page-inner {
-	position: relative;
-	padding-bottom: 170px;
-	overflow: hidden;
-}
+/* ============================================================
+   AdminServ — mobile.css  (redesign)
+   Aktywowany przez: media screen and (max-width: 1000px)
+   ============================================================ */
+
+/* ---- Container widths ------------------------------------- */
 #header-inner,
 #nav-inner,
 #connection-inner,
 #content-inner,
 #footer-inner {
 	width: 99%;
+	margin-left: auto;
+	margin-right: auto;
+	box-sizing: border-box;
 }
+
+/* ---- Elementy ukryte na mobilnym ------------------------- */
 footer,
-#theme,
-#lang,
+#theme, #lang,
 #newfolder,
 .menu-principal ul li.accesslink,
 .section-chat #chatColor,
 .section-chat #chatDestination,
-.section-chat #chatSend,
-.options-radio-inline li .icon,
 .connection-label label {
 	display: none;
 }
+
+/* ---- Content -- margin to avoid overlapping the nav -------- */
 #content {
-	margin-top: 50px;
+	margin-top: 10px;
+}
+#page-inner {
+	position: relative;
+}
+
+/* ---- Header ---------------------------------------------- */
+#header-inner {
+	height: auto;
+	min-height: 52px;
+	padding-bottom: 4px;
+}
+#logo img {
+	max-height: 44px;
+}
+#title {
+	font-size: 2em;
+	letter-spacing: -1px;
+	line-height: 44px;
+}
+
+/* ---- Settings button -- larger on mobile ----------------- */
+.settings-btn {
+	width: 44px;
+	height: 36px;
+	font-size: 18px;
+}
+/* Popover on mobile -- full width so it doesn't overflow the screen */
+.settings-popover {
+	right: 0;
+	left: 0;
+	min-width: 0;
+	width: 100%;
+	top: 36px;
+	border-radius: 0 0 8px 8px;
+	box-sizing: border-box;
+}
+
+/* ---- Speed Admin — pod logo, po lewej -------------------- */
+.speed-admin {
+	position: static;
+	float: left;
+	margin: 4px 0 4px 4px;
+	right: auto;
+	top: auto;
+}
+.speed-admin ul {
+	width: auto;
+	height: auto;
+	background: #333;
+	border-radius: 4px;
+	border: 1px solid #444;
+	border-top-width: 1px;
+}
+.speed-admin ul li a {
+	width: 24px;
+	height: 24px;
+	background-position: 2px 2px;
+}
+.speed-admin ul li a:hover,
+.speed-admin ul li a.locked {
+	background-position: 2px 2px;
+}
+
+/* ---- Switch Server — po prawej stronie speed admin ------- */
+.switch-server {
+	position: static;
+	float: right;
+	top: auto;
+	right: auto;
+	width: 48%;
+	margin: 4px 2px 0 0;
+}
+#switchServerList {
+	width: 100%;
+	padding: 5px 6px;
+	border-radius: 4px;
+	box-sizing: border-box;
+}
+
+/* ---- Main navigation ------------------------------------ */
+.horizontal-nav {
+	position: static;
+	clear: both;
+	padding-bottom: 4px;
+	width: 100%;
+}
+#connection-inner,
+.menu-principal {
+	height: auto;
+	border-radius: 0 0 6px 6px;
+	border-width: 0 1px 1px;
+}
+/* Reset the fixed height that causes misalignment */
+.menu-principal {
+	min-height: 0;
+	overflow: hidden;
+	padding: 4px 2px;
+}
+.menu-principal ul {
+	width: 100%;
+	overflow: hidden;
+}
+.menu-principal .menu-left {
+	float: left;
+	width: 100%;
+	padding-left: 2px;
+}
+.menu-principal .menu-right {
+	float: left;
+	clear: both;
+	width: 100%;
+	padding-left: 2px;
+	margin-top: 6px;
+	padding-top: 6px;
+	border-top: 1px solid rgba(255,255,255,.08);
+}
+/* Navigation -- flexbox, all buttons equal width */
+.menu-principal .menu-left,
+.menu-principal .menu-right {
+	float: none;
+	clear: none;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+/* Obie listy traktujemy jak jeden flex-kontener */
+.menu-principal {
+	display: flex;
+	flex-direction: column;
+	overflow: visible;    /* so button box-shadow isn't clipped */
+	padding-bottom: 6px; /* room for the box-shadow (underline) */
+}
+.menu-principal ul {
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+	gap: 3px;
+	padding: 0 3px;
+	box-sizing: border-box;
+	overflow: visible;
+}
+/* Each button -- half width */
+.menu-principal ul li {
+	float: none;
+	flex: 0 0 calc(50% - 2px);
+	width: auto;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+/* General and Results -- side by side, half width each */
+.menu-principal ul li.accessgeneral,
+.menu-principal ul li.accessresults {
+	flex: 0 0 calc(50% - 2px);
+	width: auto;
+}
+/* If Results doesn't exist (no permission) -- General takes the full width */
+.menu-principal ul li.accessgeneral:only-child,
+.menu-principal ul li.accessgeneral:last-child {
+	flex: 0 0 100%;
+	width: 100%;
+}
+/* Separator between menu-left and menu-right */
+.menu-principal .menu-right {
+	margin-top: 6px;
+	padding-top: 6px;
+	border-top: 1px solid rgba(255,255,255,.08);
+}
+/* menu-right has 3 buttons -- each 1/3 width */
+.menu-principal .menu-right li {
+	flex: 0 0 calc(33.333% - 2px);
+}
+/* Przyciski — touch target */
+.menu-principal ul li a {
+	height: 36px;
+	line-height: 36px;
+	font-size: .9em;
+	border-radius: 3px;
+	text-align: center;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	width: 100%;
+	display: block;
+	box-sizing: border-box;
+}
+
+/* ---- Formularz logowania --------------------------------- */
+#connection-inner .connection-label,
+#connection-inner .connection-login {
+	width: 99%;
+	float: left;
+	clear: both;
 }
 #as_server,
 #as_password,
 #as_adminlevel {
 	clear: both;
 	float: left;
-	margin: 5px 0;
-	padding: 5px 10px;
+	margin: 4px 0;
+	padding: 6px 10px;
 	width: 100%;
-}
-#as_password {
-	width: 97.5%;
-}
-#connection-inner,
-.menu-principal {
-	height: 100%;
-}
-#connection-inner .connection-label,
-#connection-inner .connection-login {
-	width: 99%;
+	box-sizing: border-box;
 }
 #as_login {
 	width: 100%;
+	margin-top: 6px;
+	min-height: 36px;
 }
 
-.speed-admin {
-	position: absolute;
-	left: 0;
-	top: 84px;
-	width: 60%;
-}
-.speed-admin ul {
-	width: 100%;
-	height: 27px;
-	background: #555;
-}
-.speed-admin ul li {
-	display: block;
-	float: left;
-}
-.speed-admin ul li + li {
-	margin-left: 2px;
-}
-.speed-admin ul li a {
-	padding: 5px 22px 0;
-	background-position: 20px 5px;
-}
-.speed-admin ul li a:hover,
-.speed-admin ul li a.locked {
-	background-position: 20px 5px;
-}
-.speed-admin ul li + li a {
-	margin: 0;
-}
-.switch-server {
-	top: 84px;
-	right: 0;
-	width: 40%;
-}
-.switch-server #switchServerList {
-	padding: 7px 10px 8px;
-	width: 100%;
-	border: 0;
-	-webkit-border-radius: 0 0 5px 5px;
-	-moz-border-radius: 0 0 5px 5px;
-	-ms-border-radius: 0 0 5px 5px;
-	-o-border-radius: 0 0 5px 5px;
-	border-radius: 0 0 5px 5px;
+/* ---- Pola formularza ------------------------------------- */
+input.width1, input.width2, input.width3,
+select.width1, select.width2, select.width3,
+textarea.width1, textarea.width2, textarea.width3 {
+	width: 100% !important;
+	max-width: 100%;
+	box-sizing: border-box;
 }
 
-.horizontal-nav {
-	position: absolute;
-	bottom: 0;
-	padding-bottom: 5px;
-	width: 100%;
-}
-.menu-principal {
-	height: 140px;
-	border-width: 1px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	-ms-border-radius: 5px;
-	-o-border-radius: 5px;
-	border-radius: 5px;
-}
-.menu-principal ul {
-	width: 102%;
-}
-.menu-principal .menu-right {
+/* ---- General — kolumny pionowo --------------------------- */
+.section-index .cadre.left,
+.section-guestban .cadre.left {
 	clear: both;
 	float: left;
-	padding-left: 5px;
-}
-.menu-principal ul li {
-	margin-bottom: 4px;
-	width: 48.5%;
-}
-.menu-principal ul li.accessgeneral {
 	width: 99%;
-}
-.menu-principal .menu-right li {
-	width: 32%;
-}
-.menu-principal ul li a {
-	height: 25px;
-	line-height: 25px;
-	font-size: 1.05em;
-	-webkit-border-radius: 0;
-	-moz-border-radius: 0;
-	-ms-border-radius: 0;
-	-o-border-radius: 0;
-	border-radius: 0;
-}
-.section-index .cadre.left,
-.section-guestban .cadre.left,
-.hasMenu.hasFolders .cadre.left.menu {
-	margin-bottom: 10px;
-	width: 97.5%;
+	margin-bottom: 8px;
 }
 .section-index .cadre.right,
 .section-guestban .cadre.right {
 	clear: both;
 	float: left;
-	margin: -10px 0 0;
-	padding-top: 20px;
-	padding-left: 10px;
-	width: 97.5%;
+	width: 99%;
+	margin: 0;
+	padding-left: 12px;
 }
 .section-index .title-detail,
 .section-guestban .title-detail {
-	top: 24px;
-}
-#playerlist {
-	min-height: 150px;
-}
-.section-chat #chatNickname {
-	width: 18%;
-}
-.section-chat #chatSend {
-	width: 20%;
-}
-.section-chat #chatMessage {
-	margin: 0;
-	width: 68%;
+	top: 16px;
 }
 
-.hasMenu .cadre.right,
-.hasMenu.hasFolders .cadre.right {
-	width: 71%;
+/* ---- Guest-Ban -- pełna szerokość tabeli, jak lista graczy w General --- */
+.section-guestban table,
+.section-guestban tbody,
+.section-guestban thead,
+.section-guestban tr,
+.section-guestban td,
+.section-guestban th {
+	min-width: 0 !important;
 }
-.cadre.left.menu {
-	margin-bottom: 0;
+.section-guestban table {
+	display: table !important;
+	width: 100% !important;
+	max-width: 100% !important;
+	margin: 0 !important;
+	table-layout: auto !important;
+	border-collapse: collapse !important;
 }
-.cadre.middle.folders {
-	clear: left;
-	width: 15.5%;
+.section-guestban table th,
+.section-guestban table td {
+	word-break: break-word !important;
+	white-space: normal !important;
 }
-.options-radio-inline li {
-	width: 22%;
+
+/* ---- title-detail -- pill button at h1 height ---------- */
+.title-detail {
+	position: absolute !important;
+	top: 14px;
+	right: 8px;
+	display: flex;
+	align-items: center;
+	gap: 0;
+	padding: 0;
+	margin: 0;
+	line-height: 1;
 }
-.options-radio-inline li .name {
+.title-detail ul {
+	display: flex;
+	align-items: center;
+	gap: 0;
+}
+.title-detail li {
+	float: none;
+	height: auto;
+	line-height: 1;
+	padding: 0;
+	border: none;
+}
+.title-detail li.last { border: 0; }
+
+/* Link -- left part of the pill */
+.title-detail a {
+	display: inline-block;
+	font-size: .78em;
+	padding: 3px 8px;
+	border-radius: 4px;
+	text-decoration: none;
+	background: rgba(0,0,0,.3);
+	color: #ddd !important;
+	opacity: 1 !important;
+	transition: background .15s, color .15s;
+	white-space: nowrap;
+}
+.title-detail a:hover {
+	background: rgba(0,0,0,.5);
+	color: #fff !important;
+}
+/* Checkbox — plain, bez pilla */
+.title-detail input[type="checkbox"] {
+	display: inline-block !important;
+	width: 14px !important;
+	height: 14px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	float: none !important;
+	vertical-align: middle;
+	cursor: pointer;
+	background: transparent;
+	border-radius: 0;
+}
+.title-detail li.last {
+	display: inline-flex;
+	align-items: center;
+	background: none;
+	border-radius: 0;
+	padding: 0 2px;
+	border: none;
+}
+
+.section-index .cadre,
+.section-index .cadre.left,
+.section-index .cadre.right {
+	float: none !important;
+	width: 99% !important;
+	max-width: 99% !important;
+	margin: 0 0 8px 0 !important;
+	padding-left: 12px !important;
+	box-sizing: border-box;
+	min-height: auto !important;
+}
+.section-index .cadre.right {
+	margin-bottom: 8px !important;
+	margin-left: 0 !important;
+}
+.section-index .cadre .content {
+	width: 100% !important;
+	max-width: 100% !important;
+}
+.section-index .cadre table.current_map {
+	display: table !important;
+	width: auto !important;
+	max-width: 100% !important;
+	margin: 0 auto !important;
+	table-layout: fixed !important;
+	overflow-x: visible !important;
+}
+.section-index .cadre table.current_map td,
+.section-index .cadre table.current_map th {
+	min-width: 0 !important;
+	word-break: break-word !important;
+	white-space: normal !important;
+	width: auto !important;
+}
+.section-index #playerlist table,
+.section-index #playerlist tbody,
+.section-index #playerlist thead,
+.section-index #playerlist tr,
+.section-index #playerlist td,
+.section-index #playerlist th {
+	min-width: 0 !important;
+}
+.section-index #playerlist table {
+	display: table !important;
+	width: 100% !important;
+	max-width: 100% !important;
+	margin: 0 !important;
+	table-layout: auto !important;
+	border-collapse: collapse !important;
+}
+.section-index #playerlist table th,
+.section-index #playerlist table td {
+	word-break: break-word !important;
+	white-space: normal !important;
+}
+.section-index .cadre #map_currentcallvote,
+.section-index .cadre #map_teamscore {
+	width: auto !important;
+	max-width: 100% !important;
+	height: auto !important;
+	line-height: normal !important;
+}
+.section-index .cadre #map_thumbnail {
+	position: static !important;
+	float: none !important;
+	width: auto !important;
+	max-width: 100% !important;
+	margin: 8px 0 0 0 !important;
+}
+.section-index .cadre #map_thumbnail img {
+	max-width: 100% !important;
+	height: auto !important;
+}
+.section-index #playerlist {
+	min-height: auto !important;
+}
+
+/* ---- Chat -------------------------------------------------- */
+.section-chat .options {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 8px 10px;
+}
+.section-chat #chatNickname,
+.section-chat #chatMessage,
+.section-chat #chatSend {
+	width: 100% !important;
+	box-sizing: border-box;
+	margin: 0 !important;
+	float: none !important;
+}
+.section-chat #chatSend {
+	display: block !important;
+	min-height: 38px;
+}
+
+/* ---- Mapy z menu ----------------------------------------- */
+.maps.hasMenu,
+.maps.hasMenu.hasFolders {
+	display: block;
 	width: 100%;
 }
+.hasMenu .cadre.right,
+.hasMenu.hasFolders .cadre.right {
+	display: block;
+	float: none !important;
+	clear: both;
+	width: 100% !important;
+	max-width: 100% !important;
+	margin: 0 0 8px !important;
+	margin-left: 0 !important;
+	padding-left: 12px !important;
+	box-sizing: border-box;
+}
+.cadre.left.menu {
+	display: block;
+	float: none !important;
+	clear: both;
+	width: 100% !important;
+	max-width: 100% !important;
+	margin: 0 0 8px !important;
+	margin-left: 0 !important;
+	box-sizing: border-box;
+}
+.cadre.middle.folders {
+	display: block;
+	float: none !important;
+	clear: both;
+	width: 100% !important;
+	max-width: 100% !important;
+	margin: 0 0 8px !important;
+	margin-left: 0 !important;
+	padding-left: 12px !important;
+	box-sizing: border-box;
+}
+.hasMenu.hasFolders .cadre.left.menu {
+	width: 100% !important;
+}
+
+/* ---- Radio options (Transfer mode, sortowanie) ------------ */
+.options-radio-inline {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.options-radio-inline li {
+	float: none !important;
+	width: 100% !important;
+	margin: 0 !important;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+}
+.options-radio-inline li input {
+	float: none !important;
+	margin: 0 !important;
+	flex-shrink: 0;
+}
+.options-radio-inline li .name {
+	width: auto !important;
+	margin: 0 !important;
+	flex: 1 1 auto;
+}
+.options-radio-inline li .icon {
+	display: none;
+}
+/* Order section -- same rules, smaller padding since labels are shorter */
 .section-maps-order .options-radio-inline li {
-	width: 14%;
+	padding: 8px 12px;
 }
 .section-maps-order .save {
 	margin-top: 10px;
 }
+
+/* ---- Folder path ------------------------------------ */
 .path {
 	width: 200px;
+	max-width: 60%;
+}
+
+/* ---- Tables -- horizontal scroll instead of wrapping ------------- */
+.cadre table {
+	display: block;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+/* ---- Server Options — General i Advanced --- FLEXBOX HACK ---- */
+
+/* Fieldset — bez scrollowania */
+.section-srvopts fieldset,
+.section-srvopts .content {
+	max-height: none !important;
+	height: auto !important;
+	overflow: visible !important;
+}
+.section-srvopts .srvopts_changeauthpassword {
+	padding-bottom: 10px;
+}
+
+/* Block-mode Server Options — full-width stacked rows */
+.section-srvopts table,
+.section-srvopts tbody,
+.section-srvopts thead,
+.section-srvopts tfoot,
+.section-srvopts tr,
+.section-srvopts td,
+.section-srvopts th {
+	display: block !important;
+	width: 100% !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: none !important;
+	box-sizing: border-box !important;
+	min-width: 0;
+	float: none !important;
+	position: static !important;
+}
+
+.section-srvopts tr {
+	padding: 8px 0 !important;
+	margin-bottom: 8px !important;
+	height: auto !important;
+	border-bottom: 1px solid rgba(128,128,128,.14) !important;
+	overflow: visible !important;
+}
+.section-srvopts tr:last-child {
+	margin-bottom: 0 !important;
+	border-bottom: none !important;
+}
+
+.section-srvopts tr,
+.section-srvopts td,
+.section-srvopts th {
+	height: auto !important;
+}
+
+.section-srvopts td.key {
+	font-size: .8em;
+	color: #999;
+	padding: 0 0 4px 0 !important;
+	text-align: left;
+}
+
+.section-srvopts td.value {
+	width: 100% !important;
+	padding: 0 !important;
+}
+.section-srvopts td.value input.text,
+.section-srvopts td.value input[type="number"],
+.section-srvopts td.value select,
+.section-srvopts td.value textarea {
+	width: 100% !important;
+	box-sizing: border-box;
+	margin-bottom: 8px !important;
+}
+.section-srvopts td.value input[type="checkbox"] {
+	width: 20px !important;
+	height: 20px !important;
+	display: inline-block !important;
+	margin: 0 0 8px auto !important;
+	flex-shrink: 0;
+}
+
+.section-srvopts td.value.col2,
+.section-srvopts td.key.col3 {
+	display: none !important;
+}
+
+.section-srvopts .preview {
+	display: none !important;
+}
+
+/* Show preview only for server name/comment rows */
+.section-srvopts tr.serverName td.preview,
+.section-srvopts tr.serverComment td.preview {
+	display: block !important;
+	width: 100% !important;
+	padding: 10px 12px !important;
+	background: rgba(255,255,255,.06) !important;
+	border-radius: 8px !important;
+	font-size: .85em !important;
+	font-style: italic !important;
+	color: #777 !important;
+	box-sizing: border-box !important;
+	margin-top: 8px !important;
+}
+
+.section-srvopts tr.serverName,
+.section-srvopts tr.serverComment {
+	padding: 8px 0 !important;
+
+}
+
+.section-srvopts tr.serverName td.key,
+.section-srvopts tr.serverComment td.key {
+	font-size: .82em !important;
+	font-weight: normal !important;
+	letter-spacing: normal !important;
+	text-transform: none !important;
+	color: #999 !important;
+	padding-bottom: 6px !important;
+}
+
+.section-srvopts tr.serverComment textarea {
+	height: auto !important;
+	min-height: 80px !important;
+	resize: vertical !important;
+	margin-bottom: 10px !important;
+}
+
+.section-srvopts td#create-preview,
+.section-srvopts td.preview {
+	clear: both !important;
+}
+
+/* Rows containing any checkbox: put label and control on one line, checkbox right-aligned */
+.section-srvopts tr:has(input[type="checkbox"]) {
+	display: flex !important;
+	flex-direction: row !important;
+	align-items: center !important;
+	gap: 12px !important;
+	padding: 6px 0 !important;
+}
+.section-srvopts tr:has(input[type="checkbox"]) td.key {
+	flex: 1 1 auto !important;
+	width: auto !important;
+	margin: 0 !important;
+	padding: 0 8px 0 0 !important;
+	display: block !important;
+}
+.section-srvopts tr:has(input[type="checkbox"]) td.value {
+	flex: 0 0 auto !important;
+	width: auto !important;
+	display: flex !important;
+	justify-content: flex-end !important;
+	align-items: center !important;
+}
+/* Ensure preview cell always breaks onto its own row under checkbox rows */
+.section-srvopts tr:has(input[type="checkbox"]) .preview,
+.section-srvopts tr:has(input[type="checkbox"]) td.preview {
+	order: 2 !important;
+	flex-basis: 100% !important;
+	width: 100% !important;
+	margin-top: 8px !important;
+}
+
+/* Slightly smaller touch targets on mobile to save vertical space */
+.section-srvopts td.key { line-height: 1.1; }
+.section-srvopts td.value input.text,
+.section-srvopts td.value input[type="number"],
+.section-srvopts td.value select,
+.section-srvopts td.value textarea { padding: 6px 8px !important; }
+
+#serverNameHtml,
+#serverCommentHtml,
+#serverNameHtml *,
+#serverCommentHtml * {
+	position: static !important;
+	float: none !important;
+	clear: none !important;
+	display: inline !important;
+}
+
+/* Reset all spans within preview (tmnick_* etc.) */
+#serverNameHtml,
+#serverCommentHtml,
+#serverNameHtml *,
+#serverCommentHtml * {
+	position: static !important;
+	float: none !important;
+	clear: none !important;
+	display: inline !important;
+}
+
+/* === P2P: both checkboxes side by side in one row === */
+.section-srvopts tr:has(#IsP2PUpload) {
+	display: flex !important;
+	flex-direction: row !important;
+	flex-wrap: nowrap !important;
+	align-items: center !important;
+	justify-content: space-between !important;
+	gap: 10px !important;
+	padding: 6px 0 !important;
+	max-width: 100% !important;
+}
+/* keep upload label and checkbox together */
+.section-srvopts tr:has(#IsP2PUpload) td.key {
+	flex: 0 0 auto !important;
+	width: auto !important;
+	margin: 0 !important;
+	padding: 0 8px 0 0 !important;
+	min-width: 0 !important;
+}
+.section-srvopts tr:has(#IsP2PUpload) td.value.col2 {
+	flex: 0 0 auto !important;
+	width: auto !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: flex-start !important;
+	min-width: 0 !important;
+}
+/* move download pair to right edge */
+.section-srvopts tr:has(#IsP2PUpload) td.key.col3 {
+	flex: 0 0 auto !important;
+	width: auto !important;
+	margin-left: auto !important;
+	padding: 0 8px 0 0 !important;
+	min-width: 0 !important;
+}
+.section-srvopts tr:has(#IsP2PUpload) td.value:last-of-type {
+	flex: 0 0 auto !important;
+	width: auto !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: flex-end !important;
+	min-width: 0 !important;
+}
+/* hide preview for P2P row (no preview needed) */
+.section-srvopts tr:has(#IsP2PUpload) td.preview { display: none !important; }
+
+/* === Change Authentication Password === */
+.section-srvopts .srvopts_changeauthpassword td.key {
+	display: none !important;
+}
+.section-srvopts .srvopts_changeauthpassword .changeauthpassword-arrow {
+	display: none !important;
+}
+/* Restore col2 -- select and input together */
+.section-srvopts .srvopts_changeauthpassword td.value.col2 {
+	display: flex !important;
+	flex: 0 0 100% !important;
+	width: 100% !important;
+	gap: 6px;
+	float: none !important;
+	box-sizing: border-box;
+}
+/* Nadpisz float:left i width:19.7% z global.css */
+.section-srvopts .srvopts_changeauthpassword select {
+	float: none !important;
+	flex: 0 0 48%;
+	width: auto !important;
+	min-width: 0;
+	box-sizing: border-box;
+}
+.section-srvopts .srvopts_changeauthpassword input.text {
+	float: none !important;
+	flex: 1 1 auto;
+	width: auto !important;
+	min-width: 0;
+	box-sizing: border-box;
+}
+
+/* ---- Linki akcji poza title-detail (cleanList, itp.) ----- */
+a.cleanList,
+a#detailMode,
+a#scrollToCurrentMap,
+a#clickNewPlaylist {
+	display: inline-block;
+	font-size: .82em;
+	padding: 3px 8px;
+	border-radius: 4px;
+	text-decoration: none;
+	background: rgba(128,128,128,.15);
+	color: #bbb;
+	transition: background .15s, color .15s;
+}
+a.cleanList:hover,
+a#detailMode:hover,
+a#scrollToCurrentMap:hover,
+a#clickNewPlaylist:hover {
+	background: rgba(128,128,128,.28);
+	color: #fff;
+}
+
+/* ---- Results — tabela ----------------------------------- */
+/* Override .cadre table { display: block } which breaks the column layout */
+#resultsTable table {
+	display: table !important;
+	width: 100% !important;
+	table-layout: auto !important;
+	overflow: visible !important;
+}
+#resultsTable thead,
+#resultsTable tbody {
+	display: table-row-group !important;
+}
+#resultsTable thead {
+	display: table-header-group !important;
+}
+#resultsTable tr {
+	display: table-row !important;
+}
+#resultsTable th,
+#resultsTable td {
+	display: table-cell !important;
+}
+/* Rank column -- narrow, fixed width */
+#resultsTable td.results-rank,
+#resultsTable th.col-rank {
+	width: 38px !important;
+	max-width: 38px !important;
+	padding-left: 2px !important;
+	padding-right: 2px !important;
+	text-align: center !important;
+	white-space: nowrap;
+	overflow: hidden;
+}
+/* "RANK" header doesn't fit in 38px -- replace with a short "#" */
+#resultsTable th.col-rank {
+	font-size: 0;
+	color: transparent;
+	position: relative;
+}
+#resultsTable th.col-rank::after {
+	content: '#';
+	position: absolute;
+	top: 50%; left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 13px;
+	color: #c0392b;
+	font-weight: 600;
+}
+/* Remaining columns -- share the rest of the width equally */
+#resultsTable th:not(.col-rank),
+#resultsTable td:not(.results-rank) {
+	width: auto !important;
+}
+
+/* ---- Game Infos — General i tryby gry --------------------- */
+.section-gameinfos .cadre {
+	overflow: visible !important;
+}
+.section-gameinfos fieldset,
+.section-gameinfos .content,
+.section-gameinfos .content.gameinfos {
+	max-height: none !important;
+	height: auto !important;
+	min-height: 0 !important;
+	overflow: visible !important;
+	overflow-y: visible !important;
+}
+.section-gameinfos table,
+.section-gameinfos tbody,
+.section-gameinfos tr,
+.section-gameinfos td {
+	border: none !important;
+	float: none !important;
+	position: static !important;
+	height: auto !important;
+	min-height: 0 !important;
+}
+.section-gameinfos table {
+	display: block !important;
+	width: 100% !important;
+}
+.section-gameinfos tbody {
+	display: block !important;
+	width: 100% !important;
+}
+.section-gameinfos tr {
+	display: flex !important;
+	flex-flow: row wrap !important;
+	padding: 8px 0;
+	margin: 0 !important;
+	border-bottom: 1px solid rgba(128,128,128,.15) !important;
+}
+.section-gameinfos tr:last-child {
+	border-bottom: none !important;
+}
+.section-gameinfos td {
+	margin: 0 !important;
+	box-sizing: border-box;
+}
+.section-gameinfos td.key {
+	flex: 1 0 100% !important;
+	max-width: 100% !important;
+	width: 100% !important;
+	text-align: left !important;
+	padding: 0 0 5px !important;
+	font-size: .8em;
+	font-weight: 600;
+	color: #888;
+	order: 1;
+}
+/* Two values (current/next) side by side, half width each */
+.section-gameinfos td.value {
+	flex: 1 1 0 !important;
+	max-width: 50% !important;
+	width: auto !important;
+	min-width: 0;
+	padding: 0 2px !important;
+	order: 2;
+}
+.section-gameinfos td.value input,
+.section-gameinfos td.value select {
+	width: 100% !important;
+	box-sizing: border-box;
+}
+/* If the value has colspan="2" (TM2020 -- single field) -- full width */
+.section-gameinfos td.value[colspan] {
+	flex: 1 1 100% !important;
+	max-width: 100% !important;
+}
+/* Hide the preview column -- no room on mobile */
+.section-gameinfos td.preview {
+	display: none !important;
+	order: 3;
+}
+/* Checkboxes (Respawn, etc.) -- don't stretch */
+.section-gameinfos td.value input[type="checkbox"] {
+	width: 20px !important;
+	height: 20px !important;
+}
+
+/* ---- Save current MatchSettings + przycisk Save ----------- */
+/* fleft (checkbox) and fright (Save) overlap on narrow screens -- */
+/* stack them vertically, checkbox above the button */
+.fleft.options-checkbox {
+	float: none !important;
+	clear: both;
+	display: block;
+	width: 100%;
+	margin: 8px 0 !important;
+	padding-left: 14px;
+	box-sizing: border-box;
+}
+.fleft.options-checkbox label {
+	display: inline-block;
+	white-space: normal;
+	line-height: 1.3;
+	vertical-align: middle;
+}
+.fright.save {
+	float: none !important;
+	clear: both;
+	display: block;
+	width: 100%;
+	text-align: right;
+	margin: 8px 0 0 !important;
+}
+.fright.save .button {
+	width: 100%;
+	text-align: center;
+}
+
+/* ---- Vertical menu (List/Send/Order/etc.) -- alignment ----- */
+.menu .vertical-nav li a {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	padding: 8px 12px;
+	text-align: left;
+}
+
+/* ---- Upload -- hide the drop area, stretch the button -------- */
+.qq-uploader {
+	min-height: 60px;
+}
+.qq-upload-drop-area {
+	display: none !important;
+}
+.qq-upload-button {
+	position: static !important;
+	top: auto !important;
+	width: 100% !important;
+	padding: 12px 0 !important;
+	box-sizing: border-box;
+	border-right: none !important;
+	font-size: 1em;
+}
+.qq-upload-list {
+	margin: 10px 0 0 !important;
+	padding: 0 5px;
+}
+.qq-upload-list li {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 6px;
+}
+.qq-upload-file {
+	width: auto !important;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* ---- Error/info popup (#error, #info) -- full width, centered --- */
+#error, #info {
+	left: 50%;
+	right: auto;
+	width: calc(100% - 24px);
+	max-width: 500px;
+	margin: 0;
+	transform: translateX(-50%);
+	box-sizing: border-box;
 }

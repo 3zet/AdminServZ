@@ -2,23 +2,23 @@
 /**
 * Class Folder
 *
-* Méthodes de traitement de dossier
+* Folder processing methods
 */
 abstract class Folder {
 	
 	/**
-	* Liste les dossiers et fichiers d'un répertoire
+	* List the folders and files in a directory
 	*
-	* @param  string $path                 -> Le chemin du répertoire à lister
-	* @param  mixed  $hidden_folders       -> Les dossiers à masquer : array('dossier1', 'dossier2); ou 'all' pour ne pas charger les dossiers
-	* @param  mixed  $hidden_files         -> Les fichiers ou extension à masquer : array('Thumbs.db', 'index.php', 'exe');  ou 'all' pour ne pas charger les fichiers
-	* @param  int    $recent_status_period -> Période pour afficher le statut "récent"
+	* @param  string $path                 -> Path of the directory to list
+	* @param  mixed  $hidden_folders       -> Folders to hide: array('folder1', 'folder2'); or 'all' to skip loading folders
+	* @param  mixed  $hidden_files         -> Files or extensions to hide: array('Thumbs.db', 'index.php', 'exe'); or 'all' to skip loading files
+	* @param  int    $recent_status_period -> Period for showing "recent" status
 	* @return array ['folders'], ['files']
 	*/
-	public static function read($path = '.', $hiddenFolders = array(), $hiddenFiles = array(), $recentStatusPeriod = 86400){
-		$out = array();
+	public static function read($path = '.', $hiddenFolders = [], $hiddenFiles = [], $recentStatusPeriod = 86400){
+		$out = [];
 		$midnight = time() - (date('H') * 3600) - (date('i') * 60);
-		if( substr($path, -1, 1) != '/'){ $path .= '/'; }
+		if( !str_ends_with($path, '/')){ $path .= '/'; }
 		
 		if( !class_exists('File') && !class_exists('Str') ){
 			$out = 'Class "File" or "Str" not exists';
@@ -30,7 +30,7 @@ abstract class Folder {
 			else{
 				$dir = scandir($path);
 				foreach($dir as $entry){
-					$entry = utf8_encode($entry);
+					$entry = mb_convert_encoding($entry, 'UTF-8', 'ISO-8859-1');
 					if($entry != '.' && $entry != '..'){
 						$pathToEntry = $path.'/'.$entry;
 						
@@ -67,10 +67,10 @@ abstract class Folder {
 	
 	
 	/**
-	* Créer un dossier
+	* Create a folder
 	*
-	* @param string $dirname -> Chemin du dossier à créer
-	* @return true si réussi sinon message d'erreur
+	* @param string $dirname -> Path of the folder to create
+	* @return true if successful, otherwise error message
 	*/
 	public static function create($dirname){
 		$out = null;
@@ -93,13 +93,13 @@ abstract class Folder {
 	
 	
 	/**
-	* Renomme un dossier
+	* Rename a folder
 	*
-	* @param string $oldname -> Chemin de l'ancien dossier
-	* @param string $newname -> Chemin du nouveau dossier
-	* @return true si réussi sinon message d'erreur
+	* @param string $oldname -> Path of the old folder
+	* @param string $newname -> Path of the new folder
+	* @return true if successful, otherwise error message
 	*/
-	public static function rename($oldname, $newname){
+	public static function rename(string $oldname, $newname){
 		$out = null;
 		
 		if( file_exists($oldname) ){
@@ -124,14 +124,14 @@ abstract class Folder {
 	
 	
 	/**
-	* Supprime un dossier avec son contenu (dossiers + fichiers)
+	* Delete a folder with its content (folders + files)
 	*
-	* @param string $dirname -> Chemin du dossier à supprimer
-	* @return true si réussi sinon message d'erreur
+	* @param string $dirname -> Path of the folder to delete
+	* @return true if successful, otherwise error message
 	*/
 	public static function delete($dirname){
 		$out = null;
-		if( substr($dirname, -1, 1) != '/'){ $dirname .= '/'; }
+		if( !str_ends_with($dirname, '/')){ $dirname .= '/'; }
 		
 		if( class_exists('File') ){
 			if( file_exists($dirname) ){
@@ -169,15 +169,15 @@ abstract class Folder {
 	
 	
 	/**
-	* Compte le nombre de fichier présent dans un dossier
+	* Count the number of files in a folder
 	*
-	* @param string $path        -> Le chemin du dossier
-	* @param array  $hiddenFiles -> Les fichiers ou extensions à ne pas prendre en compte
+	* @param string $path        -> The folder path
+	* @param array  $hiddenFiles -> Files or extensions to ignore
 	* @return int
 	*/
-	public static function countFiles($path, $hiddenFiles = array() ){
+	public static function countFiles($path, $hiddenFiles = [] ){
 		$out = 0;
-		if( substr($path, -1, 1) != '/'){ $path .= '/'; }
+		if( !str_ends_with($path, '/')){ $path .= '/'; }
 		
 		if( class_exists('File') ){
 			if( file_exists($path) ){
@@ -218,14 +218,14 @@ abstract class Folder {
 	
 	
 	/**
-	* Taille d'un dossier
+	* Size of a folder
 	*
-	* @param string $path -> Le chemin du dossier
+	* @param string $path -> The folder path
 	* @return int
 	*/
 	public static function getSize($path){
 		$out = 0;
-		if( substr($path, -1, 1) != '/'){ $path .= '/'; }
+		if( !str_ends_with($path, '/')){ $path .= '/'; }
 		
 		if( file_exists($path) ){
 			$dir = scandir($path);
@@ -250,18 +250,18 @@ abstract class Folder {
 	
 	
 	/**
-	* Retourne l'arborescence complete du chemin avec un décalage du dossier
+	* Return the complete tree of the path with a folder offset
 	*
-	* @param string $path          -> Le chemin du dossier
-	* @param array  $hiddenFiles   -> Les fichiers ou extensions à ne pas prendre en compte
-	* @param int    $hidePathLevel -> Nombre de niveau du chemin à masquer pour l'affichage
+	* @param string $path          -> The folder path
+	* @param array  $hiddenFiles   -> Files or extensions to ignore
+	* @param int    $hidePathLevel -> Number of path levels to hide from display
 	* @return array
 	*/
-	public static function getArborescence($path = '.', $hiddenFolders = array(), $hidePathLevel = 0){
-		$out = array();
+	public static function getArborescence(string $path = '.', $hiddenFolders = [], $hidePathLevel = 0){
+		$out = [];
 		$struct = self::read($path, $hiddenFolders);
 		
-		// Décalage selon la profondeur de l'arborescence
+		// Offset based on tree depth
 		$countSlash = substr_count($path, '/') - $hidePathLevel;
 		$pathLevel = null;
 		for($i = 0; $i < $countSlash; $i++){
@@ -271,11 +271,7 @@ abstract class Folder {
 		
 		if( isset($struct['folders']) && count($struct['folders']) > 0 ){
 			foreach($struct['folders'] as $dir => $values){
-				$out[] = array(
-					'path' => $path.$dir.'/',
-					'name' => $dir,
-					'level' => $pathLevel
-				);
+				$out[] = ['path' => $path.$dir.'/', 'name' => $dir, 'level' => $pathLevel];
 				$out = array_merge($out, self::getArborescence($path.$dir.'/', $hiddenFolders, $hidePathLevel) );
 			}
 		}
@@ -285,11 +281,11 @@ abstract class Folder {
 	
 	
 	/**
-	* Vérifie les droits par rapport au chmod
+	* Check permissions against chmod
 	*/
 	public static function checkRights($path, $minChmod){
-		$out = array();
-		$chars = str_split($minChmod);
+		$out = [];
+		$chars = str_split((string) $minChmod);
 		
 		$i = 0;
 		foreach($chars as $char){
@@ -338,11 +334,11 @@ abstract class Folder {
 	
 	
 	/**
-	* Converti un chmod int (777) en string (rwxrwxrwx)
+	* Convert a chmod int (777) into a string (rwxrwxrwx)
 	*/
 	public static function chmodToStr($chmod){
 		$out = null;
-		$chars = str_split($chmod);
+		$chars = str_split((string) $chmod);
 		
 		foreach($chars as $char){
 			switch($char){

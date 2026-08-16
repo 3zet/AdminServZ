@@ -1,14 +1,14 @@
 <?php
 
 /**
-* Classe pour la gestion des plugins
+* Class for plugin management
 */
 class AdminServPlugin {
 	
 	/**
-	* Tente de récupérer une config des plugins à partir d'un autre fichier
+	* Try to get a plugin config from another file
 	*/
-	public static function setPluginsList(){
+	public static function setPluginsList(): void{
 		$otherPluginsList = AdminServConfig::PLUGINS_LIST;
 		
 		if($otherPluginsList){
@@ -35,9 +35,9 @@ class AdminServPlugin {
 	
 	
 	/**
-	* Détermine s'il y a au moins un plugin disponible
+	* Determine if at least one plugin is available
 	*
-	* @param string $pluginName -> Test un plugin en particulier
+	* @param string $pluginName -> Test a specific plugin
 	* @return bool
 	*/
 	public static function hasPlugin($pluginName = null){
@@ -66,15 +66,15 @@ class AdminServPlugin {
 	
 	
 	/**
-	* Récupère le plugin courant
+	* Get the current plugin
 	*
 	* @return pluginName
 	*/
-	public static function getCurrent(){
+	public static function getCurrent(): ?string{
 		$out = null;
 		
 		if( defined('USER_PAGE') ){
-			$pageEx = explode('-', USER_PAGE);
+			$pageEx = explode('-', (string) USER_PAGE);
 			if( count($pageEx) > 0 && isset($pageEx[0]) && $pageEx[0] == 'plugins' ){
 				if( isset($pageEx[1]) && $pageEx[1] != 'list' ){
 					$out = $pageEx[1];
@@ -87,11 +87,11 @@ class AdminServPlugin {
 	
 	
 	/**
-	* Récupère la config du plugin grâce au fichier config.ini
+	* Get the plugin config from the config.ini file
 	*
-	* @param string $pluginName  -> Le nom du dossier plugin
-	* @param string $returnField -> Retourner un champ en particulier
-	* @return array ou string si le 2ème paramètre est spécifié
+	* @param string $pluginName  -> The plugin folder name
+	* @param string $returnField -> Return a specific field
+	* @return array or string if the 2nd parameter is specified
 	*/
 	public static function getConfig($pluginName = null, $returnField = null){
 		$out = null;
@@ -115,13 +115,13 @@ class AdminServPlugin {
 	
 	
 	/**
-	* Retourne une liste html pour le menu des plugins
+	* Return an html list for the plugins menu
 	*
 	* @return html
 	*/
 	public static function getMenuList(){
 		$out = null;
-		$pluginsList = array();
+		$pluginsList = [];
 		if( count(ExtensionConfig::$PLUGINS) > 0 ){
 			foreach(ExtensionConfig::$PLUGINS as $plugin){
 				$pluginInfos = self::getConfig($plugin);
@@ -146,13 +146,11 @@ class AdminServPlugin {
 	
 	
 	/**
-	* Compte le nombre de plugins installés
-	*
-	* @return array
-	*/
-	public static function countPlugins(){
-		$out = array();
-		$pluginsList = array();
+     * Count the number of installed plugins
+     */
+    public static function countPlugins(): array{
+		$out = [];
+		$pluginsList = [];
 		if( self::hasPlugin() ){
 			foreach(ExtensionConfig::$PLUGINS as $plugin){
 				$pluginInfos = self::getConfig($plugin);
@@ -175,21 +173,20 @@ class AdminServPlugin {
 	
 	
 	/**
-	* Inclue les fichiers pour le rendu d'un plugin
-	*
-	* @param string $pluginName -> Le nom du dossier plugin
-	* @return html
-	*/
-	public static function renderPlugin($pluginName = null) {
+     * Include the files for rendering a plugin
+     *
+     * @param string $pluginName -> The plugin folder name
+     */
+    public static function renderPlugin($pluginName = null): void {
 		global $client, $translate, $args;
 		if($pluginName === null){
 			$pluginName = USER_PLUGIN;
 		}
 		
-		// Tente de récupérer les plugins d'une autre config
+		// Try to get plugins from another config
 		self::setPluginsList();
 		
-		// Création du rendu du plugin
+		// Build the plugin render
 		$pluginPath = AdminServConfig::$PATH_PLUGINS .$pluginName.'/';
 		$scriptFile = $pluginPath.'script.php';
 		$viewFile = $pluginPath.'view.php';
@@ -202,7 +199,6 @@ class AdminServPlugin {
 				$client->Terminate();
 			}
 			
-			// Header
 			AdminServUI::getHeader();
 			
 			// Content
@@ -217,7 +213,6 @@ class AdminServPlugin {
 				echo '</section>'
 			.'</section>';
 			
-			// Footer
 			AdminServUI::getFooter();
 			
 			AdminServLogs::add('access', 'Plugin: '.$pluginName);
@@ -231,9 +226,9 @@ class AdminServPlugin {
 	
 	
 	/**
-	* Récupère le chemin du dossier plugin
+	* Get the plugin folder path
 	*
-	* @param string $pluginName -> Le nom du dossier plugin
+	* @param string $pluginName -> The plugin folder name
 	* @return string
 	*/
 	public static function getPluginPath($pluginName = null){

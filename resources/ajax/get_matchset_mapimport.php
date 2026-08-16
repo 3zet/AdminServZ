@@ -13,9 +13,9 @@
 	AdminServUI::lang();
 	
 	// ISSET
-	if( isset($_GET['path']) ){ $path = addslashes($_GET['path']); }else{ $path = null; }
-	if( isset($_GET['d']) ){ $directory = addslashes($_GET['d']); }else{ $directory = null; }
-	if( isset($_GET['op']) ){ $operation = addslashes($_GET['op']); }else{ $operation = null; }
+	if( isset($_GET['path']) ){ $path = addslashes((string) $_GET['path']); }else{ $path = null; }
+	if( isset($_GET['d']) ){ $directory = addslashes((string) $_GET['d']); }else{ $directory = null; }
+	if( isset($_GET['op']) ){ $operation = addslashes((string) $_GET['op']); }else{ $operation = null; }
 	if( isset($_GET['select']) ){ $selection = $_GET['select']; }else{ $selection = null; }
 	
 	// DATA
@@ -30,9 +30,9 @@
 			$mapsImport = AdminServ::getLocalMapList($currentDir, $directory);
 		}
 		
-		// Faire une sélection
+		// Make a selection
 		if($operation == 'setSelection'){
-			// On supprime les maps non sélectionnées
+			// Remove unselected maps
 			if( $selection != null && count($selection) > 0 ){
 				foreach($mapsImport['lst'] as $id => $values){
 					if( !in_array($id, $selection) ){
@@ -47,7 +47,7 @@
 			}
 		}
 		
-		// Enregistrement de la sélection du MatchSettings
+		// Save the MatchSettings selection
 		if($operation != 'getSelection'){
 			AdminServ::saveMatchSettingSelection($mapsImport);
 		}

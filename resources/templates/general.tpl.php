@@ -1,4 +1,5 @@
 <section class="cadre left<?php if ($data['isTeamGameMode']): echo ' isTeamGameMode'; endif; ?>">
+
 	<h1><?php echo Utils::t('Current map'); ?></h1>
 	<form method="post" action=".">
 	<div class="content">
@@ -13,7 +14,10 @@
 			</tr>
 			<tr>
 				<td class="key"><?php echo Utils::t('Environment'); ?></td>
-				<td class="value" id="map_enviro"><?php echo $data['serverInfo']['map']['enviro']; ?><img src="<?php echo AdminServConfig::$PATH_RESOURCES .'images/env/'.strtolower($data['serverInfo']['map']['enviro']); ?>.png" alt="" /></td>
+				<td class="value" id="map_enviro">
+					<?php echo $data['serverInfo']['map']['enviro']; ?>
+					<img src="<?php echo AdminServConfig::$PATH_RESOURCES.'images/env/'.strtolower((string)$data['serverInfo']['map']['enviro']); ?>.png" alt="" />
+				</td>
 			</tr>
 			<tr>
 				<td class="key"><?php echo Utils::t('Map UId'); ?></td>
@@ -21,9 +25,10 @@
 			</tr>
 			<tr>
 				<td class="key"><?php echo Utils::t('Game mode'); ?></td>
-				<td class="value <?php echo strtolower($data['serverInfo']['srv']['gameModeName']); ?>" id="map_gamemode">
-					<?php if (isset($data['serverInfo']['srv']['gameModeScriptName'])): ?>
-						<?php echo $data['serverInfo']['srv']['gameModeScriptName']; ?> <span class="scriptName">(<?php echo $data['serverInfo']['srv']['gameModeName']; ?>)</span>
+				<td class="value <?php echo strtolower((string)$data['serverInfo']['srv']['gameModeName']); ?>" id="map_gamemode">
+					<?php if (isset($data['serverInfo']['srv']['gameModeScriptName']) && $data['serverInfo']['srv']['gameModeScriptName']): ?>
+						<?php echo $data['serverInfo']['srv']['gameModeScriptName']; ?>
+						<span class="scriptName">(<?php echo $data['serverInfo']['srv']['gameModeName']; ?>)</span>
 					<?php else: ?>
 						<?php echo $data['serverInfo']['srv']['gameModeName']; ?>
 					<?php endif; ?>
@@ -42,15 +47,16 @@
 				<tr>
 					<td class="key"><?php echo Utils::t('Scores'); ?></td>
 					<td class="value" id="map_teamscore">
-						<span class="team_0" title="<?php echo Utils::t('Blue team'); ?>"></span>
+						<span class="team_0" title="<?php echo Utils::t('Blue team'); ?>">&nbsp;</span>
 						<input class="text" type="number" min="0" name="ScoreTeamBlue" id="ScoreTeamBlue" value="<?php echo $data['serverInfo']['map']['scores']['blue']; ?>" />
-						<span class="team_1" title="<?php echo Utils::t('Red team'); ?>"></span>
+						<span class="team_1" title="<?php echo Utils::t('Red team'); ?>">&nbsp;</span>
 						<input class="text" type="number" min="0" name="ScoreTeamRed" id="ScoreTeamRed" value="<?php echo $data['serverInfo']['map']['scores']['red']; ?>" />
 						<input class="button light" type="submit" name="ForceScores" id="ForceScores" value="<?php echo Utils::t('Force the scores'); ?>" />
 					</td>
 				</tr>
 			<?php endif; ?>
 		</table>
+
 		<?php if ($data['serverInfo']['map']['thumb'] != null): ?>
 			<div id="map_thumbnail" data-text-thumbnail="<?php echo Utils::t('No thumbnail'); ?>">
 				<img src="data:image/jpeg;base64,<?php echo $data['serverInfo']['map']['thumb']; ?>" alt="<?php echo Utils::t('No thumbnail'); ?>" />
@@ -58,7 +64,7 @@
 		<?php endif; ?>
 	</div>
 	</form>
-	
+
 	<h1><?php echo Utils::t('Server'); ?></h1>
 	<div class="content">
 		<table>
@@ -86,12 +92,12 @@
 			</tr>
 			<tr>
 				<td class="key"><?php echo Utils::t('Dedicated version'); ?></td>
-				<td class="value"><?php echo SERVER_BUILD.' ('. SERVER_VERSION .')'; ?></td>
+				<td class="value"><?php echo SERVER_BUILD.' ('.SERVER_VERSION.')'; ?></td>
 			</tr>
 		</table>
 	</div>
-	
-	<?php if (AdminServAdminLevel::isType('SuperAdmin')): ?>
+
+	<?php if (AdminServAdminLevel::isType('SuperAdmin') && isset($data['serverInfo']['net'])): ?>
 		<h1><?php echo Utils::t('Statistics'); ?></h1>
 		<div class="content last">
 			<table>
@@ -130,29 +136,45 @@
 			</table>
 		</div>
 	<?php endif; ?>
+
 </section>
 
 <section class="cadre right<?php if ($data['isTeamGameMode']): echo ' isTeamGameMode'; endif; ?>">
+
 	<h1><?php echo Utils::t('Players'); ?></h1>
 	<div class="title-detail">
 		<ul>
-			<li><a id="detailMode" href="." data-statusmode="<?php echo USER_MODE_GENERAL; ?>" data-textdetail="<?php echo Utils::t('Detailed mode'); ?>" data-textsimple="<?php echo Utils::t('Simple mode'); ?>"><?php echo (USER_MODE_GENERAL == 'detail') ? Utils::t('Simple mode') : Utils::t('Detailed mode'); ?></a></li>
-			<li class="last"><input type="checkbox" name="checkAll" id="checkAll" value=""<?php if (!is_array($data['serverInfo']['ply'])): echo ' disabled="disabled"'; endif; ?> /></li>
+			<li>
+				<a id="detailMode" href="."
+					data-statusmode="<?php echo USER_MODE_GENERAL; ?>"
+					data-textdetail="<?php echo Utils::t('Detailed mode'); ?>"
+					data-textsimple="<?php echo Utils::t('Simple mode'); ?>">
+					<?php echo (USER_MODE_GENERAL == 'detail') ? Utils::t('Simple mode') : Utils::t('Detailed mode'); ?>
+				</a>
+			</li>
+			<li class="last">
+				<input type="checkbox" name="checkAll" id="checkAll" value=""<?php if (!is_array($data['serverInfo']['ply'])): echo ' disabled="disabled"'; endif; ?> />
+			</li>
 		</ul>
 	</div>
-	
-	<!-- Liste des joueurs -->
+
 	<form method="post" action=".">
 	<div id="playerlist">
 		<table>
 			<thead>
 				<tr>
 					<?php if ($data['isTeamGameMode']): ?>
-						<th class="detailModeTh thleft"<?php if (USER_MODE_GENERAL == 'simple'): echo ' hidden="hidden"'; endif; ?>><a href="?sort=team"><?php echo Utils::t('Team'); ?></a></th>
+						<th class="detailModeTh thleft"<?php if (USER_MODE_GENERAL == 'simple'): echo ' hidden="hidden"'; endif; ?>>
+							<a href="?sort=team"><?php echo Utils::t('Team'); ?></a>
+						</th>
 					<?php endif; ?>
-					<th class="firstTh <?php if (USER_MODE_GENERAL == 'simple' || !$data['isTeamGameMode']): echo 'thleft'; endif; ?>"><a href="?sort=nickname"><?php echo Utils::t('Nickname'); ?></a></th>
+					<th class="firstTh <?php if (USER_MODE_GENERAL == 'simple' || !$data['isTeamGameMode']): echo 'thleft'; endif; ?>">
+						<a href="?sort=nickname"><?php echo Utils::t('Nickname'); ?></a>
+					</th>
 					<?php if (!$data['isTeamGameMode']): ?>
-						<th class="detailModeTh"<?php if (USER_MODE_GENERAL == 'simple'): echo ' hidden="hidden"'; endif; ?>><a href="?sort=ladder"><?php echo Utils::t('Ladder'); ?></a></th>
+						<th class="detailModeTh"<?php if (USER_MODE_GENERAL == 'simple'): echo ' hidden="hidden"'; endif; ?>>
+							<a href="?sort=ladder"><?php echo Utils::t('Ladder'); ?></a>
+						</th>
 					<?php endif; ?>
 					<th><a href="?sort=login"><?php echo Utils::t('Login'); ?></a></th>
 					<th><a href="?sort=status"><?php echo Utils::t('Status'); ?></a></th>
@@ -161,32 +183,43 @@
 			</thead>
 			<tbody>
 				<tr class="table-separation"><td colspan="<?php echo ($data['isTeamGameMode']) ? '6' : '5'; ?>"></td></tr>
-				<?php if ($data['serverInfo']['nbp'] > 0): ?>
-					<?php $i = 0; ?>
-					<?php foreach ($data['serverInfo']['ply'] as $player): ?>
-						<tr class="<?php echo ($i%2) ? 'even' : 'odd'; ?>">
+				<?php if (is_array($data['serverInfo']['ply'])): ?>
+					<?php $i = 0; foreach ($data['serverInfo']['ply'] as $player): ?>
+						<tr>
 							<?php if ($data['isTeamGameMode'] && USER_MODE_GENERAL == 'detail'): ?>
-								<td class="detailModeTd imgleft"><span class="team_<?php echo $player['TeamId']; ?>" title="<?php echo $player['TeamName']; ?>">&nbsp;</span><?php echo $player['TeamName']; ?></td>
+								<td class="detailModeTd imgleft">
+									<span class="team_<?php echo $player['TeamId']; ?>" title="<?php echo $player['TeamName']; ?>">&nbsp;</span>
+									<?php echo $player['TeamName']; ?>
+								</td>
 							<?php endif; ?>
-							<td class="imgleft"><img src="<?php echo AdminServConfig::$PATH_RESOURCES; ?>images/16/solo.png" alt="" /><?php echo $player['NickName']; ?></td>
+							<td class="imgleft">
+								<img src="<?php echo AdminServConfig::$PATH_RESOURCES; ?>images/16/solo.png" alt="" />
+								<?php echo $player['NickName']; ?>
+							</td>
 							<?php if (!$data['isTeamGameMode']): ?>
-								<td class="detailModeTd imgleft"<?php if (USER_MODE_GENERAL == 'simple'): ' hidden="hidden"'; endif; ?>><img src="<?php echo AdminServConfig::$PATH_RESOURCES; ?>images/16/leagueladder.png" alt="" /><?php echo $player['LadderRanking']; ?></td>
+								<td class="detailModeTd imgleft"<?php if (USER_MODE_GENERAL == 'simple'): echo ' hidden="hidden"'; endif; ?>>
+									<img src="<?php echo AdminServConfig::$PATH_RESOURCES; ?>images/16/leagueladder.png" alt="" />
+									<?php echo $player['LadderRanking']; ?>
+								</td>
 							<?php endif; ?>
 							<td><?php echo $player['Login']; ?></td>
 							<td><?php echo $player['PlayerStatus']; ?></td>
-							<td class="checkbox"><input type="checkbox" name="player[]" value="<?php echo $player['Login']; ?>" /></td>
+							<td class="checkbox">
+								<input type="checkbox" name="player[]" value="<?php echo $player['Login']; ?>" />
+							</td>
 						</tr>
-						<?php $i++; ?>
-					<?php endforeach; ?>
+					<?php $i++; endforeach; ?>
 				<?php else: ?>
 					<tr class="no-line">
-						<td class="center" colspan="<?php echo ($data['isTeamGameMode']) ? '6' : '5'; ?>"><?php echo $data['serverInfo']['ply']; ?></td>
+						<td colspan="<?php echo ($data['isTeamGameMode']) ? '6' : '5'; ?>">
+							<?php echo is_string($data['serverInfo']['ply']) ? $data['serverInfo']['ply'] : Utils::t('No player'); ?>
+						</td>
 					</tr>
 				<?php endif; ?>
 			</tbody>
 		</table>
 	</div>
-	
+
 	<div class="options">
 		<div class="fleft">
 			<span class="nb-line"><?php echo $data['serverInfo']['nbp']; ?></span>
@@ -197,33 +230,34 @@
 				<span class="selected-files-count">(0)</span>
 				<div class="selected-files-option">
 					<?php if (AdminServAdminLevel::hasPermission('player_ignore')): ?>
-						<input class="button dark" type="submit" name="IgnoreLoginList" id="IgnoreLoginList" value="<?php echo Utils::t('Ignore'); ?>" />
+						<input class="button dark" type="submit" name="IgnoreLoginList" value="<?php echo Utils::t('Ignore'); ?>" />
 					<?php endif; ?>
 					<?php if (AdminServAdminLevel::hasPermission('player_guest')): ?>
-						<input class="button dark" type="submit" name="GuestLoginList" id="GuestLoginList" value="<?php echo Utils::t('Guest'); ?>" />
+						<input class="button dark" type="submit" name="GuestLoginList" value="<?php echo Utils::t('Guest'); ?>" />
 					<?php endif; ?>
 					<?php if (AdminServAdminLevel::hasPermission('player_ban')): ?>
-						<input class="button dark" type="submit" name="BanLoginList" id="BanLoginList" value="<?php echo Utils::t('Ban'); ?>" />
+						<input class="button dark" type="submit" name="BanLoginList" value="<?php echo Utils::t('Ban'); ?>" />
 					<?php endif; ?>
 					<?php if (AdminServAdminLevel::hasPermission('player_kick')): ?>
-						<input class="button dark" type="submit" name="KickLoginList" id="KickLoginList" value="<?php echo Utils::t('Kick'); ?>" />
+						<input class="button dark" type="submit" name="KickLoginList" value="<?php echo Utils::t('Kick'); ?>" />
 					<?php endif; ?>
 					<?php if ($data['isTeamGameMode'] && AdminServAdminLevel::hasPermission('player_changeteam')): ?>
-						<input class="button dark" type="submit" name="ForceBlueTeam" id="ForceBlueTeam" value="<?php echo Utils::t('Blue team'); ?>" />
-						<input class="button dark" type="submit" name="ForceRedTeam" id="ForceRedTeam" value="<?php echo Utils::t('Red team'); ?>" />
+						<input class="button dark" type="submit" name="ForceBlueTeam" value="<?php echo Utils::t('Blue team'); ?>" />
+						<input class="button dark" type="submit" name="ForceRedTeam" value="<?php echo Utils::t('Red team'); ?>" />
 					<?php endif; ?>
 					<?php if (AdminServAdminLevel::hasPermission('player_forcetospectator')): ?>
-						<input class="button dark" type="submit" name="ForceSpectatorList" id="ForceSpectatorList" value="<?php echo Utils::t('Spectator'); ?>" />
+						<input class="button dark" type="submit" name="ForceSpectatorList" value="<?php echo Utils::t('Spectator'); ?>" />
 					<?php endif; ?>
 					<?php if (AdminServAdminLevel::hasPermission('player_forcetoplayer')): ?>
-						<input class="button dark" type="submit" name="ForcePlayerList" id="ForcePlayerList" value="<?php echo Utils::t('Player'); ?>" />
+						<input class="button dark" type="submit" name="ForcePlayerList" value="<?php echo Utils::t('Player'); ?>" />
 					<?php endif; ?>
 				</div>
 			</div>
 		</div>
 	</div>
-	
+
 	<input type="hidden" id="currentSort" name="currentSort" value="" />
 	<input type="hidden" id="isTeamGameMode" name="isTeamGameMode" value="<?php echo $data['isTeamGameMode']; ?>" />
 	</form>
+
 </section>

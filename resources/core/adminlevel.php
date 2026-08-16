@@ -1,97 +1,26 @@
 <?php
 
 /**
-* Classe pour la gestion des niveaux admins
+* Class for admin level management
 */
 class AdminServAdminLevel {
 	
 	/**
-	* Constantes
+	* Constants
 	*/
-	private static $DEFAULT_TYPE = array(
-		'SuperAdmin' => array('SuperAdmin', 'Admin', 'User'),
-		'Admin' => array('Admin', 'User'),
-		'User' => array('User'),
-	);
-	private static $DEFAULT_ACCESS = array(
-		'srvopts' => 'server_options',
-		'gameinfos' => 'game_infos',
-		'chat' => 'chat',
-		'maps-list' => 'maps_list',
-		'maps-local' => 'maps_local',
-		'maps-upload' => 'maps_upload',
-		'maps-order' => 'maps_order',
-		'maps-matchset' => 'maps_matchsettings',
-		'maps-creatematchset' => 'maps_create_matchsettings',
-		'link_access_server',
-		'plugins-list' => 'plugins_list',
-		'guestban' => 'guest_ban',
-	);
-	private static $DEFAULT_PERMISSION = array(
-		'speed_admin',
-		'switch_server',
-		'player_kick',
-		'player_ban',
-		'player_guest',
-		'player_ignore',
-		'player_forcetospectator',
-		'player_forcetoplayer',
-		'player_changeteam',
-		'force_scores',
-		'cancel_vote',
-		'srvopts_general_name',
-		'srvopts_general_comment',
-		'srvopts_general_playerpassword',
-		'srvopts_general_spectatorpassword',
-		'srvopts_general_nbplayers',
-		'srvopts_general_nbspectators',
-		'srvopts_advanced',
-		'srvopts_adminlevelpassword',
-		'srvopts_importexport',
-		'gameinfos_general_gamemode',
-		'gameinfos_general_options',
-		'gameinfos_general_warmup',
-		'gameinfos_teams_options',
-		'gameinfos_gamemode_options',
-		'chat_sendmessage',
-		'maps_list_moveaftercurrent',
-		'maps_list_removetolist',
-		'maps_local_add',
-		'maps_local_insert',
-		'maps_local_download',
-		'maps_local_rename',
-		'maps_local_move',
-		'maps_local_delete',
-		'maps_upload_add',
-		'maps_upload_insert',
-		'maps_upload_folder',
-		'maps_matchsettings_save',
-		'maps_matchsettings_load',
-		'maps_matchsettings_add',
-		'maps_matchsettings_insert',
-		'maps_matchsettings_edit',
-		'maps_matchsettings_delete',
-		'folder_new',
-		'folder_rename',
-		'folder_move',
-		'folder_delete',
-		'guestban_addplayer',
-		'guestban_removeplayer',
-		'guestban_playlist_new',
-		'guestban_playlist_save',
-		'guestban_playlist_load',
-		'guestban_playlist_delete',
-	);
-	private static $CONFIG_PATH = './config/';
-	private static $CONFIG_FILENAME = 'adminlevel.cfg.php';
-	private static $CONFIG_START_TEMPLATE = "<?php\nclass AdminLevelConfig {\n\tpublic static \$ADMINLEVELS = array(\n\t\t/********************* ADMINLEVELS CONFIGURATION *********************/\n\t\t\n";
-	private static $CONFIG_END_TEMPLATE =  "\t);\n}\n?>";
+	private static array $DEFAULT_TYPE = ['SuperAdmin' => ['SuperAdmin', 'Admin', 'User'], 'Admin' => ['Admin', 'User'], 'User' => ['User']];
+	private static array $DEFAULT_ACCESS = ['srvopts' => 'server_options', 'gameinfos' => 'game_infos', 'chat' => 'chat', 'maps-list' => 'maps_list', 'maps-local' => 'maps_local', 'maps-upload' => 'maps_upload', 'maps-order' => 'maps_order', 'maps-matchset' => 'maps_matchsettings', 'maps-creatematchset' => 'maps_create_matchsettings', 'link_access_server', 'plugins-list' => 'plugins_list', 'guestban' => 'guest_ban'];
+	private static array $DEFAULT_PERMISSION = ['speed_admin', 'switch_server', 'player_kick', 'player_ban', 'player_guest', 'player_ignore', 'player_forcetospectator', 'player_forcetoplayer', 'player_changeteam', 'force_scores', 'cancel_vote', 'srvopts_general_name', 'srvopts_general_comment', 'srvopts_general_playerpassword', 'srvopts_general_spectatorpassword', 'srvopts_general_nbplayers', 'srvopts_general_nbspectators', 'srvopts_advanced', 'srvopts_adminlevelpassword', 'srvopts_importexport', 'gameinfos_general_gamemode', 'gameinfos_general_options', 'gameinfos_general_warmup', 'gameinfos_teams_options', 'gameinfos_gamemode_options', 'chat_sendmessage', 'maps_list_moveaftercurrent', 'maps_list_removetolist', 'maps_local_add', 'maps_local_insert', 'maps_local_download', 'maps_local_rename', 'maps_local_move', 'maps_local_delete', 'maps_upload_add', 'maps_upload_insert', 'maps_upload_folder', 'maps_matchsettings_save', 'maps_matchsettings_load', 'maps_matchsettings_add', 'maps_matchsettings_insert', 'maps_matchsettings_edit', 'maps_matchsettings_delete', 'folder_new', 'folder_rename', 'folder_move', 'folder_delete', 'guestban_addplayer', 'guestban_removeplayer', 'guestban_playlist_new', 'guestban_playlist_save', 'guestban_playlist_load', 'guestban_playlist_delete'];
+	private static string $CONFIG_PATH = './config/';
+	private static string $CONFIG_FILENAME = 'adminlevel.cfg.php';
+	private static string $CONFIG_START_TEMPLATE = "<?php\nclass AdminLevelConfig {\n\tpublic static \$ADMINLEVELS = array(\n\t\t/********************* ADMINLEVELS CONFIGURATION *********************/\n\t\t\n";
+	private static string $CONFIG_END_TEMPLATE =  "\t);\n}\n?>";
 	
 	
 	/**
-	* Vérifie s'il y a bien une config de niveaux admins
+	* Check if there's an admin levels config
 	*
-	* @param string $levelName -> Tester si le niveau admin est présent
+	* @param string $levelName -> Test if the admin level exists
 	* @return bool
 	*/
 	public static function hasLevel($levelName = null) {
@@ -120,16 +49,16 @@ class AdminServAdminLevel {
 	
 	
 	/**
-	* Vérifie s'il le niveau admin a bien l'accès à la page
+	* Check if the admin level has access to the page
 	*
-	* @param string $access    -> Nom de l'accès
-	* @param string $levelName -> Nom du niveau admin
+	* @param string $access    -> Access name
+	* @param string $levelName -> Admin level name
 	* @return bool
 	*/
 	public static function hasAccess($access, $levelName = null) {
 		$out = false;
 		
-		// Si l'accès demandé est le nom d'une page
+		// If the requested access is a page name
 		$defaultAccess = self::getDefaultAccess();
 		if (array_key_exists($access, $defaultAccess)) {
 			foreach ($defaultAccess as $pageName => $accessName) {
@@ -152,11 +81,11 @@ class AdminServAdminLevel {
 	
 	
 	/**
-	* Vérifie s'il le niveau admin a bien la permission d'utiliser une fonctionnalité
+	* Check if the admin level has permission to use a feature
 	*
-	* @param mixed  $permission -> Nom de la permission ou tableau de plusieurs permissions
-	* @param string $levelName  -> Nom du niveau admin
-	* @param string $levelType  -> Type de niveau minimum à autoriser
+	* @param mixed  $permission -> Permission name or array of multiple permissions
+	* @param string $levelName  -> Admin level name
+	* @param string $levelType  -> Minimum level type to allow
 	* @return bool
 	*/
 	public static function hasPermission($permission, $levelName = null, $levelType = null) {
@@ -177,7 +106,7 @@ class AdminServAdminLevel {
 			
 			if (!empty($levelData)) {
 				if (is_array($permission)) {
-					$result = array();
+					$result = [];
 					foreach ($permission as $perm) {
 						if (in_array($perm, $levelData)) {
 							$result[] = true;
@@ -203,13 +132,13 @@ class AdminServAdminLevel {
 	
 	
 	/**
-	* Récupère les niveaux par défaut ou renvoie les niveaux autorisés suivant le type
+	* Get the default levels or return the allowed levels depending on the type
 	*
-	* @param string $type -> Type de niveau
+	* @param string $type -> Level type
 	* @return array
 	*/
 	public static function getDefaultType($levelType = null){
-		$out = array();
+		$out = [];
 		
 		if ($levelType === null) {
 			$out = array_keys(self::$DEFAULT_TYPE);
@@ -234,14 +163,14 @@ class AdminServAdminLevel {
 	
 	
 	/**
-	* Récupère les données de configuration pour un niveau admin
+	* Get the config data for an admin level
 	*
-	* @param string $levelName -> Nom du niveau admin
-	* @param string $fieldName -> Nom du champ de données à retourner
+	* @param string $levelName -> Admin level name
+	* @param string $fieldName -> Name of the data field to return
 	* @return array
 	*/
 	public static function getData($levelName = null, $fieldName = 'all') {
-		$out = array();
+		$out = [];
 		if ($levelName === null && defined('USER_ADMINLEVEL')) {
 			$levelName = USER_ADMINLEVEL;
 		}
@@ -264,19 +193,18 @@ class AdminServAdminLevel {
 	
 	
 	/**
-	* Récupère la position du niveau admin dans le fichier de config
-	*
-	* @param string $levelName -> Nom du niveau admin
-	* @return string
-	*/
-	public static function getId($levelName = null) {
+     * Get the position of the admin level in the config file
+     *
+     * @param string $levelName -> Admin level name
+     */
+    public static function getId($levelName = null): int {
 		$id = 0;
 		$levelList = self::getStaticList();
 		if ($levelName === null && defined('USER_ADMINLEVEL')) {
 			$levelName = USER_ADMINLEVEL;
 		}
 		
-		// On cherche la position du niveau à partir de son nom
+		// Look for the level's position from its name
 		if (!empty($levelList)) {
 			foreach ($levelList as $levelListName) {
 				if ($levelListName == $levelName) {
@@ -288,15 +216,15 @@ class AdminServAdminLevel {
 			}
 		}
 		
-		// Si l'id = le nb total de levels -> pas trouvé
+		// If id = total number of levels -> not found
 		return ($id == count($levelList)) ? -1 : $id;
 	}
 	
 	
 	/**
-	* Récupère le type à partir du nom
+	* Get the type from the name
 	*
-	* @param string $levelName -> Nom du niveau admin
+	* @param string $levelName -> Admin level name
 	* @return string
 	*/
 	public static function getType($levelName = null) {
@@ -315,9 +243,9 @@ class AdminServAdminLevel {
 	
 	
 	/**
-	* Récupère le nom à partir du type
+	* Get the name from the type
 	*
-	* @param int $levelId -> Numéro de la position dans la config
+	* @param int $levelId -> Position number in the config
 	* @return string
 	*/
 	public static function getName($levelId) {
@@ -340,9 +268,9 @@ class AdminServAdminLevel {
 	
 	
 	/**
-	* Détermine si le niveau utilisateur est au minimum de type $levelType
+	* Determine if the user level is at least of type $levelType
 	*
-	* @param string $levelType -> Type de niveau admin minimum
+	* @param string $levelType -> Minimum admin level type
 	* @return bool
 	*/
 	public static function isType($levelType, $levelName = null) {
@@ -362,13 +290,12 @@ class AdminServAdminLevel {
 	
 	
 	/**
-	* Récupère la liste des niveaux admins configurés pour le serveur courant
-	*
-	* @param string $server -> Nom du serveur
-	* @return array
-	*/
-	public static function getServerList($serverName = null) {
-		$out = array();
+     * Get the list of admin levels configured for the current server
+     *
+     * @param string $server -> Server name
+     */
+    public static function getServerList($serverName = null): array {
+		$out = [];
 		if ($serverName === null && defined('SERVER_NAME')) {
 			$serverName = SERVER_NAME;
 		}
@@ -398,10 +325,10 @@ class AdminServAdminLevel {
 	
 	
 	/**
-	* Récupère la liste des niveaux admins configurés
+	* Get the list of configured admin levels
 	*/
 	public static function getStaticList(){
-		$out = array();
+		$out = [];
 		
 		if (self::hasLevel()) {
 			foreach (AdminLevelConfig::$ADMINLEVELS as $levelName => $levelData) {
@@ -414,10 +341,10 @@ class AdminServAdminLevel {
 	
 	
 	/**
-	* Vérifie si l'ip de l'utilisateur est autorisé dans le niveau admin
+	* Check if the user's IP is allowed in the admin level
 	*
-	* @param string $level  -> Nom du niveau admin
-	* @param string $server -> Nom du serveur
+	* @param string $level  -> Admin level name
+	* @param string $server -> Server name
 	* @return bool
 	*/
 	public static function userAllowed($levelName, $serverName = null) {
@@ -455,11 +382,11 @@ class AdminServAdminLevel {
 	
 	
 	/**
-	* Créer le template d'un niveau admin
+	* Create the admin level template
 	*
 	* @param array $levelData -> assoc array(adminlevel => array(type), access, permission)
 	*/
-	public static function getTemplate($levelData){
+	public static function getTemplate($levelData): string{
 		$out = "\t\t'".$levelData['name']."' => array(\n"
 			."\t\t\t'adminlevel' => array(\n";
 				foreach ($levelData['adminlevel'] as $adminlevelName => $adminlevelData) {
@@ -479,49 +406,41 @@ class AdminServAdminLevel {
 						$out .= "\t\t\t\t'$permissionName',\n";
 					}
 				}
-			$out .= "\t\t\t),\n"
-		."\t\t),\n";
 		
-		return $out;
+		return $out . ("\t\t\t),\n" . "\t\t),\n");
 	}
 	
 	
 	/**
-	* Sauvegarde le fichier de configuration des niveaux admins
+	* Save the admin levels config file
 	*
 	* @param array $levelData -> assoc array(adminlevel => array(type), access, permission)
-	* @param int   $editLevel -> Id du niveau à éditer
-	* @param array $levelList -> Liste des niveaux de la config
+	* @param int   $editLevel -> Id of the level to edit
+	* @param array $levelList -> List of levels from the config
 	* @return bool or string error
 	*/
-	public static function saveConfig($levelData = array(), $editLevel = -1, $levelList = array()) {
-		// Liste des niveaux
+	public static function saveConfig($levelData = [], $editLevel = -1, $levelList = []) {
+		// List of levels
 		$levels = (isset($levelList) && !empty($levelList)) ? $levelList : AdminLevelConfig::$ADMINLEVELS;
 		
-		// Template
 		$fileTemplate = self::$CONFIG_START_TEMPLATE;
 		$i = 0;
 		foreach ($levels as $levelName => $levelValues) {
-			// Édition
+			// Edit
 			if ($i == $editLevel && isset($levelData) && !empty($levelData)) {
 				$fileTemplate .= self::getTemplate($levelData);
 			}
 			else {
-				// Récupération des données des niveaux existant
-				$getLevelsData = array(
-					'name' => $levelName,
-					'adminlevel' => $levelValues['adminlevel'],
-					'access' => $levelValues['access'],
-					'permission' => $levelValues['permission'],
-				);
+				// Retrieve existing level data
+				$getLevelsData = ['name' => $levelName, 'adminlevel' => $levelValues['adminlevel'], 'access' => $levelValues['access'], 'permission' => $levelValues['permission']];
 				
-				// Ajout des données au template
+				// Add data to the template
 				$fileTemplate .= self::getTemplate($getLevelsData);
 			}
 			$i++;
 		}
 		
-		// Ajout d'un nouveau
+		// Add a new one
 		if ($editLevel === -1 && isset($levelData) && !empty($levelData)) {
 			if (self::getId($levelData['name']) === -1) {
 				$fileTemplate .= self::getTemplate($levelData);
@@ -532,7 +451,7 @@ class AdminServAdminLevel {
 		}
 		$fileTemplate .= self::$CONFIG_END_TEMPLATE;
 		
-		// Enregistrement
+		// Save
 		return File::save(self::$CONFIG_PATH.self::$CONFIG_FILENAME, $fileTemplate, false);
 	}
 }

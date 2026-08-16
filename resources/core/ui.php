@@ -1,14 +1,14 @@
 <?php
 
 /**
-* Classe pour l'interface d'AdminServ
+* Class for AdminServ's UI
 */
 class AdminServUI {
 	
 	/**
-	* Récupère le titre de l'application
+	* Get the application title
 	*
-	* @param string $type -> Retourner "str" ou "html"
+	* @param string $type -> Return "str" or "html"
 	* @return string
 	*/
 	public static function getTitle($type = 'str'){
@@ -35,7 +35,7 @@ class AdminServUI {
 	
 	
 	/**
-	* Vérifie s'il y a bien une config de theme
+	* Check if there's a theme config
 	*/
 	public static function hasTheme(){
 		$out = false;
@@ -49,12 +49,12 @@ class AdminServUI {
 	
 	
 	/**
-	* Récupère le thème courant ou
+	* Get the current theme or
 	*
-	* @param string $setTheme -> Utiliser un autre thème
+	* @param string $setTheme -> Use a different theme
 	* @return $_SESSION['theme']
 	*/
-	public static function theme($setTheme = null){
+	public static function theme($setTheme = null): string{
 		$saveCookie = false;
 		
 		if($setTheme){
@@ -79,12 +79,7 @@ class AdminServUI {
 		}
 		
 		if($saveCookie){
-			$cookieData = array(
-				$_SESSION['theme'],
-				self::lang(),
-				Utils::readCookieData('adminserv_user', 2),
-				Utils::readCookieData('adminserv_user', 3)
-			);
+			$cookieData = [$_SESSION['theme'], self::lang(), Utils::readCookieData('adminserv_user', 2), Utils::readCookieData('adminserv_user', 3)];
 			
 			Utils::addCookieData('adminserv_user', $cookieData, AdminServConfig::COOKIE_EXPIRE);
 		}
@@ -98,14 +93,14 @@ class AdminServUI {
 			}
 		}
 		
-		return strtolower($_SESSION['theme']);
+		return strtolower((string) $_SESSION['theme']);
 	}
 	
 	
 	/**
-	* Récupère la couleur définie dans le thème
+	* Get the color defined in the theme
 	*
-	* @param int $indexColor -> Index de la couleur à récupérer
+	* @param int $indexColor -> Index of the color to retrieve
 	* @return string code hexa
 	*/
 	public static function getThemeColor($indexColor = 0){
@@ -122,46 +117,71 @@ class AdminServUI {
 	
 	
 	/**
-	* Récupère la liste des thèmes
+	* Get the list of themes
 	*/
-	public static function getThemeList($currentTheme = array() ){
+	public static function getThemeList($currentTheme = [] ){
 		$out = null;
-		$list = array();
+		$list = [];
 		if( self::hasTheme() ){
 			$list = ExtensionConfig::$THEMES;
 		}
-		$countList = count($list);
-		
-		// Page courante
+
+		// Current page
 		if(USER_PAGE && USER_PAGE != 'index'){
 			$param = '?p='.USER_PAGE .'&amp;th=';
 		}
 		else{
 			$param = '?th=';
 		}
-		
-		if( $countList > 0 ){
+
+		// Group into light/dark pairs (e.g. 'blue' + 'blue-dark')
+		$pairs = [];
+		foreach($list as $name => $color){
+			if( str_ends_with($name, '-dark') ) continue;
+			$pairs[$name] = $color;
+		}
+
+		if( count($pairs) > 0 ){
+			$activeName = defined('USER_THEME') ? USER_THEME : '';
 			$out .= '<ul>';
-			// S'il y a un thème courant, on le place en 1er
-			if( count($currentTheme) > 0 ){
-				$currentThemeName = key($currentTheme);
-				$currentThemeColor = current($currentTheme);
-				unset($list[$currentThemeName]);
-				$out .= '<li><a tabindex="-1" class="theme-color" style="background-color: '.$currentThemeColor[0].';" href="'.$param.$currentThemeName.'" title="'.Utils::t( ucfirst($currentThemeName) ).'"></a></li>';
+
+			foreach($pairs as $name => $color){
+				$darkName  = $name.'-dark';
+				$hasDark   = isset($list[$darkName]);
+				$darkColor = $hasDark ? $list[$darkName] : null;
+
+				$isActiveLight = ($activeName === $name);
+				$isActiveDark  = ($activeName === $darkName);
+
+				$labelLight    = Utils::t( ucfirst($name) );
+				$activeLight   = $isActiveLight ? ' theme-color-active' : '';
+
+				$out .= '<li class="theme-pair">';
+				$out .= '<a tabindex="-1" class="theme-color'.$activeLight.'"'
+					.' style="background-color:'.$color[0].';"'
+					.' href="'.$param.$name.'"'
+					.' title="'.$labelLight.'"></a>';
+
+				if( $hasDark ){
+					$labelDark  = Utils::t( ucfirst($name) ).' dark';
+					$activeDark = $isActiveDark ? ' theme-color-active' : '';
+					$halfStyle  = 'background:linear-gradient(135deg,'.$darkColor[0].' 50%,#111 50%)';
+
+					$out .= '<a tabindex="-1" class="theme-color theme-color-dark'.$activeDark.'"'
+						.' style="'.$halfStyle.';"'
+						.' href="'.$param.$darkName.'"'
+						.' title="'.$labelDark.'"></a>';
+				}
+
+				$out .= '</li>';
 			}
-			foreach($list as $name => $color){
-				$out .= '<li><a tabindex="-1" class="theme-color" style="background-color: '.$color[0].';" href="'.$param.$name.'" title="'.Utils::t( ucfirst($name) ).'"></a></li>';
-			}
+
 			$out .= '</ul>';
 		}
-		
+
 		return $out;
 	}
-	
-	
-	/**
-	* Vérifie s'il y a bien une config de langue
-	*/
+
 	public static function hasLang(){
 		$out = false;
 		
@@ -174,15 +194,15 @@ class AdminServUI {
 	
 	
 	/**
-	* Récupère la langue courante
+	* Get the current language
 	*
-	* @param string $setLang -> Forcer l'utilisation de la langue
+	* @param string $setLang -> Force use of the language
 	* @return $_SESSION['lang']
 	*/
-	public static function lang($setLang = null){
+	public static function lang($setLang = null): string{
 		global $translate;
 		$saveCookie = false;
-		
+
 		if($setLang){
 			$_SESSION['lang'] = $setLang;
 			$saveCookie = true;
@@ -195,7 +215,7 @@ class AdminServUI {
 				else{
 					if( AdminServConfig::DEFAULT_LANGUAGE == 'auto' ){
 						$_SESSION['lang'] = 'en';
-						$autoLangCode = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+						$autoLangCode = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? substr((string) $_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2) : 'en';
 						if( self::hasLang() ){
 							if( in_array($autoLangCode, ExtensionConfig::$LANG) ){
 								$_SESSION['lang'] = $autoLangCode;
@@ -216,12 +236,7 @@ class AdminServUI {
 		}
 		
 		if($saveCookie){
-			$cookieData = array(
-				self::theme(),
-				$_SESSION['lang'],
-				Utils::readCookieData('adminserv_user', 2),
-				Utils::readCookieData('adminserv_user', 3)
-			);
+			$cookieData = [self::theme(), $_SESSION['lang'], Utils::readCookieData('adminserv_user', 2), Utils::readCookieData('adminserv_user', 3)];
 			
 			Utils::addCookieData('adminserv_user', $cookieData, AdminServConfig::COOKIE_EXPIRE);
 		}
@@ -235,7 +250,7 @@ class AdminServUI {
 			}
 		}
 		
-		$langCode = strtolower($_SESSION['lang']);
+		$langCode = strtolower((string) $_SESSION['lang']);
 		$langFile = AdminServConfig::$PATH_RESOURCES .'lang/'.$langCode.'.php';
 		if( file_exists($langFile) ){
 			require_once $langFile;
@@ -246,17 +261,17 @@ class AdminServUI {
 	
 	
 	/**
-	* Récupère la liste des langues
+	* Get the list of languages
 	*/
-	public static function getLangList($currentLang = array() ){
+	public static function getLangList($currentLang = [] ){
 		$out = null;
-		$list = array();
+		$list = [];
 		if( self::hasLang() ){
 			$list = ExtensionConfig::$LANG;
 		}
 		$countList = count($list);
 		
-		// Page courante
+		// Current page
 		if(USER_PAGE && USER_PAGE != 'index'){
 			$param = '?p='.USER_PAGE .'&amp;lg=';
 		}
@@ -264,18 +279,16 @@ class AdminServUI {
 			$param = '?lg=';
 		}
 		
-		// Liste de toutes les langues
+		// Active language from USER_LANG or from $currentLang
+		$activeLangCode = defined('USER_LANG') ? USER_LANG : '';
+		if( count($currentLang) > 0 ){ $activeLangCode = key($currentLang); }
+		
+		// All languages side by side, active one with the active class
 		if( $countList > 0 ){
-			$out .= '<ul>';
-			// S'il y a une langue courante, on la place en 1er
-			if( count($currentLang) > 0 ){
-				$currentLangCode = key($currentLang);
-				$currentLangName = current($currentLang);
-				unset($list[$currentLangCode]);
-				$out .= '<li><a tabindex="-1" class="lang-flag" style="background-image: url('. AdminServConfig::$PATH_RESOURCES .'images/lang/'.$currentLangCode.'.png);" href="'.$param.$currentLangCode.'" title="'.$currentLangName.'"></a></li>';
-			}
+			$out .= '<ul class="lang-list">';
 			foreach($list as $code => $name){
-				$out .= '<li><a tabindex="-1" class="lang-flag" style="background-image: url('. AdminServConfig::$PATH_RESOURCES .'images/lang/'.$code.'.png);" href="'.$param.$code.'" title="'.$name.'"></a></li>';
+				$activeClass = ($code === $activeLangCode) ? ' active' : '';
+				$out .= '<li><a tabindex="-1" class="lang-flag'.$activeClass.'" style="background-image: url('. AdminServConfig::$PATH_RESOURCES .'images/lang/'.$code.'.png);" href="'.$param.$code.'" title="'.$name.'"></a></li>';
 			}
 			$out .= '</ul>';
 		}
@@ -285,9 +298,9 @@ class AdminServUI {
 	
 	
 	/**
-	* Récupère le header/footer du site
+	* Get the site's header/footer
 	*/
-	public static function getHeader(){
+	public static function getHeader(): void{
 		global $args;
 		
 		if( !isset($GLOBALS['body_class']) ){
@@ -315,42 +328,51 @@ class AdminServUI {
 		
 		require_once AdminServConfig::$PATH_RESOURCES . 'templates/header.tpl.php';
 	}
-	public static function getFooter(){
+	public static function getFooter(): void{
 		require_once AdminServConfig::$PATH_RESOURCES . 'templates/footer.tpl.php';
 	}
 	
 	
 	/**
-	* Récupère le CSS/JS du site
+	* Get the site's CSS/JS
 	*/
-	public static function getCss(){
+	public static function getCss(): string{
 		$path = AdminServConfig::$PATH_RESOURCES .'css/';
 		$out = '<link rel="stylesheet" href="'.$path.'fileuploader.css" />'."\n\t\t"
 		.'<link rel="stylesheet" href="'.$path.'global.css" />'."\n\t\t"
 		.'<!--[if IE]><link rel="stylesheet" href="'.$path.'ie.css" /><![endif]-->'."\n\t\t";
+
 		if( defined('USER_THEME') && USER_THEME ){
-			$out .= '<link rel="stylesheet" href="'.$path.'jqueryui/'. USER_THEME .'.css" />'."\n\t\t"
-			.'<link rel="stylesheet" href="'.$path.'theme.php?th='. USER_THEME .'" />'."\n\t\t";
+			$isDark      = str_ends_with(USER_THEME, '-dark');
+			// jQuery UI: blue-dark → blue.css
+			$jquiTheme   = $isDark ? substr(USER_THEME, 0, -5) : USER_THEME;
+			if( file_exists($path.'jqueryui/'.$jquiTheme.'.css') ){
+				$out .= '<link rel="stylesheet" href="'.$path.'jqueryui/'.$jquiTheme.'.css" />'."\n\t\t";
+			}
+			$out .= '<link rel="stylesheet" href="'.$path.'theme.php?th='.USER_THEME.'" />'."\n\t\t";
+			if( $isDark ){
+				$out .= '<link rel="stylesheet" href="'.$path.'dark.css" />'."\n\t\t";
+			}
 		}
-		$out .= '<link rel="stylesheet" media="screen and (max-width: 1000px) and (min-width: 335px)" href="'.$path.'mobile.css" />'."\n";
-		
-		return $out;
+
+		return $out . ('<link rel="stylesheet" media="screen and (max-width: 1000px) and (min-width: 335px)" href="' . $path . 'mobile.css" />' . "\n");
 	}
-	public static function getJS(){
+
+	public static function getJS(): string{
 		$path = AdminServConfig::$PATH_RESOURCES .'js/';
-		$out = '<script src="'.$path.'jquery.js"></script>'."\n\t\t"
+		
+		return '<script src="'.$path.'jquery.js"></script>'."\n\t\t"
 		.'<script src="'.$path.'jquery-ui.js"></script>'."\n\t\t"
 		.'<script src="'.$path.'colorpicker.js"></script>'."\n\t\t"
 		.'<script src="'.$path.'fileuploader.js"></script>'."\n\t\t"
 		.'<script src="'.$path.'adminserv_funct.js"></script>'."\n\t\t"
-		.'<script src="'.$path.'adminserv_event.js"></script>'."\n";
-		
-		return $out;
+		.'<script src="'.$path.'adminserv_event.js"></script>'."\n\t\t"
+		.'<script src="'.$path.'settings-popover.js"></script>'."\n";
 	}
 	
 	
 	/**
-	* Récupère la liste des serveurs configurés
+	* Get the list of configured servers
 	*
 	* @return string
 	*/
@@ -379,9 +401,9 @@ class AdminServUI {
 	
 	
 	/**
-	* Récupère la liste des modes de jeu
+	* Get the list of game modes
 	*
-	* @param int $currentGameMode -> Le mode de jeu à sélectionner
+	* @param int $currentGameMode -> The game mode to select
 	* @return string
 	*/
 	public static function getGameModeList($currentGameMode = null){
@@ -402,20 +424,16 @@ class AdminServUI {
 	
 	
 	/**
-	* Récupère le formulaire pour un champ
+	* Get the form for a field
 	*
-	* @param array  $gameinfos -> Informations de jeu courantes et suivantes
-	* @param string $name      -> Le nom du champ affiché dans un label
-	* @param string $id        -> L'id du champ du tableau GameInfos
+	* @param array  $gameinfos -> Current and next game info
+	* @param string $name      -> The field name shown in a label
+	* @param string $id        -> The field id in the GameInfos array
 	* @return string HTML
 	*/
-	public static function getGameInfosField($gameinfos, $name, $id){
+	public static function getGameInfosField($gameinfos, $name, $id): void{
 		global $data;
-		$data['gameInfosField'] = array(
-			'gameInfos' => $gameinfos,
-			'name' => $name,
-			'id' => $id
-		);
+		$data['gameInfosField'] = ['gameInfos' => $gameinfos, 'name' => $name, 'id' => $id];
 		
 		self::getTemplate('gameinfos-field');
 		unset($data['gameInfosField']);
@@ -423,9 +441,9 @@ class AdminServUI {
 	
 	
 	/**
-	* Récupère la liste des joueurs
+	* Get the list of players
 	*
-	* @param string $currentPlayerLogin -> Le login joueur à sélectionner
+	* @param string $currentPlayerLogin -> The player login to select
 	* @return string
 	*/
 	public static function getPlayerList($currentPlayerLogin = null){
@@ -452,51 +470,44 @@ class AdminServUI {
 	
 	
 	/**
-	* Retourne le menu pour les pages maps
+	* Return the menu for the maps pages
 	*
 	* @return template html
 	*/
-	public static function getMapsMenuList(){
+	public static function getMapsMenuList(): void{
 		global $data, $args;
 		$list = ExtensionConfig::$MAPSMENU;
-		$excludeLocalPage = array('maps-local', 'maps-matchset', 'maps-creatematchset');
+		$excludeLocalPage = ['maps-local', 'maps-matchset', 'maps-creatematchset'];
 		if( !IS_LOCAL ){
 			foreach($excludeLocalPage as $page){
 				unset($list[$page]);
 			}
 		}
 		
-		$data += array(
-			'menuList' => $list,
-		);
+		$data += ['menuList' => $list];
 		self::getTemplate('maps-menu');
 	}
 	
 	
 	/**
-	* Récupère la liste des dossiers du répertoire "Maps"
+	* Get the list of folders in the "Maps" directory
 	*
 	* @require class "Folder"
 	*
-	* @param string $path        -> Le chemin du dossier "Maps"
-	* @param string $currentPath -> Le chemin à partir de "Maps"
-	* @param bool   $showOptions -> Afficher les options (nouveau, renommer, déplacer, supprimer)
+	* @param string $path        -> Path of the "Maps" folder
+	* @param string $currentPath -> The path relative to "Maps"
+	* @param bool   $showOptions -> Show options (new, rename, move, delete)
 	* @return template maps-directorylist
 	*/
-	public static function getMapsDirectoryList($directory, $currentPath = null, $showOptions = true){
+	public static function getMapsDirectoryList($directory, $currentPath = null, $showOptions = true): void{
 		global $data;
 		
 		if (class_exists('Folder')) {
-			$data += array(
-				'folders' => array(),
-				'currentPath' => $currentPath,
-				'parentPath' => null,
-				'showOptions' => $showOptions,
-			);
+			$data += ['folders' => [], 'currentPath' => $currentPath, 'parentPath' => null, 'showOptions' => $showOptions];
 			
-			// Liste des dossiers
+			// List of folders
 			if (is_array($directory)) {
-				// Dossier parent
+				// Parent folder
 				if ($currentPath) {
 					$params = null;
 					$parentPathEx = explode('/', $currentPath);
@@ -511,7 +522,6 @@ class AdminServUI {
 					}
 				}
 				
-				// Dossiers
 				if (!empty($directory['folders'])) {
 					$data['folders'] = $directory['folders'];
 				}
@@ -530,20 +540,13 @@ class AdminServUI {
 	
 	
 	/**
-	* Ititialise une page en back office
+	* Initialize a back-office page
 	*/
-	public static function initBackPage() {
+	public static function initBackPage(): void {
 		global $client, $data, $args;
 		
 		// Pages list
-		$pagesList = array(
-			'general',
-			'srvopts',
-			'gameinfos',
-			'chat',
-			'plugins-list',
-			'guestban',
-		);
+		$pagesList = ['general', 'results', 'srvopts', 'gameinfos', 'chat', 'plugins-list', 'guestban'];
 		$pagesList = array_merge($pagesList, array_keys(ExtensionConfig::$MAPSMENU) );
 		$firstPage = array_shift($pagesList);
 		
@@ -554,10 +557,7 @@ class AdminServUI {
 				self::renderPage($pagesList[$pageKey]);
 			}
 			else {
-				$data = array(
-					'errorTitle' => Utils::t('Erreur d\'accès à la page'),
-					'errorMessage' => Utils::t('Vous n\'avez pas les droits requis pour accéder à cette page. Veuillez contacter votre administrateur.'),
-				);
+				$data = ['errorTitle' => Utils::t('Page access error'), 'errorMessage' => Utils::t('You do not have the required permissions to access this page. Please contact your administrator.')];
 				self::renderPage('page-error');
 			}
 		}
@@ -578,9 +578,9 @@ class AdminServUI {
 	
 	
 	/**
-	* Ititialise une page en front office
+	* Initialize a front-office page
 	*/
-	public static function initFrontPage() {
+	public static function initFrontPage(): void {
 		// Render page
 		if (self::isPageType('config')) {
 			$pageTitle = 'Configuration';
@@ -596,9 +596,9 @@ class AdminServUI {
 	
 	
 	/**
-	* Inclue les fichiers pour le rendu d'une page
+	* Include the files for rendering a page
 	*/
-	public static function renderPage($pageName) {
+	public static function renderPage(string $pageName): void {
 		global $client, $data, $args;
 		
 		// Preprocess
@@ -621,30 +621,27 @@ class AdminServUI {
 			$client->Terminate();
 		}
 		
-		// Header
 		self::getHeader();
 		
-		// Template
 		self::getTemplate($pageName);
 		
-		// Footer
 		self::getFooter();
 		
-		AdminServLogs::add('access', (isset($GLOBALS['page_title'])) ? $GLOBALS['page_title'] : $pageName);
+		AdminServLogs::add('access', $GLOBALS['page_title'] ?? $pageName);
 	}
 	
 	
 	/**
-	* Vérifie si la page est du type demandé
+	* Check if the page is of the requested type
 	*
-	* @param string $pageType -> Type de page à tester (config, plugin)
+	* @param string $pageType -> Page type to test (config, plugin)
 	* @return bool
 	*/
 	public static function isPageType($pageType, $pageName = USER_PAGE){
 		$out = false;
 		
-		if (strstr($pageName, '-')) {
-			$pageNameEx = explode('-', $pageName);
+		if (strstr((string) $pageName, '-')) {
+			$pageNameEx = explode('-', (string) $pageName);
 			if ($pageNameEx[0] === $pageType) {
 				$out = true;
 			}
@@ -655,12 +652,12 @@ class AdminServUI {
 	
 	
 	/**
-	* Inclue un fichier template
+	* Include a template file
 	*
-	* @param string $templateName -> Nom du fichier template sans les extensions
-	* @return template HTML ou null si le template n'existe pas
+	* @param string $templateName -> Template file name without extensions
+	* @return template HTML or null if the template doesn't exist
 	*/
-	public static function getTemplate($templateName){
+	public static function getTemplate(string $templateName): void{
 		global $data, $args;
 		
 		$tplFile = AdminServConfig::$PATH_RESOURCES.'templates/'.$templateName.'.tpl.php';

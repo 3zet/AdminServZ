@@ -1,18 +1,14 @@
 <?php
 	// GAME VERSION
+	// InsertChallenge / AddChallenge — TmForever
+	// InsertMap       / AddMap       — ManiaPlanet + TM2020 (identical)
 	if(SERVER_VERSION_NAME == 'TmForever'){
-		$queries = array(
-			'insert' => 'InsertChallenge',
-			'add' => 'AddChallenge'
-		);
+		$queries = ['insert' => 'InsertChallenge', 'add' => 'AddChallenge'];
 	}
 	else{
-		$queries = array(
-			'insert' => 'InsertMap',
-			'add' => 'AddMap'
-		);
+		$queries = ['insert' => 'InsertMap', 'add' => 'AddMap'];
 	}
-	
+
 	// ACTIONS
 	if( isset($_POST['addMap']) && isset($_POST['map']) && count($_POST['map']) > 0 ){
 		foreach($_POST['map'] as $map){
@@ -35,16 +31,15 @@
 		}
 	}
 	else if( isset($_POST['downloadMap']) && isset($_POST['map']) && count($_POST['map']) > 0 ){
-		// Si on télécharge plusieurs fichiers, on envoi un zip
 		$countMaps = count($_POST['map']);
 		if($countMaps > 1){
-			$struct = array();
+			$struct = [];
 			foreach($_POST['map'] as $map){
 				$struct[] = $data['mapsDirectoryPath'].$map;
 			}
 			$zipError = null;
 			$zipFileName = 'maps.zip';
-			if( !Zip::create($zipFileName, $struct, $zipError) ){
+			if( !(new Zip())->create($zipFileName, $struct, $zipError) ){
 				AdminServ::error($zipError);
 			}
 			else{
@@ -55,7 +50,6 @@
 				}
 			}
 		}
-		// Sinon on envoi le fichier seul
 		else{
 			File::download($data['mapsDirectoryPath'].$_POST['map'][0]);
 			AdminServLogs::add('action', 'Download map: '.$_POST['map'][0]);
@@ -74,7 +68,7 @@
 			}
 			$i++;
 		}
-		
+
 		Utils::redirection(false, '?p='.USER_PAGE .$hasDirectory);
 	}
 	else if( isset($_POST['renameAutoValid']) && isset($_POST['map']) && count($_POST['map']) > 0 && isset($_POST['renameMapList']) && count($_POST['renameMapList']) > 0 ){
@@ -90,30 +84,28 @@
 			}
 			$i++;
 		}
-		
+
 		Utils::redirection(false, '?p='.USER_PAGE .$hasDirectory);
 	}
 	else if( isset($_POST['moveMapValid']) && isset($_POST['moveDirectoryList']) && isset($_POST['map']) && count($_POST['map']) > 0 ){
-		// Chemin
 		if($_POST['moveDirectoryList'] == '.'){
 			$newPath = $data['mapsDirectoryPath'];
 		}
 		else{
 			$newPath = $_POST['moveDirectoryList'];
 		}
-		
-		// Déplacement
+
 		foreach($_POST['map'] as $map){
-			$result = File::rename($data['mapsDirectoryPath'].$map, $newPath.basename($map) );
+			$result = File::rename($data['mapsDirectoryPath'].$map, $newPath.basename((string) $map) );
 			if($result !== true ){
 				AdminServ::error(Utils::t('Unable to move the map').' : '.$map.' ('.$result.')');
 				break;
 			}
 			else{
-				AdminServLogs::add('action', 'Move map: '.$map.' to '.$newPath.basename($map) );
+				AdminServLogs::add('action', 'Move map: '.$map.' to '.$newPath.basename((string) $map) );
 			}
 		}
-		
+
 		Utils::redirection(false, '?p='.USER_PAGE .$hasDirectory);
 	}
 	else if( isset($_POST['deleteMap']) && isset($_POST['map']) && count($_POST['map']) > 0 ){
@@ -127,10 +119,11 @@
 				AdminServLogs::add('action', 'Delete map: '.$map);
 			}
 		}
-		
+
 		Utils::redirection(false, '?p='.USER_PAGE .$hasDirectory);
 	}
-	// Save MatchSettings
+
+	// Save MatchSettings -- SaveMatchSettings available in MP and TM2020
 	if( (isset($_POST['addMap']) || isset($_POST['insertMap'])) && SERVER_MATCHSET ){
 		if( isset($_POST['SaveCurrentMatchSettings']) && array_key_exists('SaveCurrentMatchSettings', $_POST) ){
 			if( !$client->query('SaveMatchSettings', $data['mapsDirectoryPath'] . SERVER_MATCHSET) ){
@@ -138,12 +131,12 @@
 			}
 		}
 	}
-	
-	
+
+
 	// MAPLIST
 	$sort = null;
 	if( isset($_GET['sort']) && $_GET['sort'] != null){
-		$sort = addslashes($_GET['sort']);
+		$sort = addslashes((string) $_GET['sort']);
 	}
 	$data['maps'] = AdminServ::getLocalMapList($data['currentDir'], $args['directory'], $sort);
 ?>

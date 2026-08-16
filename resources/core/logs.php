@@ -1,16 +1,16 @@
 <?php
 
 /**
-* Classe pour le traitement des logs AdminServ
+* Class for AdminServ log processing
 */
 class AdminServLogs {
 	/**
-	* Globales
+	* Globals
 	*/
 	public static $LOGS_PATH = './logs/';
 	
 	/**
-	* Initialise les logs (vérification des droits, création des fichiers)
+	* Initialize the logs (permission check, file creation)
 	* @return bool
 	*/
 	public static function initialize(){
@@ -60,22 +60,22 @@ class AdminServLogs {
 	
 	
 	/**
-	* Ajoute un log au fichier correspondant
+	* Add a log to the corresponding file
 	*
-	* @param string $type -> Type de log : access, action, etc
-	* @param string $str  -> Ligne de log à écrire
+	* @param string $type -> Log type: access, action, etc
+	* @param string $str  -> Log line to write
 	* @return bool
 	*/
 	public static function add($type, $str){
 		$out = false;
 		$type = strtolower($type);
 		if( defined('USER_PAGE') ){ $userPage = USER_PAGE; }else{ $userPage = 'index'; }
-		if( defined('SERVER_NAME') ){ $serverName = '['.utf8_decode(SERVER_NAME).'] '; }else{ $serverName = null; }
-		$str = '['.date('d/m/Y H:i:s').'] ['.$_SERVER['REMOTE_ADDR'].'] : '.$serverName.'['.$userPage.'] '.utf8_decode($str)."\n";
+		if( defined('SERVER_NAME') ){ $serverName = '['.mb_convert_encoding(SERVER_NAME, 'ISO-8859-1').'] '; }else{ $serverName = null; }
+		$str = '['.date('d/m/Y H:i:s').'] ['.$_SERVER['REMOTE_ADDR'].'] : '.$serverName.'['.$userPage.'] '.mb_convert_encoding($str, 'ISO-8859-1')."\n";
 		$path = self::$LOGS_PATH.$type.'.log';
 		
 		if( file_exists($path) ){
-			if( File::save($path, utf8_encode($str) ) !== true ){
+			if( File::save($path, mb_convert_encoding($str, 'UTF-8', 'ISO-8859-1') ) !== true ){
 				$error = Utils::t('Unable to add log in file:').' '.$type.'.';
 				if($_SESSION['error'] != null){
 					$_SESSION['error'] .= '<br />'.$error;

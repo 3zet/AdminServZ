@@ -1,13 +1,13 @@
 <?php
 
 /**
-* Classe pour la gestion du cache
+* Class for cache management
 */
 class AdminServCache {
-	private $folder;
+	private readonly string $folder;
 	
 	/**
-	* Initialisation du cache
+	* Cache initialization
 	*/
 	function __construct(){
 		$this->folder = AdminServConfig::$PATH_RESOURCES.'cache/';
@@ -19,13 +19,13 @@ class AdminServCache {
 	
 	
 	/**
-	* Enregistre la valeur dans un fichier
+	* Save the value to a file
 	*
-	* @param string $key   -> Clef du cache
-	* @param array  $value -> Valeur à enregistrer
+	* @param string $key   -> Cache key
+	* @param array  $value -> Value to store
 	* @return bool
 	*/
-	public function set($key, $value){
+	public function set(string $key, $value){
 		$out = false;
 		$file = $this->folder . $key . '.json';
 		$data = json_encode($value);
@@ -52,13 +52,13 @@ class AdminServCache {
 	
 	
 	/**
-	* Récupère la valeur depuis un fichier
+	* Get the value from a file
 	*
-	* @param string $key -> Clef du cache à récupérer
+	* @param string $key -> Cache key to retrieve
 	* @return array()
 	*/
-	public function get($key){
-		$out = array();
+	public function get(string $key){
+		$out = [];
 		$file = $this->folder . $key . '.json';
 		
 		if( file_exists($file) ){
@@ -68,7 +68,7 @@ class AdminServCache {
 		
 		$error = self::getErrorMsg('get');
 		if($error){
-			$out = array();
+			$out = [];
 			AdminServ::error($error);
 		}
 		
@@ -77,12 +77,12 @@ class AdminServCache {
 	
 	
 	/**
-	* Supprime un fichier de cache
+	* Delete a cache file
 	*
-	* @param string $key -> Clef du cache à supprimer
+	* @param string $key -> Cache key to delete
 	* @return bool
 	*/
-	public function delete($key){
+	public function delete(string $key){
 		$out = false;
 		$file = $this->folder . $key . '.json';
 		
@@ -100,25 +100,20 @@ class AdminServCache {
 	
 	
 	/**
-	* Récupère le message d'erreur lors de l'encodage/décodage du JSON
+	* Get the error message from JSON encoding/decoding
 	*/
-	public static function getErrorMsg($type){
+	public static function getErrorMsg(string $type){
 		switch( json_last_error() ){
 			case JSON_ERROR_DEPTH:
 				return 'CACHE ('.$type.') - Profondeur maximale atteinte';
-				break;
 			case JSON_ERROR_STATE_MISMATCH:
-				return 'CACHE ('.$type.') - Inadéquation des modes ou underflow';
-				break;
+				return 'CACHE ('.$type.') - State mismatch or underflow';
 			case JSON_ERROR_CTRL_CHAR:
-				return 'CACHE ('.$type.') - Erreur lors du contrôle des caractères';
-				break;
+				return 'CACHE ('.$type.') - Control character error';
 			case JSON_ERROR_SYNTAX:
-				return 'CACHE ('.$type.') - Erreur de syntaxe ; JSON malformé';
-				break;
+				return 'CACHE ('.$type.') - Syntax error; malformed JSON';
 			case JSON_ERROR_UTF8:
-				return 'CACHE ('.$type.') - Caractères UTF-8 malformés, probablement une erreur d\'encodage';
-				break;
+				return 'CACHE ('.$type.') - Malformed UTF-8 characters, likely an encoding error';
 		}
 	}
 }

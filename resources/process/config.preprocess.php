@@ -7,7 +7,7 @@
 	
 	// VERIFICATION
 	if( class_exists('ServerConfig') ){
-		// Si on n'autorise pas la configuration en ligne
+		// If online configuration isn't allowed
 		if( OnlineConfig::ACTIVATE !== true ){
 			AdminServ::info( Utils::t('No server available. To add one, configure "config/servers.cfg.php" file.') );
 			Utils::redirection();

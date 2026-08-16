@@ -12,7 +12,7 @@
 	AdminServ::getClass();
 	
 	// ISSET
-	if( isset($_POST['cmd']) ){ $cmd = addslashes( htmlspecialchars($_POST['cmd']) ); }else{ $cmd = null; }
+	if( isset($_POST['cmd']) ){ $cmd = addslashes( htmlspecialchars((string) $_POST['cmd']) ); }else{ $cmd = null; }
 	
 	// SPEED ADMIN
 	$out = false;

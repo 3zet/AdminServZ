@@ -9,7 +9,7 @@
 				<th><?php echo Utils::t('Port'); ?></th>
 				<th><?php echo Utils::t('MatchSettings'); ?></th>
 				<th><?php echo Utils::t('SuperAdmin level'); ?></th>
-				<th><?php echo ucwords( Utils::t('Admin level') ); ?></th>
+				<th><?php echo ucwords( (string) Utils::t('Admin level') ); ?></th>
 				<th><?php echo Utils::t('User level'); ?></th>
 				<th class="thright"><?php echo Utils::t('Manage'); ?></th>
 			</tr>
@@ -20,11 +20,10 @@
 				<?php $i = 0; ?>
 				<?php foreach ($data['servers'] as $serverName => $serverData): ?>
 					<?php
-						// MatchSettings
-						$matchSettings = ($serverData['matchsettings']) ? $serverData['matchsettings'] : Utils::t('None');
+						$matchSettings = $serverData['matchsettings'] ?: Utils::t('None');
 						
-						// Niveaux admins
-						$adminLevelsStatus = array();
+						// Admin levels
+						$adminLevelsStatus = [];
 						foreach($data['adminLevelsType'] as $level){
 							if( array_key_exists($level, $serverData['adminlevel']) ){
 								if( is_array($serverData['adminlevel'][$level]) ){

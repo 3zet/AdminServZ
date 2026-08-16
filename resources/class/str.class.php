@@ -2,14 +2,14 @@
 /**
 * Class Str
 *
-* Méthodes de traitement de chaines de caractères
+* String processing methods
 */
 abstract class Str {
 	
 	/**
-	* Formatage de la taille
+	* Format the size
 	* 
-	* @param int $size -> Taille
+	* @param int $size -> Size
 	* @return string
 	*/
 	public static function formatSize($size){
@@ -36,9 +36,9 @@ abstract class Str {
 	
 	
 	/**
-	* Modifie les antislashes d'un lien local en slashes pour usage web
+	* Change backslashes in a local link to forward slashes for web use
 	*
-	* @param string $path -> Le chemin à modifier
+	* @param string $path -> Path to modify
 	* @return string
 	*/
 	public static function toSlash($path){
@@ -60,12 +60,12 @@ abstract class Str {
 	
 	
 	/**
-	* Remplace ou supprime les caractères spéciaux
+	* Replace or remove special characters
 	*
-	* @param string $str -> La chaine de caractères
+	* @param string $str -> The string
 	*/
 	public static function replaceSpecialChars($str, $replaceSpace = true){
-		// Listes
+		// Lists
 		$toRemove = array(
 			"'", '"', '&', '<', '>', '+', '=', '*', '/', '²', '~', '#', '{', '[', '(', '|', '`', '\\', '^', '@', ')', ']', '}', '¨', '$', '£', '¤',
 			'!', '%', '§', ':', ';', ',', '?', '«', '»', '“', '”', '„', '…', '¡', '¿', '‘', '’', 'ˆ', '˜', '¸', '·', '•', '¯', '‾', '—', '¦', '†',
@@ -80,7 +80,7 @@ abstract class Str {
 			);
 		}
 		
-		// Remplacement
+		// Replacement
 		$str = trim($str);
 		$str = str_replace($toRemove, '', $str);
 		if($replaceSpace){
@@ -94,9 +94,9 @@ abstract class Str {
 	
 	
 	/**
-	* Remplace les caractères accentués par leurs caractères normal
+	* Replace accented characters with their normal equivalent
 	*
-	* @param string $str -> La chaine de caractères
+	* @param string $str -> The string
 	*/
 	public static function replaceAccentChars($str){
 		$str = utf8_decode($str);
@@ -106,9 +106,9 @@ abstract class Str {
 	
 	
 	/**
-	* Remplace ou supprime les caractères spéciaux et remplace les caractères accentués
+	* Replace or remove special characters and replace accented characters
 	*
-	* @param string $str -> La chaine de caractères
+	* @param string $str -> The string
 	*/
 	public static function replaceChars($str){
 		return self::replaceSpecialChars( self::replaceAccentChars($str) );
@@ -116,9 +116,9 @@ abstract class Str {
 	
 	
 	/**
-	* Récupère le type d'une valeur
+	* Get the type of a value
 	*
-	* @param  mixed $val -> La valeur à analyser
+	* @param  mixed $val -> The value to analyze
 	* @return string
 	*/
 	public static function getValueType($val){
@@ -151,10 +151,10 @@ abstract class Str {
 	
 	
 	/**
-	* Converti le type d'une valeur
+	* Convert the type of a value
 	*
-	* @param mixed  $val  -> La valeur à convertir
-	* @param string $type -> Le type à affecter
+	* @param mixed  $val  -> The value to convert
+	* @param string $type -> The type to assign
 	*/
 	public static function setValueType($val, $type){
 		switch($type){

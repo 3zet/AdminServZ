@@ -2,14 +2,14 @@
 /**
 * Class File
 *
-* Méthodes de traitement de fichier
+* File processing methods
 */
 abstract class File {
 	
 	/**
-	* Récupère l'extension d'un fichier
+	* Get a file's extension
 	*
-	* @param  string $filename -> Le chemin ou nom du fichier
+	* @param  string $filename -> The file's path or name
 	* @return string "php"
 	*/
 	public static function getExtension($filename){
@@ -25,9 +25,9 @@ abstract class File {
 	
 	
 	/**
-	* Récupère une double extension
+	* Get a double extension
 	*
-	* @param string $filename -> Le chemin ou nom du fichier
+	* @param string $filename -> The file's path or name
 	* @return string "class.php"
 	*/
 	public static function getDoubleExtension($filename){
@@ -40,16 +40,16 @@ abstract class File {
 			$out .= '.'.$filenameEx[$countFilenameEx - 1];
 		}
 		
-		return strtolower($out);
+		return strtolower((string) $out);
 	}
 	
 	
 	/**
-	* Créer ou ajoute des données à un fichier
+	* Create or append data to a file
 	*
-	* @param  string $filename -> Le chemin ou nom du fichier
-	* @param  string $data     -> Données à écrire
-	* @return true si réussi, sinon erreur string
+	* @param  string $filename -> The file's path or name
+	* @param  string $data     -> Data to write
+	* @return true if successful, otherwise error string
 	*/
 	public static function save($filename, $data = null, $appendData = true){
 		$out = null;
@@ -79,11 +79,11 @@ abstract class File {
 	
 	
 	/**
-	* Enregistre les données dans un fichier au pointeur
+	* Save data to a file at the pointer
 	*
-	* @param  string $filename -> Le chemin ou nom du fichier
-	* @param  string $data     -> Données à écrire
-	* @param  string $seek     -> Le pointeur pour l'endroit à écrire
+	* @param  string $filename -> The file's path or name
+	* @param  string $data     -> Data to write
+	* @param  string $seek     -> The pointer for where to write
 	*/
 	public static function saveAtSeek($filename, $data, $seek = 0){
 		$out = null;
@@ -105,11 +105,11 @@ abstract class File {
 	
 	
 	/**
-	* Récupère le pointeur à partir d'une chaine de caractère dans un fichier
+	* Get the pointer from a string within a file
 	*
-	* @param string $filename -> Le chemin du fichier
-	* @param string $string   -> La chaine à rechercher
-	* @param bool   $lastChar -> Retourner le pointer à partir du dernier caractère de la chaine recherchée
+	* @param string $filename -> The file's path
+	* @param string $string   -> The string to search for
+	* @param bool   $lastChar -> Return the pointer from the last character of the searched string
 	* @return int or text error
 	*/
 	public static function getSeekFromString($filename, $string, $lastChar = false){
@@ -133,10 +133,10 @@ abstract class File {
 	
 	
 	/**
-	* Renomme un fichier
+	* Rename a file
 	*
-	* @param string $filename    -> Chemin du fichier à renommer
-	* @param string $newfilename -> Chemin du nouveau fichier renommé
+	* @param string $filename    -> Path of the file to rename
+	* @param string $newfilename -> Path of the renamed file
 	*/
 	public static function rename($filename, $newfilename){
 		$out = null;
@@ -158,9 +158,9 @@ abstract class File {
 	
 	
 	/**
-	* Supprime un fichier
+	* Delete a file
 	*
-	* @param string $filename -> Chemin du fichier à supprimer
+	* @param string $filename -> Path of the file to delete
 	*/
 	public static function delete($filename){
 		$out = null;
@@ -182,15 +182,14 @@ abstract class File {
 	
 	
 	/**
-	* Envoi les headers pour télécharger un fichier
+	* Send headers to download a file
 	*
-	* @param string $pathToFile -> Le chemin du fichier à télécharger
-	* @param int    $fileSize   -> Taille du fichier, si null = automatique
+	* @param string $pathToFile -> Path of the file to download
+	* @param int    $fileSize   -> File size, if null = automatic
 	*/
-	public static function sendDownloadHeaders($pathToFile, $fileSize = null){
+	public static function sendDownloadHeaders($pathToFile, $fileSize = null): void{
 		$path_parts = pathinfo($pathToFile);
 		$filename = htmlspecialchars( trim($path_parts['basename']), ENT_QUOTES, 'UTF-8');
-		$path = $path_parts['dirname'].'/';
 		
 		header('Content-Disposition: attachment; filename="'.$filename);
 		header('Content-Type: application/force-download');
@@ -202,7 +201,7 @@ abstract class File {
 			header('Content-Length: '.filesize($pathToFile));
 		}
 		header('Pragma: no-cache');
-		if( preg_match('/MSIE/i', $_SERVER['HTTP_USER_AGENT']) ){
+		if( preg_match('/MSIE/i', (string) $_SERVER['HTTP_USER_AGENT']) ){
 			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 		}
 		else{
@@ -213,12 +212,12 @@ abstract class File {
 	
 	
 	/**
-	* Permet de télécharger un fichier
+	* Allows downloading a file
 	*
-	* @param string $pathToFile -> Le chemin du fichier à télécharger
-	* @param int    $fileSize   -> Taille du fichier, si null = automatique
+	* @param string $pathToFile -> Path of the file to download
+	* @param int    $fileSize   -> File size, if null = automatic
 	*/
-	public static function download($pathToFile, $fileSize = null){
+	public static function download($pathToFile, $fileSize = null): void{
 		self::sendDownloadHeaders($pathToFile, $fileSize);
 		flush();
 		readfile($pathToFile);

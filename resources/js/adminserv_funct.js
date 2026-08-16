@@ -1,5 +1,5 @@
 /**
-* Fonctions générales
+* General functions
 */
 function getResourcesPath(){
 	return $.trim( $('#path_resources').text() );
@@ -41,9 +41,9 @@ function getUrlParams(key){
 
 
 /**
-* Affiche la valeur seconde -> minute
+* Display the value converted from seconds -> minutes
 *
-* @param int sec -> La valeur en seconde
+* @param int sec -> The value in seconds
 */
 function secToMin(sec){
 	if(sec == '' || sec == undefined || isNaN(sec) ){
@@ -54,10 +54,10 @@ function secToMin(sec){
 
 
 /**
-* Math.round avec précision
+* Math.round with precision
 *
-* @param int value     -> Valeur à arrondir
-* @param int precision -> Nombre de caractère après la virgule
+* @param int value     -> Value to round
+* @param int precision -> Number of decimal digits
 */
 function round(value, precision){
 	power = Math.pow(10, precision);
@@ -66,7 +66,7 @@ function round(value, precision){
 
 
 /**
-* Affichage du texte d'erreur
+* Display the error text
 */
 function error(text, hide){
 	var selector = $('#error');
@@ -84,7 +84,7 @@ function error(text, hide){
 
 
 /**
-* Affichage du texte d'erreur
+* Display the error text
 */
 function info(text, hide){
 	var selector = $('#info');
@@ -102,9 +102,9 @@ function info(text, hide){
 
 
 /**
-* Administration rapide (restart, next, endround)
+* Quick administration (restart, next, endround)
 *
-* @param string cmd -> Le nom de la méthode à utiliser
+* @param string cmd -> Name of the method to use
 */
 function speedAdmin(cmd){
 	$.post(getResourcesPath()+'ajax/speed_admin.php', {cmd: cmd}, function(response){
@@ -126,7 +126,7 @@ function speedAdmin(cmd){
 
 
 /**
-* Récupère la liste des niveaux admin suivant le serveur sélectionné
+* Get the list of admin levels for the selected server
 */
 function getServerAdminLevel(){
 	var serverName = $('#as_server').val();
@@ -151,7 +151,7 @@ function getServerAdminLevel(){
 
 
 /**
-* Récupère les informations du serveur actuel (map, serveur, stats, joueurs)
+* Get the current server's information (map, server, stats, players)
 */
 function getCurrentServerInfo(mode, sort){
 	var path_ressources = getResourcesPath();
@@ -208,7 +208,7 @@ function getCurrentServerInfo(mode, sort){
 			if(data.ply != null && !$('#playerlist').isChecked() ){
 				var out = '';
 				
-				// Création du tableau
+				// Build the table
 				out += '<tr class="table-separation"><td colspan="'; if(isTeamGameMode){ out += '6'; }else{ out += '5'; } out += '"></td></tr>';
 				if( typeof(data.ply) == 'object' ){
 					$.each(data.ply, function(i, player){
@@ -250,7 +250,7 @@ function getCurrentServerInfo(mode, sort){
 
 
 /**
-* Transforme une chaine de caractère de couleur en HTML
+* Convert a color string to HTML
 *
 * @param string str
 */
@@ -268,20 +268,20 @@ function getCurrentServerInfo(mode, sort){
 
 
 /**
-* Récupère la configuration du gameMode sélectionné
+* Get the config for the selected gameMode
 */
 function getCurrentGameModeConfig(){
 	var gameMode = $('#NextGameMode option:selected').text();
 	var selector = $('#gameMode-'+gameMode.toLowerCase() );
 	
-	// Fermeture de tous les modes par défaut
+	// Close all modes by default
 	if( $('body').hasClass('section-maps-creatematchset') ){
 		var section = '.section-maps-creatematchset';
 	}else{
 		var section = '.section-gameinfos';
 	}
 	$.each( $(section+' .content.gameinfos fieldset'), function(i, n){
-		if( !$(this).hasClass('gameinfos_general') && !$(this).hasClass('gameinfos_teaminfos') ){
+		if( !$(this).hasClass('gameinfos_general') && !$(this).hasClass('gameinfos_teaminfos') && !$(this).hasClass('gameinfos_script_settings_inline') ){
 			if( $(this).attr('hidden') ){
 				$(this).hide();
 			}
@@ -292,7 +292,7 @@ function getCurrentGameModeConfig(){
 		}
 	});
 	
-	// Affichage du mode de jeu sélectionné
+	// Show the selected game mode
 	if( selector.attr('hidden') ){
 		selector.slideDown('fast').removeAttr('hidden');
 	}
@@ -300,117 +300,238 @@ function getCurrentGameModeConfig(){
 
 
 /**
-* Récupère les paramètres du script courant
+* Get the settings for the current script
 */
 function getScriptSettings(){
 	$.post(getResourcesPath()+'ajax/script_settings.php', {method: 'get'}, function(data){
-		if(data != null){
-			// Script info
-			$('#dialogScriptInfoName').html(data.Name+' ('+data.Version+')');
-			$('#dialogScriptInfoCompatibleMapTypes').html(data.CompatibleMapTypes);
-			if(data.Description != ''){
-				$('.dialogScriptInfoDesc').attr('hidden', false);
-				$('#dialogScriptInfoDesc').html(data.Description);
-			}
-			
-			// Paramètres
-			paramsList = '';
-			if( typeof(data.ParamDescs) == 'object' ){
-				$.each(data.ParamDescs, function(i, param){
-					var paramValueField = '';
-					if(param.Type == 'boolean'){
-						var isChecked = '';
-						if(param.Default == 'True'){
-							isChecked = ' checked="checked"';
-						}
-						paramValueField = '<input class="text" data-type="'+param.Type+'" type="checkbox" name="'+param.Name+'" id="'+param.Name+'" value="'+param.Default+'"'+isChecked+' />';
-					}
-					else{
-						paramValueField = '<input class="text" data-type="'+param.Type+'" type="text" name="'+param.Name+'" id="'+param.Name+'" value="'+param.Default+'" />';
-					}
-					
-					paramsList += '<tr>'
-						+ '<td class="first">'+param.Name+'</td>'
-						+ '<td class="middle">'+paramValueField+'</td>'
-						+ '<td class="last">'+param.Desc+'</td>'
-					+ '</tr>';
-				});
-				
-				$('#dialogScriptSettings table tbody').html(paramsList);
-			}
-			
-			// Dialog
-			$('#getScriptSettingsDialog').dialog({
-				title: $('#getScriptSettingsDialog').data('title'),
-				modal: true,
-				minWidth: 800,
-				minHeight: 400,
-				buttons: [
-					{
-						text: $('#getScriptSettingsDialog').data('cancel'),
-						click: function(){
-							$(this).dialog('close');
-						}
-					},
-					{
-						text: $('#getScriptSettingsDialog').data('save'),
-						click: function(){
-							setScriptSettings();
-						}
-					}
-				]
-			});
+		if( !data ){ return; }
+
+		var $section = $('#tm2020-script-settings');
+		var $inner   = $('#inlineScriptSettings');
+
+		if( data.Name ){
+			var shortName = data.Name.replace(/\.Script\.txt$/i, '').replace(/.*[\/\\]/, '');
+			$section.find('.script-settings-name').text('\u2014 ' + shortName);
 		}
+
+		if( !data.ParamDescs || typeof data.ParamDescs !== 'object' || Object.keys(data.ParamDescs).length === 0 ){
+			$section.attr('hidden', true);
+			return;
+		}
+
+		$.post(getResourcesPath()+'ajax/script_settings.php', {method: 'getcurrent'}, function(cur){
+			var current = (cur && typeof cur === 'object') ? cur : {};
+			renderInlineScriptSettings(data, current, $inner, $section);
+		}, 'json').fail(function(){
+			renderInlineScriptSettings(data, {}, $inner, $section);
+		});
 	}, 'json');
 }
 
 
 /**
-* Enregistre les paramètres du script courant
-*/
-function setScriptSettings(){
-	var params = [];
-	
-	$('#dialogScriptSettings table tbody tr').each(function(){
-		var key = $(this).find('.first').text();
-		var type = $(this).find('.middle input').data('type');
-		
-		if(type == 'boolean'){
-			if( $(this).find('.middle input').attr('checked') == 'checked' ){
-				var val = 1;
+ * Render inline script settings as a full table with descriptions and grouping (TM2020 desktop)
+ */
+function renderInlineScriptSettings(info, current, $inner, $section){
+	var params = info.ParamDescs || [];
+	var extraDescs = info._extraDescs || {};
+
+	// Hidden parameters -- names can be added here to skip them
+	var ignored = {};
+
+	// --- group by S_ prefix ---
+	var groups  = {};
+	var gOrder  = [];
+
+	$.each(params, function(i, param){
+		if( ignored[param.Name] ){ return; } // skip
+		// Prefix: "S_TimeLimit" -> "Time", "S_WarmUpNb" -> "WarmUp", no prefix -> "General"
+		var m     = param.Name.match(/^S_([A-Z][a-z]+)/);
+		var group = m ? m[1] : 'General';
+		if( !groups[group] ){ groups[group] = []; gOrder.push(group); }
+		groups[group].push(param);
+	});
+
+	// Strip ManiaPlanet style tags ($<$tXXXtext$>, $z, $s, $i, $l, $6F9 etc.)
+	function stripMlTags(str){
+		if( !str ){ return ''; }
+		return str
+			.replace(/\$[0-9a-fA-F]{3}/g, '')   // kolory $RGB
+			.replace(/\$[lL]\[.*?\]/g, '')        // linki $l[url]
+			.replace(/\$[lLhH]<.*?>/g, '')        // tagi <text>
+			.replace(/\$[lLhH]/g, '')
+			.replace(/\$[zZsSiIoObBnNtTuUmMkKgGwW]/g, '') // style
+			.replace(/\$</g, '').replace(/\$>/g, '')       // remaining brackets
+			.replace(/\$/g, '')
+			.trim();
+	}
+
+	var scriptDesc = stripMlTags(info.Description || '');
+
+	var html = (scriptDesc ? '<p class="sset-script-desc">' + $('<div/>').text(scriptDesc).html() + '</p>' : '')
+		+ '<table class="sset-table">'
+		+ '<thead><tr>'
+		+ '<th class="sset-th sset-th-name">Parameter</th>'
+		+ '<th class="sset-th sset-th-value">Value</th>'
+		+ '<th class="sset-th sset-th-default">Default</th>'
+		+ '<th class="sset-th sset-th-desc">Description</th>'
+		+ '</tr></thead>'
+		+ '<tbody>';
+
+	$.each(gOrder, function(gi, group){
+		$.each(groups[group], function(pi, param){
+			var val     = (current[param.Name] !== undefined) ? current[param.Name] : param.Default;
+			var defVal  = param.Default;
+			// Description: first from extra, then from API, then empty
+			var apiDesc = (param.Desc && param.Desc.trim()) ? param.Desc.trim() : '';
+			var desc    = (extraDescs[param.Name] && extraDescs[param.Name].trim())
+				? extraDescs[param.Name].trim()
+				: apiDesc;
+
+			// Changed indicator
+			var changed = String(val) !== String(defVal) ? ' sset-changed' : '';
+
+			// Input field
+			var field = '';
+			var typeLC = (param.Type || '').toLowerCase();
+			if( typeLC === 'boolean' ){
+				var sT = (val === true || val === 'True'  || val === 1 || val === '1') ? ' selected="selected"' : '';
+				var sF = (!sT) ? ' selected="selected"' : '';
+				field = '<select class="text sset-input" data-name="' + $('<div/>').text(param.Name).html()
+					+ '" data-type="Boolean" data-default="' + defVal + '">'
+					+ '<option value="True"' + sT + '>True</option>'
+					+ '<option value="False"' + sF + '>False</option>'
+					+ '</select>';
+			} else if( typeLC === 'integer' ){
+				field = '<input class="text sset-input" type="number" '
+					+ 'data-name="' + $('<div/>').text(param.Name).html() + '" data-type="Integer" '
+					+ 'data-default="' + defVal + '" value="' + $('<div/>').text(String(val)).html() + '" />';
+			} else if( typeLC === 'real' ){
+				field = '<input class="text sset-input" type="number" step="any" '
+					+ 'data-name="' + $('<div/>').text(param.Name).html() + '" data-type="Real" '
+					+ 'data-default="' + defVal + '" value="' + $('<div/>').text(String(val)).html() + '" />';
+			} else {
+				field = '<input class="text sset-input sset-text" type="text" '
+					+ 'data-name="' + $('<div/>').text(param.Name).html() + '" data-type="Text" '
+					+ 'data-default="' + defVal + '" value="' + $('<div/>').text(String(val)).html() + '" />';
 			}
-			else{
-				var val = 0;
-			}
-		}
-		else{
-			var val = $(this).find('.middle input').val();
-		}
-		
-		params.push({
-			name: key,
-			value: val,
-			type: type,
+
+			// Default badge
+			var defBadge = '<span class="sset-default" title="Default: ' + $('<div/>').text(String(defVal)).html() + '">'
+				+ $('<div/>').text(String(defVal)).html()
+				+ '</span>';
+
+			// Reset link (shown only when value differs from default)
+			var resetBtn = '<a class="sset-reset" href="#" title="Reset to default" '
+				+ 'data-default="' + $('<div/>').text(String(defVal)).html() + '" '
+				+ 'data-type="' + typeLC + '"'
+				+ (changed ? '' : ' hidden="hidden"')
+				+ '>\u21ba</a>';
+
+			html += '<tr class="sset-row' + changed + '">'
+				+ '<td class="sset-name" title="' + $('<div/>').text(param.Name).html() + '">'
+				+ $('<div/>').text(param.Name.replace(/^S_/, '')).html()
+				+ '</td>'
+				+ '<td class="sset-value">' + field + resetBtn + '</td>'
+				+ '<td class="sset-default-cell">' + defBadge + '</td>'
+				+ '<td class="sset-desc">' + $('<div/>').text(desc).html() + '</td>'
+				+ '</tr>';
 		});
 	});
-	
-	$.post(getResourcesPath()+'ajax/script_settings.php', {method: 'set', params: params}, function(response){
-		if(response != 'true'){
-			error(response);
-			scrollTop();
+
+	html += '</tbody></table>';
+	html += '<div class="sset-actions">'
+		+ '<button id="inlineScriptSettingsSaveBtn" class="button dark">Apply script settings</button>'
+		+ '<a href="#" id="ssetResetAll" class="sset-reset-all">Reset all to default</a>'
+		+ '<span id="inlineScriptSettingsResult" class="script-result-msg" hidden="hidden"></span>'
+		+ '</div>';
+
+	$inner.html(html);
+	$section.removeAttr('hidden');
+
+	// Reset a single field
+	$inner.on('click', '.sset-reset', function(e){
+		e.preventDefault();
+		var $row  = $(this).closest('tr');
+		var $inp  = $row.find('.sset-input');
+		var def   = $(this).data('default');
+		var type  = $(this).data('type');
+		if( type === 'boolean' ){
+			$inp.val( String(def) === 'True' || String(def) === '1' || def === true ? 'True' : 'False' );
+		} else {
+			$inp.val(def);
 		}
-		else{
-			$('#getScriptSettingsDialog').dialog('close');
-			info($('#getScriptSettings').data('infotext'), true);
-		}
+		$row.removeClass('sset-changed');
+		$(this).attr('hidden', true);
+	});
+
+	// Reset all
+	$inner.on('click', '#ssetResetAll', function(e){
+		e.preventDefault();
+		$inner.find('.sset-input').each(function(){
+			var def  = $(this).data('default');
+			var type = $(this).data('type').toLowerCase();
+			if( type === 'boolean' ){
+				$(this).val( String(def) === 'True' || String(def) === '1' || def === true ? 'True' : 'False' );
+			} else {
+				$(this).val(def);
+			}
+			$(this).closest('tr').removeClass('sset-changed');
+			$(this).siblings('.sset-reset').attr('hidden', true);
+		});
+	});
+
+	// Changed highlight on input
+	$inner.on('change input', '.sset-input', function(){
+		var $row = $(this).closest('tr');
+		var def  = String($(this).data('default'));
+		var cur  = String($(this).val());
+		var ch   = (cur !== def);
+		$row.toggleClass('sset-changed', ch);
+		$row.find('.sset-reset').attr('hidden', ch ? null : true);
 	});
 }
 
 
 /**
-* Récupère les lignes du chat du serveur
+ * Save inline script settings to the server (TM2020)
+ */
+function setScriptSettings(){
+	var params = [];
+	$('.sset-input').each(function(){
+		params.push({ name: $(this).data('name'), value: $(this).val(), type: $(this).data('type') });
+	});
+
+	var $result = $('#inlineScriptSettingsResult');
+	var $btn    = $('#inlineScriptSettingsSaveBtn');
+	$result.attr('hidden', true);
+	$btn.prop('disabled', true);
+
+	$.post(getResourcesPath()+'ajax/script_settings.php', {method: 'set', params: params}, function(response){
+		$btn.prop('disabled', false);
+		if( response === true || response === 'true' || response === 1 ){
+			$result.text('Script settings applied.').removeClass('script-err').addClass('script-ok').removeAttr('hidden');
+			// Refresh changed indicators
+			$('.sset-input').each(function(){
+				$(this).closest('tr').removeClass('sset-changed');
+				$(this).data('default', $(this).val());
+				$(this).siblings('.sset-reset').attr('hidden', true);
+			});
+		} else {
+			$result.text(response || 'Error').removeClass('script-ok').addClass('script-err').removeAttr('hidden');
+			error(response);
+			scrollTop();
+		}
+	});
+}
+
+
+
+
+/**
+* Get the server's chat lines
 *
-* @param bool hideServerLines -> Afficher ou non les lignes provenant d'un gestionnaire de serveur
+* @param bool hideServerLines -> Whether to show lines coming from a server manager
 * @return string html
 */
 function getChatServerLines(hideServerLines){
@@ -421,7 +542,7 @@ function getChatServerLines(hideServerLines){
 
 
 /**
-* Ajoute une ligne (pseudo + message) dans le chat du serveur
+* Add a line (nickname + message) to the server chat
 */
 function addChatServerLine(){
 	var nickname = $('#chatNickname').val();
@@ -443,7 +564,7 @@ function addChatServerLine(){
 
 
 /**
-* Initialisation de l'uploader Ajax
+* Initialize the Ajax uploader
 */
 function initializeUploader(){
 	var formSelector = $('#formUpload');
@@ -531,7 +652,7 @@ function initializeUploader(){
 
 
 /**
-* Récupère les paramètres utilisateur de l'uploader
+* Get the uploader's user settings
 */
 function getUploaderUserParams(){
 	return {
@@ -544,7 +665,7 @@ function getUploaderUserParams(){
 
 
 /**
-* Récupère la liste des maps du serveur
+* Get the server's map list
 */
 function getMapList(mode, sort){
 	var path_ressources = getResourcesPath();
@@ -560,7 +681,7 @@ function getMapList(mode, sort){
 			if(data.lst != null && !$('#maplist').isChecked() ){
 				var out = '';
 				
-				// Création du tableau
+				// Build the table
 				out += '<tr class="table-separation"><td colspan="6"></td></tr>';
 				if( typeof(data.lst) == 'object' ){
 					$.each(data.lst, function(i, map){
@@ -605,7 +726,7 @@ function getMapList(mode, sort){
 
 
 /**
-* Récupère la liste des fichiers map pour les renommer
+* Get the list of map files to rename
 */
 (function($){
 	$.fn.getMapRenameList = function(){
@@ -642,7 +763,7 @@ function getMapList(mode, sort){
 
 
 /**
-* Récupère l'arboréscence des dossiers pour déplacer
+* Get the folder tree for moving
 */
 function getMoveFolderList(nbFiles){
 	$.getJSON(getResourcesPath()+'ajax/get_directory_list.php', function(data){
@@ -673,7 +794,7 @@ function getMoveFolderList(nbFiles){
 }
 
 /**
-* Fonctions d'affichage des formulaires
+* Form display functions
 */
 function slideDownRenameForm(){
 	$('#form-rename-map').slideDown('fast');
@@ -721,7 +842,7 @@ function slideUpNewFolderForm(){
 
 
 /**
-* Fait un tri sur la liste des maps pour la page "maps-order"
+* Sort the map list for the "maps-order" page
 */
 function setMapsOrderSort(sort, order){
 	var resourcesPath = getResourcesPath();
@@ -752,7 +873,7 @@ function setMapsOrderSort(sort, order){
 
 
 /**
-* Met en place l'affichage en mode détail
+* Set up detail-mode display
 */
 (function($){
 	$.fn.setDetailMode = function(){
@@ -784,9 +905,9 @@ function setMapsOrderSort(sort, order){
 
 
 /**
-* Coche toutes les checkbox d'un selecteur
+* Check all checkboxes for a selector
 *
-* @param bool isChecked -> Si la checkbox "checkAll" est cochée
+* @param bool isChecked -> Whether the "checkAll" checkbox is checked
 */
 (function($){
 	$.fn.checkAll = function(isChecked){
@@ -804,9 +925,9 @@ function setMapsOrderSort(sort, order){
 })(jQuery);
 
 /**
-* Met à jour la checkbox "checkAll" si toutes les lignes sont cochées ou non
+* Update the "checkAll" checkbox based on whether all lines are checked
 *
-* @param string checkAllSelector -> Selecteur de l'input "checkAll"
+* @param string checkAllSelector -> Selector for the "checkAll" input
 */
 (function($){
 	$.fn.updateCheckAll = function(checkAllSelector){
@@ -829,7 +950,7 @@ function setMapsOrderSort(sort, order){
 
 
 /**
-* Met à jour le nombre de fichiers sélectionnés
+* Update the number of selected files
 */
 (function($){
 	$.fn.updateNbSelectedLines = function(){
@@ -847,7 +968,7 @@ function setMapsOrderSort(sort, order){
 
 
 /**
-* Détermine si il y a au moins une ligne sélectionnée
+* Determine if at least one line is selected
 */
 (function($){
 	$.fn.isChecked = function(){
@@ -869,9 +990,9 @@ function setMapsOrderSort(sort, order){
 */
 
 /**
-* Vérifie si le nom du MatchSettings n'existe pas déjà
+* Check that the MatchSettings name doesn't already exist
 *
-* @param string filename -> Le nom du fichier
+* @param string filename -> The file name
 */
 function matchset_getFileExists(filename){
 	$.getJSON(getResourcesPath()+'ajax/get_matchset_fileexists.php', {path: getPath(), name: filename}, function(response){
@@ -885,7 +1006,7 @@ function matchset_getFileExists(filename){
 }
 
 /**
-* Récupère la liste des maps en local pour la création d'un matchSettings
+* Get the local map list for creating a matchSettings
 */
 function matchset_mapImport(){
 	var path = $('#mapsDirectoryList').val();
@@ -907,7 +1028,7 @@ function matchset_mapImportSelection(){
 		if(data != null){
 			var out = '';
 			
-			// Création du tableau
+			// Build the table
 			out += '<tr class="table-separation"><td colspan="4"></td></tr>';
 			if( typeof(data.lst) == 'object' ){
 				$.each(data.lst, function(i, map){
@@ -973,7 +1094,7 @@ function matchset_mapImportSelection(){
 
 
 /**
-* Met à jour le nombre de maps sélectionnées
+* Update the number of selected maps
 *
 * @param int nb
 */
@@ -981,7 +1102,7 @@ function matchset_setNbMapSelection(nb){
 	$('#nbMapSelected').text(nb);
 }
 /**
-* Récupère et affiche la sélection du MatchSettings
+* Get and display the MatchSettings selection
 */
 function matchset_mapSelection(removeId){
 	var path_ressources = getResourcesPath();
@@ -994,7 +1115,7 @@ function matchset_mapSelection(removeId){
 		if(data != null){
 			var out = '';
 			
-			// Création du tableau
+			// Build the table
 			out += '<tr class="table-separation"><td colspan="4"></td></tr>';
 			if( typeof(data.lst) == 'object' ){
 				$.each(data.lst, function(i, map){
@@ -1104,5 +1225,291 @@ function getMoveFolderForm(){
 			},
 			
 		]
+	});
+}
+
+/**
+* Fetch the current ranking (GetCurrentRanking) and refresh the table.
+*/
+function getResults(){
+	$.getJSON(getResourcesPath()+'ajax/get_results.php', {}, function(data){
+		if(data == null) return;
+
+		var $resultsDiv = $('#resultsTable');
+		var columns = data.columns || ['Rank', 'NickName', 'Login', 'Score'];
+		var prevColumns = $resultsDiv.attr('data-columns');
+		var newColumnsJson = JSON.stringify(columns);
+
+		var colLabels = {
+			'Rank': 'Rank', 'NickName': 'Nickname', 'Login': 'Login',
+			'Score': 'Score', 'BestTime': 'Best time', 'NbrLapsFinished': 'Laps'
+		};
+
+		// If the game mode changed (different columns) -- rebuild the whole <thead>
+		if(prevColumns !== newColumnsJson){
+			var headHtml = '<tr>';
+			$.each(columns, function(i, col){
+				var cls = (i === 0 ? 'thleft ' : '') + (i === columns.length - 1 ? 'thright ' : '') + 'col-'+col.toLowerCase();
+				headHtml += '<th class="'+cls+'">'+(colLabels[col] || col)+'</th>';
+			});
+			headHtml += '</tr>';
+			$resultsDiv.find('thead').html(headHtml);
+			$resultsDiv.attr('data-columns', newColumnsJson);
+		}
+
+		// Mode label in title-detail
+		if(data.modeName){
+			var $modeLabel = $('.results-mode-label');
+			if($modeLabel.length){ $modeLabel.text(data.modeName); }
+		}
+
+		var colCount = columns.length;
+		var $tbody = $('#resultsTable tbody');
+		var html = '<tr class="table-separation"><td colspan="'+colCount+'"></td></tr>';
+
+		if(data.count > 0 && typeof data.lst === 'object'){
+			$.each(data.lst, function(idx, row){
+				html += '<tr>';
+				$.each(columns, function(i, col){
+					if(col === 'Rank'){
+						html += '<td class="results-rank">#'+row.Rank+'</td>';
+					} else if(col === 'NickName'){
+						html += '<td class="imgleft"><img src="'+getResourcesPath()+'images/16/solo.png" alt="" />'+(row.NickName || '\u2014')+'</td>';
+					} else {
+						var val = row[col];
+						html += '<td>'+(val !== null && val !== undefined ? val : '\u2014')+'</td>';
+					}
+				});
+				html += '</tr>';
+			});
+		} else {
+			html += '<tr class="no-line"><td colspan="'+colCount+'">'+(typeof data.lst === 'string' ? data.lst : 'No player')+'</td></tr>';
+		}
+
+		$tbody.html(html);
+		$('.section-results-main .nb-line').text(data.count + ' players');
+	});
+}
+
+
+/**
+ * ============================================================
+ * SCRIPT MANAGER — TM2020
+ * Upload and live-edit gamemode scripts
+ * ============================================================
+ */
+
+/**
+ * Open the Script Manager dialog and load data from the server
+ */
+function openScriptManager(){
+	var $dialog = $('#scriptManagerDialog');
+
+	// Initialize jQuery UI dialog (lazy)
+	if( !$dialog.hasClass('ui-dialog-content') ){
+		$dialog.dialog({
+			title:     $dialog.data('title'),
+			modal:     true,
+			width:     780,
+			minHeight: 500,
+			resizable: true,
+			open: function(){
+				$('#scriptManagerTabs').tabs();
+				scriptEditor_load();
+			},
+			buttons: [
+				{
+					text:  $dialog.data('cancel'),
+					click: function(){ $(this).dialog('close'); }
+				}
+			]
+		});
+	}
+	else{
+		$dialog.dialog('open');
+		scriptEditor_load();
+	}
+}
+
+/**
+ * Load the script list and the current file's content into the editor
+ */
+function scriptEditor_load(){
+	var $sel    = $('#scriptEditorSelect');
+	var $wrap   = $('#scriptEditorWrap');
+	var $nolocal= $('#scriptEditorNotLocal');
+	var $result = $('#scriptEditorResult');
+
+	$sel.empty().append('<option value="">— loading… —</option>');
+	$wrap.attr('hidden', true);
+	$nolocal.attr('hidden', true);
+	$result.attr('hidden', true);
+
+	$.getJSON(getResourcesPath()+'ajax/script_editor.php?method=get', function(data){
+		if( !data || data.error ){
+			$result.text(data ? data.error : 'Error').removeAttr('hidden');
+			return;
+		}
+
+		// Fill the select with the script list
+		$sel.empty();
+		if( data.scripts && data.scripts.length > 0 ){
+			$.each(data.scripts, function(i, name){
+				var selected = (name === data.scriptName || name.replace(/\\/g,'/') === (data.scriptName||'').replace(/\\/g,'/'));
+				$sel.append('<option value="'+name+'"'+(selected?' selected="selected"':'')+'>'+name+'</option>');
+			});
+		}
+		else{
+			$sel.append('<option value="">— no scripts found —</option>');
+		}
+
+		// Show the editor or a message about missing local access
+		if( data.content !== null ){
+			$('#scriptEditorContent').val(data.content);
+			$wrap.removeAttr('hidden');
+		}
+		else{
+			$nolocal.removeAttr('hidden');
+		}
+
+		// Bind: select change -> load the file
+		$sel.off('change.scriptmgr').on('change.scriptmgr', function(){
+			scriptEditor_loadFile( $(this).val() );
+		});
+	}).fail(function(){
+		$result.text('AJAX error loading script list').removeAttr('hidden');
+	});
+}
+
+/**
+ * Load the content of the selected script file into the editor
+ */
+function scriptEditor_loadFile(name){
+	if( !name ) return;
+	var $wrap   = $('#scriptEditorWrap');
+	var $nolocal= $('#scriptEditorNotLocal');
+	var $result = $('#scriptEditorResult');
+
+	$result.attr('hidden', true);
+	$wrap.attr('hidden', true);
+
+	$.post(getResourcesPath()+'ajax/script_editor.php', {method: 'getfile', name: name}, function(data){
+		if( !data || data.error ){
+			$result.text(data ? data.error : 'Error').removeAttr('hidden');
+			return;
+		}
+		$('#scriptEditorContent').val(data.content);
+		if( data.editable ){
+			$wrap.removeAttr('hidden');
+		}
+		else{
+			$nolocal.removeAttr('hidden');
+		}
+	}, 'json').fail(function(){
+		$result.text('AJAX error loading file').removeAttr('hidden');
+	});
+}
+
+/**
+ * Save the edited script (optionally restarting the map)
+ */
+function scriptEditor_save(){
+	var $dialog = $('#scriptManagerDialog');
+	var $result = $('#scriptEditorResult');
+	var name    = $('#scriptEditorSelect').val();
+	var content = $('#scriptEditorContent').val();
+	var reload  = $('#scriptEditorReload').is(':checked') ? '1' : '0';
+
+	if( !name ){
+		$result.text('No script selected').removeClass('script-ok').addClass('script-err').removeAttr('hidden');
+		return;
+	}
+
+	$result.attr('hidden', true);
+	$('#scriptEditorSaveBtn').prop('disabled', true);
+
+	$.post(getResourcesPath()+'ajax/script_editor.php', {method: 'save', name: name, content: content, reload: reload}, function(data){
+		$('#scriptEditorSaveBtn').prop('disabled', false);
+		if( !data || data.error ){
+			$result.text(data ? data.error : 'Save error').removeClass('script-ok').addClass('script-err').removeAttr('hidden');
+		}
+		else{
+			var msg = data.reloaded ? $dialog.data('reloaded') : $dialog.data('saved');
+			if( data.reloadError ){ msg += ' (reload error: '+data.reloadError+')'; }
+			$result.text(msg).removeClass('script-err').addClass('script-ok').removeAttr('hidden');
+		}
+	}, 'json').fail(function(){
+		$('#scriptEditorSaveBtn').prop('disabled', false);
+		$result.text('AJAX error saving script').removeClass('script-ok').addClass('script-err').removeAttr('hidden');
+	});
+}
+
+/**
+ * Script upload via a hidden <input type="file">
+ */
+function scriptUpload_send(){
+	var $result   = $('#scriptUploadResult');
+	var $progress = $('#scriptUploadProgress');
+	var $btn      = $('#scriptUploadBtn');
+	var $input    = $('#scriptUploadInput');
+	var file      = $input[0].files ? $input[0].files[0] : null;
+	var $dialog   = $('#scriptManagerDialog');
+
+	if( !file ){
+		$result.text('No file selected').removeClass('script-ok').addClass('script-err').removeAttr('hidden');
+		return;
+	}
+
+	if( !/\.Script\.txt$/i.test(file.name) ){
+		$result.text('Only .Script.txt files are allowed').removeClass('script-ok').addClass('script-err').removeAttr('hidden');
+		return;
+	}
+
+	var activate = $('#scriptUploadActivate').is(':checked') ? '1' : '0';
+	var reload   = $('#scriptUploadReload').is(':checked')   ? '1' : '0';
+	var subdir   = $('#scriptUploadSubdir').val().trim();
+
+	var url = getResourcesPath()+'ajax/script_upload.php?activate='+activate+'&reload='+reload;
+	if( subdir ){ url += '&subdir='+encodeURIComponent(subdir); }
+
+	var formData = new FormData();
+	formData.append('qqfile', file);
+
+	$result.attr('hidden', true);
+	$progress.removeAttr('hidden');
+	$('#scriptUploadFilename').text(file.name);
+	$('#scriptUploadStatus').text($dialog.data('uploading'));
+	$btn.prop('disabled', true);
+
+	$.ajax({
+		url:         url,
+		type:        'POST',
+		data:        formData,
+		processData: false,
+		contentType: false,
+		dataType:    'json',
+		success: function(data){
+			$btn.prop('disabled', false);
+			$progress.attr('hidden', true);
+			if( data && data.success ){
+				var msg = $dialog.data('upload-ok')+' '+data.name;
+				if( data.activated ){ msg += ' (active)'; }
+				if( data.reloaded  ){ msg += ' (reloaded)'; }
+				if( data.activateError ){ msg += ' — activate error: '+data.activateError; }
+				if( data.reloadError   ){ msg += ' — reload error: '+data.reloadError; }
+				$result.text(msg).removeClass('script-err').addClass('script-ok').removeAttr('hidden');
+				// Refresh the editor's select
+				scriptEditor_load();
+			}
+			else{
+				$result.text(data ? (data.error || $dialog.data('upload-err')) : $dialog.data('upload-err'))
+					.removeClass('script-ok').addClass('script-err').removeAttr('hidden');
+			}
+		},
+		error: function(){
+			$btn.prop('disabled', false);
+			$progress.attr('hidden', true);
+			$result.text('AJAX upload error').removeClass('script-ok').addClass('script-err').removeAttr('hidden');
+		}
 	});
 }

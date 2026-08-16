@@ -1,21 +1,21 @@
 <?php
-	// Si on demande le mot de passe pour la config en ligne
+	// If a password is requested for online config
 	if( !isset($_SESSION['adminserv']['check_password']) && !isset($_SESSION['adminserv']['get_password']) ){
-		// On vérifie qu'une configuration existe, sinon on la créer
+		// Check that a config exists, otherwise create it
 		if( class_exists('ServerConfig') ){
-			// Si la configuration contient au moins 1 serveur et qu'il n'est pas l'exemple
+			// If the config contains at least 1 server and it's not the example one
 			if( AdminServServerConfig::hasServer() ){
-				// Connexion
+				// Connection
 				if( isset($_POST['as_server']) && isset($_POST['as_password']) && isset($_POST['as_adminlevel']) ){
-					// Récupération des valeurs
+					// Retrieve the values
 					$serverName = $_POST['as_server'];
-					$password = addslashes( htmlspecialchars( trim($_POST['as_password']) ) );
+					$password = addslashes( htmlspecialchars( trim((string) $_POST['as_password']) ) );
 					if(AdminServConfig::MD5_PASSWORD){
 						$password = md5($password);
 					}
-					$adminLevel = addslashes( htmlspecialchars($_POST['as_adminlevel']) );
+					$adminLevel = addslashes( htmlspecialchars((string) $_POST['as_adminlevel']) );
 					
-					// Vérification des valeurs
+					// Validate the values
 					if($password == null){
 						AdminServ::error( Utils::t('Please put a password.') );
 					}
@@ -25,7 +25,7 @@
 						$_SESSION['adminserv']['name'] = $serverName;
 						$_SESSION['adminserv']['password'] = $password;
 						$_SESSION['adminserv']['adminlevel'] = $adminLevel;
-						Utils::addCookieData('adminserv', array($_SESSION['adminserv']['sid'], $adminLevel), AdminServConfig::COOKIE_EXPIRE);
+						Utils::addCookieData('adminserv', [$_SESSION['adminserv']['sid'], $adminLevel], AdminServConfig::COOKIE_EXPIRE);
 						
 						// Redirection
 						if($_SESSION['adminserv']['sid'] != -1 && $_SESSION['adminserv']['name'] != null && $_SESSION['adminserv']['password'] != null && $_SESSION['adminserv']['adminlevel'] != null){
@@ -47,7 +47,7 @@
 			}
 		}
 		else{
-			if(OnlineConfig::ACTIVATE === true && !isset($_GET['error']) ){
+			if(!isset($_GET['error']) ){
 				Utils::redirection(false, './config/');
 			}
 			else{

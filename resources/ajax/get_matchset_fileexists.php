@@ -15,7 +15,7 @@
 	$out = false;
 	if($path && $name){
 		$struct = Folder::read($path);
-		if( !strstr($name, '.txt') ){
+		if( !strstr((string) $name, '.txt') ){
 			$name = $name.'.txt';
 		}
 		

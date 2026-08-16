@@ -68,11 +68,9 @@ if (!defined('LF')) {
 }
 
 class IXR_Value {
-	public $data;
 	public $type;
 
-	function IXR_Value ($data, $type = false) {
-		$this->data = $data;
+	function __construct (public $data, $type = false) {
 		if (!$type) {
 			$type = $this->calculateType();
 		}
@@ -90,7 +88,7 @@ class IXR_Value {
 		}
 	}
 
-	function calculateType() {
+	function calculateType(): string {
 		if ($this->data === true || $this->data === false) {
 			return 'boolean';
 		}
@@ -128,42 +126,33 @@ class IXR_Value {
 		switch ($this->type) {
 			case 'boolean':
 				return '<boolean>' . ($this->data ? '1' : '0') . '</boolean>';
-				break;
 			case 'int':
 				return '<int>' . $this->data . '</int>';
-				break;
 			case 'double':
 				return '<double>' . $this->data . '</double>';
-				break;
 			case 'string':
-				return '<string>' . htmlspecialchars($this->data) . '</string>';
-				break;
+				return '<string>' . htmlspecialchars((string) $this->data) . '</string>';
 			case 'array':
 				$return = '<array><data>' . LF;
 				foreach ($this->data as $item) {
 					$return .= '	<value>' . $item->getXml() . '</value>' . LF;
 				}
-				$return .= '</data></array>';
-				return $return;
-				break;
+				return $return . '</data></array>';
 			case 'struct':
 				$return = '<struct>' . LF;
 				foreach ($this->data as $name => $value) {
 					$return .= '	<member><name>' . $name . '</name><value>';
 					$return .= $value->getXml() . '</value></member>' . LF;
 				}
-				$return .= '</struct>';
-				return $return;
-				break;
+				return $return . '</struct>';
 			case 'date':
 			case 'base64':
 				return $this->data->getXml();
-				break;
 		}
 		return false;
 	}
 
-	function isStruct($array) {
+	function isStruct($array): bool {
 		// Nasty function to check if an array is a struct or not
 		$expected = 0;
 		foreach ($array as $key => $value) {
@@ -178,16 +167,15 @@ class IXR_Value {
 
 
 class IXR_Message {
-	public $message;
 	public $messageType;  // methodCall / methodResponse / fault
 	public $faultCode;
 	public $faultString;
 	public $methodName;
 	public $params;
 	// Current variable stacks
-	protected $_arraystructs = array();  // Stack to keep track of the current array/struct
-	protected $_arraystructstypes = array();  // Stack to keep track of whether things are structs or array
-	protected $_currentStructName = array();  // A stack as well
+	protected $_arraystructs = [];  // Stack to keep track of the current array/struct
+	protected $_arraystructstypes = [];  // Stack to keep track of whether things are structs or array
+	protected $_currentStructName = [];  // A stack as well
 	protected $_param;
 	protected $_value;
 	protected $_currentTag;
@@ -195,31 +183,33 @@ class IXR_Message {
 	// The XML parser
 	protected $_parser;
 
-	function IXR_Message ($message) {
-		$this->message = $message;
-	}
+	function __construct(public $message)
+    {
+    }
 
-	function parse() {
-		// first remove the XML declaration
-		$this->message = preg_replace('/<\?xml(.*)?\?'.'>/', '', $this->message);
-		if (trim($this->message) == '') {
+	function parse(): bool {
+		//remove XML declaration
+		$this->message = preg_replace('/<\?xml(.*)?\?'.'>/', '', (string) $this->message);
+		if (trim((string) $this->message) == '') {
 			return false;
 		}
+
 		$this->_parser = xml_parser_create();
-		// Set XML parser to take the case of tags into account
 		xml_parser_set_option($this->_parser, XML_OPTION_CASE_FOLDING, false);
-		// Set XML parser callback functions
-		xml_set_object($this->_parser, $this);
-		xml_set_element_handler($this->_parser, 'tag_open', 'tag_close');
-		xml_set_character_data_handler($this->_parser, 'cdata');
-		if (!xml_parse($this->_parser, $this->message)) {
-			/* die(sprintf('GbxRemote XML error: %s at line %d',
-			               xml_error_string(xml_get_error_code($this->_parser)),
-			               xml_get_current_line_number($this->_parser))); */
+		xml_set_element_handler(
+			$this->_parser,
+			[$this, 'tag_open'], // Use array syntax to refer to methods on this object
+			[$this, 'tag_close']
+		);
+		xml_set_character_data_handler($this->_parser, [$this, 'cdata']);
+
+		if (!xml_parse($this->_parser, (string) $this->message)) {
 			return false;
 		}
+
 		xml_parser_free($this->_parser);
-		// Grab the error messages, if any
+
+		// Grab the error messages
 		if ($this->messageType == 'fault') {
 			$this->faultCode = $this->params[0]['faultCode'];
 			$this->faultString = $this->params[0]['faultString'];
@@ -227,8 +217,9 @@ class IXR_Message {
 		return true;
 	}
 
-	function tag_open($parser, $tag, $attr) {
-		$this->currentTag = $tag;
+
+	function tag_open($parser, $tag, $attr): void {
+		$this->_currentTag = $tag;
 		switch ($tag) {
 			case 'methodCall':
 			case 'methodResponse':
@@ -238,59 +229,58 @@ class IXR_Message {
 			// Deal with stacks of arrays and structs
 			case 'data':  // data is to all intents and purposes more interesting than array
 				$this->_arraystructstypes[] = 'array';
-				$this->_arraystructs[] = array();
+				$this->_arraystructs[] = [];
 				break;
 			case 'struct':
 				$this->_arraystructstypes[] = 'struct';
-				$this->_arraystructs[] = array();
+				$this->_arraystructs[] = [];
 				break;
 		}
 	}
 
-	function cdata($parser, $cdata) {
+	function cdata($parser, string $cdata): void {
 		$this->_currentTagContents .= $cdata;
 	}
 
-	function tag_close($parser, $tag) {
+	function tag_close($parser, $tag): void {
 		$valueFlag = false;
 		switch ($tag) {
 			case 'int':
 			case 'i4':
-				$value = (int)trim($this->_currentTagContents);
+				$value = (int)trim((string) $this->_currentTagContents);
 				$this->_currentTagContents = '';
 				$valueFlag = true;
 				break;
 			case 'double':
-				$value = (double)trim($this->_currentTagContents);
+				$value = (double)trim((string) $this->_currentTagContents);
 				$this->_currentTagContents = '';
 				$valueFlag = true;
 				break;
 			case 'string':
-				$value = (string)trim($this->_currentTagContents);
+				$value = trim((string) $this->_currentTagContents);
 				$this->_currentTagContents = '';
 				$valueFlag = true;
 				break;
 			case 'dateTime.iso8601':
-				$value = new IXR_Date(trim($this->_currentTagContents));
-				// $value = $iso->getTimestamp();
+				$value = new IXR_Date(trim((string) $this->_currentTagContents));
 				$this->_currentTagContents = '';
 				$valueFlag = true;
 				break;
 			case 'value':
 				// If no type is indicated, the type is string
-				if (trim($this->_currentTagContents) != '') {
+				if (trim((string) $this->_currentTagContents) != '') {
 					$value = (string)$this->_currentTagContents;
 					$this->_currentTagContents = '';
 					$valueFlag = true;
 				}
 				break;
 			case 'boolean':
-				$value = (boolean)trim($this->_currentTagContents);
+				$value = (boolean)trim((string) $this->_currentTagContents);
 				$this->_currentTagContents = '';
 				$valueFlag = true;
 				break;
 			case 'base64':
-				$value = base64_decode($this->_currentTagContents);
+				$value = base64_decode((string) $this->_currentTagContents);
 				$this->_currentTagContents = '';
 				$valueFlag = true;
 				break;
@@ -305,11 +295,11 @@ class IXR_Message {
 				array_pop($this->_currentStructName);
 				break;
 			case 'name':
-				$this->_currentStructName[] = trim($this->_currentTagContents);
+				$this->_currentStructName[] = trim((string) $this->_currentTagContents);
 				$this->_currentTagContents = '';
 				break;
 			case 'methodName':
-				$this->methodName = trim($this->_currentTagContents);
+				$this->methodName = trim((string) $this->_currentTagContents);
 				$this->_currentTagContents = '';
 				break;
 		}
@@ -339,13 +329,12 @@ class IXR_Message {
 
 
 class IXR_Request {
-	public $method;
-	public $args;
-	public $xml;
+	/**
+     * @var string
+     */
+    public $xml;
 
-	function IXR_Request($method, $args) {
-		$this->method = $method;
-		$this->args = $args;
+	function __construct(public $method, public $args) {
 		$this->xml = '<?xml version="1.0" encoding="utf-8" ?><methodCall><methodName>' . $this->method . '</methodName><params>';
 		foreach ($this->args as $arg) {
 			$this->xml .= '<param><value>';
@@ -356,8 +345,8 @@ class IXR_Request {
 		$this->xml .= '</params></methodCall>';
 	}
 
-	function getLength() {
-		return strlen($this->xml);
+	function getLength(): int {
+		return strlen((string) $this->xml);
 	}
 
 	function getXml() {
@@ -367,16 +356,12 @@ class IXR_Request {
 
 
 class IXR_Error {
-	public $code;
-	public $message;
+	function __construct(public $code, public $message)
+    {
+    }
 
-	function IXR_Error($code, $message) {
-		$this->code = $code;
-		$this->message = $message;
-	}
-
-	function getXml() {
-		$xml = <<<EOD
+	function getXml(): string {
+		return <<<EOD
 <methodResponse>
 	<fault>
 		<value>
@@ -394,7 +379,6 @@ class IXR_Error {
 	</fault>
 </methodResponse>
 EOD;
-		return $xml;
 	}
 }
 
@@ -407,7 +391,7 @@ class IXR_Date {
 	public $minute;
 	public $second;
 
-	function IXR_Date($time) {
+	function __construct($time) {
 		// $time can be a PHP timestamp or an ISO one
 		if (is_numeric($time)) {
 			$this->parseTimestamp($time);
@@ -416,7 +400,7 @@ class IXR_Date {
 		}
 	}
 
-	function parseTimestamp($timestamp) {
+	function parseTimestamp($timestamp): void {
 		$this->year = date('Y', $timestamp);
 		$this->month = date('Y', $timestamp);
 		$this->day = date('Y', $timestamp);
@@ -425,38 +409,36 @@ class IXR_Date {
 		$this->second = date('s', $timestamp);
 	}
 
-	function parseIso($iso) {
-		$this->year = substr($iso, 0, 4);
-		$this->month = substr($iso, 4, 2);
-		$this->day = substr($iso, 6, 2);
-		$this->hour = substr($iso, 9, 2);
-		$this->minute = substr($iso, 12, 2);
-		$this->second = substr($iso, 15, 2);
+	function parseIso($iso): void {
+		$this->year = substr((string) $iso, 0, 4);
+		$this->month = substr((string) $iso, 4, 2);
+		$this->day = substr((string) $iso, 6, 2);
+		$this->hour = substr((string) $iso, 9, 2);
+		$this->minute = substr((string) $iso, 12, 2);
+		$this->second = substr((string) $iso, 15, 2);
 	}
 
-	function getIso() {
+	function getIso(): string {
 		return $this->year.$this->month.$this->day.'T'.$this->hour.':'.$this->minute.':'.$this->second;
 	}
 
-	function getXml() {
+	function getXml(): string {
 		return '<dateTime.iso8601>'.$this->getIso().'</dateTime.iso8601>';
 	}
 
-	function getTimestamp() {
+	function getTimestamp(): int|false {
 		return mktime($this->hour, $this->minute, $this->second, $this->month, $this->day, $this->year);
 	}
 }
 
 
 class IXR_Base64 {
-	public $data;
+	function __construct(public $data)
+    {
+    }
 
-	function IXR_Base64($data) {
-		$this->data = $data;
-	}
-
-	function getXml() {
-		return '<base64>'.base64_encode($this->data).'</base64>';
+	function getXml(): string {
+		return '<base64>'.base64_encode((string) $this->data).'</base64>';
 	}
 }
 
@@ -468,29 +450,31 @@ class IXR_Base64 {
 class IXR_Client_Gbx {
 	public $socket;
 	public $message = false;
-	public $cb_message = array();
-	public $reqhandle;
+	public $cb_message = [];
+	/**
+     * @var int
+     */
+    public $reqhandle;
 	public $protocol = 0;
 	// Storage place for an error message
 	public $error = false;
 
-	function bigEndianTest() {
-		list($endiantest) = array_values(unpack('L1L', pack('V', 1)));
+	function bigEndianTest(): bool {
+		[$endiantest] = array_values(unpack('L1L', pack('V', 1)));
 		if ($endiantest != 1) {
 			echo "Machine reports itself as BigEndian, float handling must be altered\r\n";
 			echo "Overwrite GbxRemote.inc.php with GbxRemote.bem.php\r\n";
 			die('App Terminated');
-			return false;
 		}
 		return true;
 	}  // bigEndianTest
 
-	function IXR_Client_Gbx() {
+	function __construct() {
 		$this->socket = false;
 		$this->reqhandle = 0x80000000;
 	}
 
-	function InitWithIp($ip, $port, $timeout = null) {
+	function InitWithIp($ip, $port, $timeout = null): bool {
 
 		if (!$this->bigEndianTest()) {
 			$this->error = new IXR_Error(-31999, 'endian error - script doesn\'t match machine type');
@@ -536,23 +520,23 @@ class IXR_Client_Gbx {
 		return $this->InitWithIp('localhost', $port);
 	}
 
-	function Terminate() {
+	function Terminate(): void {
 		if ($this->socket) {
 			fclose($this->socket);
 			$this->socket = false;
 		}
 	}
 
-	protected function sendRequest(IXR_Request $request) {
+	protected function sendRequest(IXR_Request $request): bool {
 		$xml = $request->getXml();
 
 		@stream_set_timeout($this->socket, 20);  // timeout 20s (to write the request)
 		// send request
 		$this->reqhandle++;
 		if ($this->protocol == 1) {
-			$bytes = pack('Va*', strlen($xml), $xml);
+			$bytes = pack('Va*', strlen((string) $xml), $xml);
 		} else {
-			$bytes = pack('VVa*', strlen($xml), $this->reqhandle, $xml);
+			$bytes = pack('VVa*', strlen((string) $xml), $this->reqhandle, $xml);
 		}
 
 		$bytes_to_write = strlen($bytes);
@@ -573,7 +557,7 @@ class IXR_Client_Gbx {
 		return true;
 	}
 
-	protected function getResult() {
+	protected function getResult(): bool {
 		$contents = '';
 		$contents_length = 0;
 		do {
@@ -628,7 +612,7 @@ class IXR_Client_Gbx {
 				// just add it to the message list for the user to read
 				$new_cb_message = new IXR_Message($contents);
 				if ($new_cb_message->parse() && $new_cb_message->messageType != 'fault') {
-					array_push($this->cb_message, array($new_cb_message->methodName, $new_cb_message->params));
+					array_push($this->cb_message, [$new_cb_message->methodName, $new_cb_message->params]);
 				}
 			}
 		} while ((int)$recvhandle != (int)$this->reqhandle);
@@ -737,7 +721,7 @@ class IXR_Client_Gbx {
 
 		@stream_set_timeout($this->socket, 0, 10000);  // timeout 10 ms (to read available data)
 		// (assignment in arguments is forbidden since php 5.1.1)
-		$read = array($this->socket);
+		$read = [$this->socket];
 		$write = NULL;
 		$except = NULL;
 		$nb = @stream_select($read, $write, $except, 0, $timeout);
@@ -778,16 +762,15 @@ class IXR_Client_Gbx {
 
 			if (($recvhandle & 0x80000000) == 0) {
 				// this is a callback. handle= $recvhandle, xml-rpc= $contents
-				//echo 'CALLBACK('.$contents_length.')[ '.$contents.' ]' . LF;
 				$new_cb_message = new IXR_Message($contents);
 				if ($new_cb_message->parse() && $new_cb_message->messageType != 'fault') {
-					array_push($this->cb_message, array($new_cb_message->methodName, $new_cb_message->params));
+					array_push($this->cb_message, [$new_cb_message->methodName, $new_cb_message->params]);
 				}
 				$something_received = true;
 			}
 
 			// (assignment in arguments is forbidden since php 5.1.1)
-			$read = array($this->socket);
+			$read = [$this->socket];
 			$write = NULL;
 			$except = NULL;
 			$nb = @stream_select($read, $write, $except, 0, $timeout);
@@ -806,15 +789,15 @@ class IXR_Client_Gbx {
 	function getCBResponses() {
 		// (look at the end of basic.php for an example)
 		$messages = $this->cb_message;
-		$this->cb_message = array();
+		$this->cb_message = [];
 		return $messages;
 	}
 
-	function isError() {
+	function isError(): bool {
 		return is_object($this->error);
 	}
 
-	function resetError() {
+	function resetError(): void {
 		$this->error = false;
 	}
 
@@ -835,10 +818,10 @@ class IXR_Client_Gbx {
 
 
 class IXR_ClientMulticall_Gbx extends IXR_Client_Gbx {
-	public $calls = array();
+	public $calls = [];
 
-	function addCall($methodName, $args = array() ) {
-		$this->calls[] = array('methodName' => $methodName, 'params' => $args);
+	function addCall($methodName, $args = [] ): int {
+		$this->calls[] = ['methodName' => $methodName, 'params' => $args];
 		
 		return (count($this->calls) - 1);
 	}
@@ -853,14 +836,17 @@ class IXR_ClientMulticall_Gbx extends IXR_Client_Gbx {
 		return $result;
 	}
 
-	function getMultiqueryResponse() {
-		$out = array();
+	/**
+     * @return mixed[]
+     */
+    function getMultiqueryResponse(): array {
+		$out = [];
 		
 		if (!empty($this->calls)) {
 			$result = $this->getResponse();
 			foreach ($this->calls as $i => $method) {
 				if (isset($result[$i]['faultCode'])) {
-					$out[$method['methodName']] = array();
+					$out[$method['methodName']] = [];
 				}
 				else {
 					if (count($result[$i]) == 1 && isset($result[$i][0])) {
@@ -873,7 +859,7 @@ class IXR_ClientMulticall_Gbx extends IXR_Client_Gbx {
 			}
 		}
 		
-		$this->calls = array();
+		$this->calls = [];
 		return $out;
 	}
 }

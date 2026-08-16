@@ -12,7 +12,7 @@
 	// ISSET
 	if( isset($_GET['srv']) ){ $serverName = $_GET['srv']; }else{ $serverName = null; }
 	
-	$out = array();
+	$out = [];
 	if($serverName != null){
 		$out = AdminServAdminLevel::getServerList($serverName);
 	}

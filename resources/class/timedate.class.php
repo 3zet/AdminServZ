@@ -2,14 +2,14 @@
 abstract class TimeDate {
 	
 	/**
-	* Retourne la date suivant la langue
+	* Return the date according to the language
 	*
-	* @param string $format    -> Le format de la fonction strftime()
-	* @param int    $timestamp -> Le temps en sec
-	* @param string $lang      -> La langue de la date retournée
+	* @param string $format    -> The format for the strftime() function
+	* @param int    $timestamp -> The time in seconds
+	* @param string $lang      -> Language of the returned date
 	* @return string
 	*/
-	public static function date($format, $timestamp = null, $lang = 'en'){
+	public static function date($format, $timestamp = null, $lang = 'fr'){
 		if($timestamp === null){
 			$timestamp = time();
 		}
@@ -19,10 +19,10 @@ abstract class TimeDate {
 	
 	
 	/**
-	* Rentourne la date au format INT
+	* Return the date in INT format
 	*
-	* @param string $date          -> La date sous la forme JJ/MM/AAAA, JJ.MM.AAAA, JJ-MM-AAAA ou JJ MM AAAA sinon mettre $use_strtotime sur true
-	* @param bool   $use_strtotime -> Utiliser la méthode php strtotime pour une date d'un autre format
+	* @param string $date          -> The date in DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY or DD MM YYYY format, otherwise set $use_strtotime to true
+	* @param bool   $use_strtotime -> Use PHP's strtotime method for a date in a different format
 	* @return int
 	*/
 	public static function dateToTime($date, $use_strtotime = false){
@@ -56,10 +56,10 @@ abstract class TimeDate {
 	
 	
 	/**
-	* Retourne un temps au format INT
+	* Return a time in INT format
 	*
-	* @param string $time          -> Le temps sous la forme HH:MM:SS, HH:MM.SS, HH.MM.SS, HH-MM-SS ou HH MM SS sinon mettre $use_strtotime sur true
-	* @param bool   $use_strtotime -> Utiliser la méthode php strtotime pour un temps d'un autre format
+	* @param string $time          -> The time in HH:MM:SS, HH:MM.SS, HH.MM.SS, HH-MM-SS or HH MM SS format, otherwise set $use_strtotime to true
+	* @param bool   $use_strtotime -> Use PHP's strtotime method for a time in a different format
 	* @return int
 	*/
 	public static function timeToSec($time, $use_strtotime){
@@ -102,12 +102,12 @@ abstract class TimeDate {
 	
 	
 	/**
-	* Formate une date pour une entrée MySQL
+	* Format a date for MySQL input
 	*
-	* @param string $type          -> Le type Mysql à retourner
-	* @param string $date          -> La date sous la forme JJ/MM/AAAA, JJ.MM.AAAA, JJ-MM-AAAA ou JJ MM AAAA sinon mettre $use_strtotime sur true
-	* @param string $time          -> Le temps sous la forme HH:MM:SS, HH:MM.SS, HH.MM.SS, HH-MM-SS ou HH MM SS
-	* @param bool   $use_strtotime -> Utiliser la méthode php strtotime pour une date d'un autre format
+	* @param string $type          -> The MySQL type to return
+	* @param string $date          -> The date in DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY or DD MM YYYY format, otherwise set $use_strtotime to true
+	* @param string $time          -> The time in HH:MM:SS, HH:MM.SS, HH.MM.SS, HH-MM-SS or HH MM SS format
+	* @param bool   $use_strtotime -> Use PHP's strtotime method for a date in a different format
 	* @return string
 	*/
 	public static function formatDateForMySQL($type, $date, $time = '00:00:00', $use_strtotime = false){
@@ -138,9 +138,9 @@ abstract class TimeDate {
 	
 	
 	/**
-	* Récupère l'âge à partir de l'année de naissance
+	* Get the age from a birth year
 	*
-	* @param string $birthday -> Sous la forme jj/mm/aaaa ou autre
+	* @param string $birthday -> In dd/mm/yyyy format or other
 	*/
 	public static function getYearOld($birthday){
 		$out = null;
@@ -159,9 +159,9 @@ abstract class TimeDate {
 	
 	
 	/**
-	* Retourne une date relative sous la forme il y a x jours/heures/minutes/secondes
+	* Return a relative date in the form "x days/hours/minutes/seconds ago"
 	*
-	* @param int $time -> Temps en seconde
+	* @param int $time -> Time in seconds
 	* @return string
 	*/
 	public static function relativeTime($time){
@@ -205,20 +205,19 @@ abstract class TimeDate {
 	
 	
 	/**
-	* Transforme un temps en seconde sous forme 0 jour 0 heure 0 minute 0 seconde
+	* Convert a time in seconds into the form 0 day 0 hour 0 minute 0 second
 	*
-	* @param  int  $sec      -> Secondes à transformer
-	* @param  bool $fullText -> Retourner le texte en entier
+	* @param  int  $sec      -> Seconds to convert
+	* @param  bool $fullText -> Return the full text
 	* @return string
 	*/
 	public static function secToStringTime($sec, $fullText = true){
 		$out = null;
 		
-		$year = 1*60*60*24*365;
-		$day = 1*60*60*24;
-		$hour = 1*60*60;
-		$minute = 1*60;
-		$second = 1;
+		$year = 60*60*24*365;
+		$day = 60*60*24;
+		$hour = 60*60;
+		$minute = 60;
 		
 		$timeDifference = intval($sec);
 		$yearCount = floor($timeDifference / $year);
@@ -229,21 +228,21 @@ abstract class TimeDate {
 		$timeDifference -= $hourCount * $hour;
 		$minuteCount = floor($timeDifference / $minute);
 		$timeDifference -= $minuteCount * $minute;
-		$secondCount = floor($timeDifference / $second);
-		$timeDifference -= $secondCount * $second;
+		$secondCount = floor($timeDifference);
+		$timeDifference -= $secondCount;
 		
-		$strDay = $dayCount.'d'; if($fullText){ $strDay .= 'day'; if($dayCount > 1){ $strDay .= 's'; } }
-		$strHour = $hourCount.'h'; if($fullText){ $strHour .= 'hour'; if($hourCount > 1){ $strHour .= 's'; } }
-		$strMinute = $minuteCount.'min'; if($fullText){ $strMinute .= 'minute'; if($minuteCount > 1){ $strMinute .= 's'; } }
-		$strSecond = $secondCount.'sec'; if($fullText){ $strSecond .= 'second'; if($secondCount > 1){ $strSecond .= 's'; } }
+		$strDay = $dayCount.'d'; if($fullText){ $strDay .= 'ay'; if($dayCount > 1){ $strDay .= 's'; } }
+		$strHour = $hourCount.'h'; if($fullText){ $strHour .= 'our'; if($hourCount > 1){ $strHour .= 's'; } }
+		$strMinute = $minuteCount.'min'; if($fullText){ $strMinute .= 'ute'; if($minuteCount > 1){ $strMinute .= 's'; } }
+		$strSecond = $secondCount.'sec'; if($fullText){ $strSecond .= 'ond'; if($secondCount > 1){ $strSecond .= 's'; } }
 		
 		if($dayCount != 0){
 			$out .= $strDay.', '.$strHour.' '.$strMinute.' '.$strSecond;
 		}
-		else if($dayCount == 0 && $hourCount != 0){
+		else if($hourCount != 0){
 			$out .= $strHour.' '.$strMinute.' '.$strSecond;
 		}
-		else if($dayCount == 0 && $hourCount == 0){
+		else if($hourCount == 0){
 			$out .= $strMinute.' '.$strSecond;
 		}
 		
@@ -252,9 +251,9 @@ abstract class TimeDate {
 	
 	
 	/**
-	* Forme le temps millisecondes en 00:00:00
+	* Format the time in milliseconds as 00:00:00
 	*
-	* @param  string $millisec -> Temps en millisecondes
+	* @param  string $millisec -> Time in milliseconds
 	* @return string
 	*/
 	public static function format($millisec){
@@ -276,7 +275,7 @@ abstract class TimeDate {
 	
 	
 	/**
-	* Méthodes de convertion du temps (Min, sec, millisec)
+	* Time conversion methods (Min, sec, millisec)
 	*/
 	public static function secToMillisec($sec){
 		$sec = intval( round($sec) );

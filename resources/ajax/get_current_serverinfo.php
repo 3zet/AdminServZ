@@ -13,8 +13,8 @@
 	AdminServUI::lang();
 	
 	// ISSET
-	if( isset($_GET['mode']) ){ $mode = addslashes($_GET['mode']); }else{ $mode = null; }
-	if( isset($_GET['sort']) ){ $sort = addslashes($_GET['sort']); }else{ $sort = null; }
+	if( isset($_GET['mode']) ){ $mode = addslashes((string) $_GET['mode']); }else{ $mode = null; }
+	if( isset($_GET['sort']) ){ $sort = addslashes((string) $_GET['sort']); }else{ $sort = null; }
 	if($mode){
 		$_SESSION['adminserv']['mode']['general'] = $mode;
 	}

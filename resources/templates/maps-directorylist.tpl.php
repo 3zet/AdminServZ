@@ -1,7 +1,6 @@
-<!-- Titre + nouveau dossier -->
 <form id="createFolderForm" method="post" action="?p=<?php echo USER_PAGE; ?>&amp;d=<?php echo $data['currentPath']; ?>">
 	<h1>
-		<?php echo Utils::t('Dossiers'); ?>
+		<?php echo Utils::t('Folders'); ?>
 		<?php if ($data['showOptions'] && AdminServAdminLevel::hasPermission('folder_new')): ?>
 			<span id="form-new-folder" hidden="hidden">
 				<input class="text" type="text" name="newFolderName" id="newFolderName" value="" />
@@ -10,14 +9,18 @@
 		<?php endif; ?>
 	</h1>
 	<?php if ($data['showOptions'] && AdminServAdminLevel::hasPermission('folder_new')): ?>
-		<div class="title-detail"><a href="." id="newfolder" data-cancel="<?php echo Utils::t('Cancel'); ?>" data-new="<?php echo Utils::t('New'); ?>"><?php echo Utils::t('New'); ?></a></div>
+		<div class="title-detail">
+			<a href="." id="newfolder"
+				data-cancel="<?php echo Utils::t('Cancel'); ?>"
+				data-new="<?php echo Utils::t('New'); ?>">
+				<?php echo Utils::t('New'); ?>
+			</a>
+		</div>
 	<?php endif; ?>
 </form>
 
-<!-- Liste des dossiers -->
 <div class="folder-list">
 	<ul>
-		<!-- Dossier parent  -->
 		<?php if ($data['currentPath']): ?>
 			<li>
 				<a href="./?p=<?php echo USER_PAGE.(($data['parentPath']) ? '&amp;d='.$data['parentPath'] : ''); ?>">
@@ -26,8 +29,7 @@
 				</a>
 			</li>
 		<?php endif; ?>
-		
-		<!-- Dossiers -->
+
 		<?php if (!empty($data['folders'])): ?>
 			<?php foreach ($data['folders'] as $dir => $values): ?>
 				<li>
@@ -43,9 +45,8 @@
 	</ul>
 </div>
 
-<!-- Options de dossier -->
-<?php if ($data['showOptions'] && $data['currentPath'] && AdminServAdminLevel::hasPermission(array('folder_new', 'folder_rename', 'folder_move', 'folder_delete'))): ?>
-	<?php $currentDir = basename($data['currentPath']); ?>
+<?php if ($data['showOptions'] && $data['currentPath'] && AdminServAdminLevel::hasPermission(['folder_rename','folder_move','folder_delete'])): ?>
+	<?php $currentDir = basename((string)$data['currentPath']); ?>
 	<form id="optionFolderForm" method="post" action="?p=<?php echo USER_PAGE; ?>&amp;d=<?php echo $data['currentPath']; ?>">
 		<div class="option-folder-list">
 			<h3><?php echo Utils::t('Folder options'); ?><span class="arrow-down">&nbsp;</span></h3>
@@ -57,13 +58,21 @@
 					<li><a class="button light move" id="moveFolder" href="."><?php echo Utils::t('Move'); ?></a></li>
 				<?php endif; ?>
 				<?php if (AdminServAdminLevel::hasPermission('folder_delete')): ?>
-					<li><a class="button light delete" id="deleteFolder" href="." data-confirm-text="<?php echo Utils::t('Do you really want to remove this folder !currentDir?', array('!currentDir' => $currentDir)); ?>>"><?php echo Utils::t('Delete'); ?></a></li>
+					<li>
+						<a class="button light delete" id="deleteFolder" href="."
+							data-confirm-text="<?php echo Utils::t('Do you really want to remove this folder !currentDir?', ['!currentDir' => $currentDir]); ?>">
+							<?php echo Utils::t('Delete'); ?>
+						</a>
+					</li>
 				<?php endif; ?>
 			</ul>
 		</div>
 		<input type="hidden" name="optionFolderHiddenFieldAction" id="optionFolderHiddenFieldAction" value="" />
 		<input type="hidden" name="optionFolderHiddenFieldValue" id="optionFolderHiddenFieldValue" value="" />
-		<div id="renameFolderForm" class="option-form" hidden="hidden" data-title="<?php echo Utils::t('Rename folder'); ?>" data-cancel="<?php echo Utils::t('Cancel'); ?>" data-rename="<?php echo Utils::t('Rename'); ?>">
+		<div id="renameFolderForm" class="option-form" hidden="hidden"
+			data-title="<?php echo Utils::t('Rename folder'); ?>"
+			data-cancel="<?php echo Utils::t('Cancel'); ?>"
+			data-rename="<?php echo Utils::t('Rename'); ?>">
 			<ul>
 				<li>
 					<span class="rename-map-name"><?php echo $currentDir; ?></span>
@@ -72,6 +81,12 @@
 				</li>
 			</ul>
 		</div>
-		<div id="moveFolderForm" class="option-form" hidden="hidden" data-title="<?php echo Utils::t('Move folder'); ?>" data-cancel="<?php echo Utils::t('Cancel'); ?>" data-move="<?php echo Utils::t('Move'); ?>" data-root="<?php echo Utils::t('Root'); ?>" data-movethefolder="<?php echo Utils::t('Move folder <b>!currentDir</b> in:', array('!currentDir' => $currentDir)); ?>"></div>
+		<div id="moveFolderForm" class="option-form" hidden="hidden"
+			data-title="<?php echo Utils::t('Move folder'); ?>"
+			data-cancel="<?php echo Utils::t('Cancel'); ?>"
+			data-move="<?php echo Utils::t('Move'); ?>"
+			data-root="<?php echo Utils::t('Root'); ?>"
+			data-movethefolder="<?php echo Utils::t('Move folder <b>!currentDir</b> in:', ['!currentDir' => $currentDir]); ?>">
+		</div>
 	</form>
 <?php endif; ?>

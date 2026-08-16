@@ -1,96 +1,55 @@
 <?php
 /**
-* Cette classe gère les chaines TMF, c'est à dire que cette classe permet de convertir une chaine TM en:
-*   - html (ombre et lien sont géré)
-*   - texte brut -> sans la mise en forme
-*   - image (tout format supporté, image d'arrière plan ou pas)
+* This class handles TMF strings, meaning it can convert a TM string into:
+*   - html (shadow and links are handled)
+*   - plain text -> without formatting
+*   - image (any supported format, with or without background image)
 *
 * @author Mr. Das - Gildas de Cadoudal - gdecad@gmail.com
 * @package framework
 */
 class TmNick {
 	/**
-	* Ces codes sont valables dans l'ensemble des jeux TrackMania :
+	* These codes are valid across all TrackMania games:
 	* 
-	* $t Majuscule
-	* $i Italique
-	* $s Ombré
-	* $w Espacements larges
-	* $n Espacements courts
-	* $m Espacements normaux
-	* $g Couleur par défaut
-	* $z Tout réinitialiser
-	* $$ Ecrire un "$"
-	* $o Gras avec espacements semi-larges
-	* $h Lien interne vers un Manialink
-	* $p Lien interne avec info joueur
-	* $l Lien externe vers un site web
+	* $t Uppercase
+	* $i Italic
+	* $s Shadowed
+	* $w Wide spacing
+	* $n Short spacing
+	* $m Normal spacing
+	* $g Default color
+	* $z Reset everything
+	* $$ Write a "$"
+	* $o Bold with semi-wide spacing
+	* $h Internal link to a Manialink
+	* $p Internal link with player info
+	* $l External link to a website
 	*/
 	public  static $m_fontPath = 'fonts/';
 	public  static $linkProtocol = 'tmtp';
-	private static $m_pattern = '/\\$\\$|\\$[0-9a-fA-F][0-9a-zA-Z]{2}|\\$[twmgonishplzTWMGONISHLZ]/';
-	private static $m_patternLink = '/(?:\\[(?P<url>[^\\[\\]]*)\\]){0,1}(?P<label>.+){0,1}/';
-	private static $m_lstTags = array('h','p','l','o','g','t','w','m','n','i','s','z','color');
-	private static $m_css = array(
-		'h' => 'tmnick_internallink',
-		'p' => 'tmnick_internallink_withlogin',
-		'l' => 'tmnick_externallink',
-		'o' => 'tmnick_bold',
-		'g' => 'tmnick_defaultcolor',
-		't' => 'tmnick_upper',
-		'w' => 'tmnick_wide',
-		'm' => 'tmnick_normal',
-		'n' => 'tmnick_short',
-		'i' => 'tmnick_italic',
-		's' => 'tmnick_shadowed',
-		'z' => 'tmnick_raz'
-	);
-	private static $m_fonts = array(
-		'h' => '',
-		'l' => '',
-		'o' => 'DM',
-		'g' => '',
-		't' => '',
-		'w' => '',
-		'm' => '',
-		'n' => 'CN',
-		'i' => 'IT',
-		's' => '',
-		'z' => 'MD'
-	);
-	private static $m_defaultHexaOnError = '0';
-	private static $m_colorNameToHtml = array(
-		'aliceblue' => '#f0f8ff', 'antiquewhite' => '#faebd7', 'aqua' => '#00ffff', 'aquamarine' => '#7fffd4', 'azure' => '#f0ffff', 'beige' => '#f5f5dc', 'bisque' => '#ffe4c4', 'black' => '#000000', 'blanchedalmond' => '#ffebcd', 'blue' => '#0000ff',
-		'blueviolet' => '#8a2be2', 'brown' => '#a52a2a', 'burlywood' => '#deb887', 'cadetblue' => '#5f9ea0', 'chartreuse' => '#7fff00', 'chocolate' => '#d2691e', 'coral' => '#ff7f50', 'cornflowerblue' => '#6495ed', 'cornsilk' => '#fff8dc', 'crimson' => '#dc143c',
-		'cyan' => '#00ffff', 'darkblue' => '#00008b', 'darkcyan' => '#008b8b', 'darkgoldenrod' => '#b8860b', 'darkgray' => '#a9a9a9', 'darkgrey' => '#a9a9a9', 'darkgreen' => '#006400', 'darkkhaki' => '#bdb76b', 'darkmagenta' => '#8b008b', 'darkolivegreen' => '#556b2f',
-		'darkorange' => '#ff8c00', 'darkorchid' => '#9932cc', 'darkred' => '#8b0000', 'darksalmon' => '#e9967a', 'darkseagreen' => '#8fbc8f', 'darkslateblue' => '#483d8b', 'darkslategray' => '#2f4f4f', 'darkslategrey' => '#2f4f4f', 'darkturquoise' => '#00ced1', 'darkviolet' => '#9400d3',
-		'deeppink' => '#ff1493', 'deepskyblue' => '#00bfff', 'dimgray' => '#696969', 'dimgrey' => '#696969', 'dodgerblue' => '#1e90ff', 'firebrick' => '#b22222', 'floralwhite' => '#fffaf0', 'forestgreen' => '#228b22', 'fuchsia' => '#ff00ff', 'gainsboro' => '#dcdcdc',
-		'ghostwhite' => '#f8f8ff', 'gold' => '#ffd700', 'goldenrod' => '#daa520', 'gray' => '#808080', 'grey' => '#808080', 'green' => '#008000', 'greenyellow' => '#adff2f', 'honeydew' => '#f0fff0', 'hotpink' => '#ff69b4', 'indianred' => '#cd5c5c',
-		'indigo' => '#4b0082', 'ivory' => '#fffff0', 'khaki' => '#f0e68c', 'lavender' => '#e6e6fa', 'lavenderblush' => '#fff0f5', 'lawngreen' => '#7cfc00', 'lemonchiffon' => '#fffacd', 'lightblue' => '#add8e6', 'lightcoral' => '#f08080', 'lightcyan' => '#e0ffff',
-		'lightgoldenrodyellow' => '#fafad2', 'lightgray' => '#d3d3d3', 'lightgrey' => '#d3d3d3', 'lightgreen' => '#90ee90', 'lightpink' => '#ffb6c1', 'lightsalmon' => '#ffa07a', 'lightseagreen' => '#20b2aa', 'lightskyblue' => '#87cefa', 'lightslategray' => '#778899', 'lightslategrey' => '#778899',
-		'lightsteelblue' => '#b0c4de', 'lightyellow' => '#ffffe0', 'lime' => '#00ff00', 'limegreen' => '#32cd32', 'linen' => '#faf0e6', 'magenta' => '#ff00ff', 'maroon' => '#800000', 'mediumaquamarine' => '#66cdaa', 'mediumblue' => '#0000cd', 'mediumorchid' => '#ba55d3',
-		'mediumpurple' => '#9370d8', 'mediumseagreen' => '#3cb371', 'mediumslateblue' => '#7b68ee', 'mediumspringgreen' => '#00fa9a', 'mediumturquoise' => '#48d1cc', 'mediumvioletred' => '#c71585', 'midnightblue' => '#191970', 'mintcream' => '#f5fffa', 'mistyrose' => '#ffe4e1', 'moccasin' => '#ffe4b5',
-		'navajowhite' => '#ffdead', 'navy' => '#000080', 'oldlace' => '#fdf5e6', 'olive' => '#808000', 'olivedrab' => '#6b8e23', 'orange' => '#ffa500', 'orangered' => '#ff4500', 'orchid' => '#da70d6', 'palegoldenrod' => '#eee8aa', 'palegreen' => '#98fb98',
-		'paleturquoise' => '#afeeee', 'palevioletred' => '#d87093', 'papayawhip' => '#ffefd5', 'peachpuff' => '#ffdab9', 'peru' => '#cd853f', 'pink' => '#ffc0cb', 'plum' => '#dda0dd', 'powderblue' => '#b0e0e6', 'purple' => '#800080', 'red' => '#ff0000',
-		'rosybrown' => '#bc8f8f', 'royalblue' => '#4169e1', 'saddlebrown' => '#8b4513', 'salmon' => '#fa8072', 'sandybrown' => '#f4a460', 'seagreen' => '#2e8b57', 'seashell' => '#fff5ee', 'sienna' => '#a0522d', 'silver' => '#c0c0c0', 'skyblue' => '#87ceeb',
-		'slateblue' => '#6a5acd', 'slategray' => '#708090', 'slategrey' => '#708090', 'snow' => '#fffafa', 'springgreen' => '#00ff7f', 'steelblue' => '#4682b4', 'tan' => '#d2b48c', 'teal' => '#008080', 'thistle' => '#d8bfd8', 'tomato' => '#ff6347',
-		'turquoise' => '#40e0d0', 'violet' => '#ee82ee', 'wheat' => '#f5deb3', 'white' => '#ffffff', 'whitesmoke' => '#f5f5f5', 'yellow' => '#ffff00', 'yellowgreen' => '#9acd32'
-	);
+	private static string $m_pattern = '/\\$\\$|\\$[0-9a-fA-F]{1,3}|\\$[twmgonishplzTWMGONISHLZ]/';
+	private static string $m_patternLink = '/(?:\\[(?P<url>[^\\[\\]]*)\\]){0,1}(?P<label>.+){0,1}/';
+	private static array $m_lstTags = ['h', 'p', 'l', 'o', 'g', 't', 'w', 'm', 'n', 'i', 's', 'z', 'color'];
+	private static array $m_css = ['h' => 'tmnick_internallink', 'p' => 'tmnick_internallink_withlogin', 'l' => 'tmnick_externallink', 'o' => 'tmnick_bold', 'g' => 'tmnick_defaultcolor', 't' => 'tmnick_upper', 'w' => 'tmnick_wide', 'm' => 'tmnick_normal', 'n' => 'tmnick_short', 'i' => 'tmnick_italic', 's' => 'tmnick_shadowed', 'z' => 'tmnick_raz'];
+	private static array $m_fonts = ['h' => '', 'l' => '', 'o' => 'DM', 'g' => '', 't' => '', 'w' => '', 'm' => '', 'n' => 'CN', 'i' => 'IT', 's' => '', 'z' => 'MD'];
+	private static string $m_defaultHexaOnError = '0';
+	private static array $m_colorNameToHtml = ['aliceblue' => '#f0f8ff', 'antiquewhite' => '#faebd7', 'aqua' => '#00ffff', 'aquamarine' => '#7fffd4', 'azure' => '#f0ffff', 'beige' => '#f5f5dc', 'bisque' => '#ffe4c4', 'black' => '#000000', 'blanchedalmond' => '#ffebcd', 'blue' => '#0000ff', 'blueviolet' => '#8a2be2', 'brown' => '#a52a2a', 'burlywood' => '#deb887', 'cadetblue' => '#5f9ea0', 'chartreuse' => '#7fff00', 'chocolate' => '#d2691e', 'coral' => '#ff7f50', 'cornflowerblue' => '#6495ed', 'cornsilk' => '#fff8dc', 'crimson' => '#dc143c', 'cyan' => '#00ffff', 'darkblue' => '#00008b', 'darkcyan' => '#008b8b', 'darkgoldenrod' => '#b8860b', 'darkgray' => '#a9a9a9', 'darkgrey' => '#a9a9a9', 'darkgreen' => '#006400', 'darkkhaki' => '#bdb76b', 'darkmagenta' => '#8b008b', 'darkolivegreen' => '#556b2f', 'darkorange' => '#ff8c00', 'darkorchid' => '#9932cc', 'darkred' => '#8b0000', 'darksalmon' => '#e9967a', 'darkseagreen' => '#8fbc8f', 'darkslateblue' => '#483d8b', 'darkslategray' => '#2f4f4f', 'darkslategrey' => '#2f4f4f', 'darkturquoise' => '#00ced1', 'darkviolet' => '#9400d3', 'deeppink' => '#ff1493', 'deepskyblue' => '#00bfff', 'dimgray' => '#696969', 'dimgrey' => '#696969', 'dodgerblue' => '#1e90ff', 'firebrick' => '#b22222', 'floralwhite' => '#fffaf0', 'forestgreen' => '#228b22', 'fuchsia' => '#ff00ff', 'gainsboro' => '#dcdcdc', 'ghostwhite' => '#f8f8ff', 'gold' => '#ffd700', 'goldenrod' => '#daa520', 'gray' => '#808080', 'grey' => '#808080', 'green' => '#008000', 'greenyellow' => '#adff2f', 'honeydew' => '#f0fff0', 'hotpink' => '#ff69b4', 'indianred' => '#cd5c5c', 'indigo' => '#4b0082', 'ivory' => '#fffff0', 'khaki' => '#f0e68c', 'lavender' => '#e6e6fa', 'lavenderblush' => '#fff0f5', 'lawngreen' => '#7cfc00', 'lemonchiffon' => '#fffacd', 'lightblue' => '#add8e6', 'lightcoral' => '#f08080', 'lightcyan' => '#e0ffff', 'lightgoldenrodyellow' => '#fafad2', 'lightgray' => '#d3d3d3', 'lightgrey' => '#d3d3d3', 'lightgreen' => '#90ee90', 'lightpink' => '#ffb6c1', 'lightsalmon' => '#ffa07a', 'lightseagreen' => '#20b2aa', 'lightskyblue' => '#87cefa', 'lightslategray' => '#778899', 'lightslategrey' => '#778899', 'lightsteelblue' => '#b0c4de', 'lightyellow' => '#ffffe0', 'lime' => '#00ff00', 'limegreen' => '#32cd32', 'linen' => '#faf0e6', 'magenta' => '#ff00ff', 'maroon' => '#800000', 'mediumaquamarine' => '#66cdaa', 'mediumblue' => '#0000cd', 'mediumorchid' => '#ba55d3', 'mediumpurple' => '#9370d8', 'mediumseagreen' => '#3cb371', 'mediumslateblue' => '#7b68ee', 'mediumspringgreen' => '#00fa9a', 'mediumturquoise' => '#48d1cc', 'mediumvioletred' => '#c71585', 'midnightblue' => '#191970', 'mintcream' => '#f5fffa', 'mistyrose' => '#ffe4e1', 'moccasin' => '#ffe4b5', 'navajowhite' => '#ffdead', 'navy' => '#000080', 'oldlace' => '#fdf5e6', 'olive' => '#808000', 'olivedrab' => '#6b8e23', 'orange' => '#ffa500', 'orangered' => '#ff4500', 'orchid' => '#da70d6', 'palegoldenrod' => '#eee8aa', 'palegreen' => '#98fb98', 'paleturquoise' => '#afeeee', 'palevioletred' => '#d87093', 'papayawhip' => '#ffefd5', 'peachpuff' => '#ffdab9', 'peru' => '#cd853f', 'pink' => '#ffc0cb', 'plum' => '#dda0dd', 'powderblue' => '#b0e0e6', 'purple' => '#800080', 'red' => '#ff0000', 'rosybrown' => '#bc8f8f', 'royalblue' => '#4169e1', 'saddlebrown' => '#8b4513', 'salmon' => '#fa8072', 'sandybrown' => '#f4a460', 'seagreen' => '#2e8b57', 'seashell' => '#fff5ee', 'sienna' => '#a0522d', 'silver' => '#c0c0c0', 'skyblue' => '#87ceeb', 'slateblue' => '#6a5acd', 'slategray' => '#708090', 'slategrey' => '#708090', 'snow' => '#fffafa', 'springgreen' => '#00ff7f', 'steelblue' => '#4682b4', 'tan' => '#d2b48c', 'teal' => '#008080', 'thistle' => '#d8bfd8', 'tomato' => '#ff6347', 'turquoise' => '#40e0d0', 'violet' => '#ee82ee', 'wheat' => '#f5deb3', 'white' => '#ffffff', 'whitesmoke' => '#f5f5f5', 'yellow' => '#ffff00', 'yellowgreen' => '#9acd32'];
 	
 	
 	/**
-	* Convertie une chaine TM en HTML
+	* Convert a TM string to HTML
 	*
-	* @param string $nick                   -> La chaine TM pas de limite de longueur, et peut être multiligne
-	* @param int    $fontSize               -> Taille de la police
-	* @param bool   $forcedDefault          -> Force la couleur par défaut à être utilise à la place de la mise en forme
-	* @param string $defaultColor           -> La couleur par défaut (la couleur peut être au format HTML, nommé, array RGB, ou TM)
-	* @param string $defaultBackgroundColor -> La couleur de fond (transparent est possible) (la couleur peut être au format HTML, nommé, array RGB, ou TM)
-	* @return string chaine HTML sans le CSS
+	* @param string $nick                   -> The TM string, no length limit, can be multiline
+	* @param int    $fontSize               -> Font size
+	* @param bool   $forcedDefault          -> Force the default color to be used instead of formatting
+	* @param string $defaultColor           -> The default color (can be HTML, named, RGB array, or TM format)
+	* @param string $defaultBackgroundColor -> The background color (transparent is possible) (can be HTML, named, RGB array, or TM format)
+	* @return string HTML string without the CSS
 	*/
-	public static function toHtml($nick, $fontSize = 11, $forcedShadow = false, $forcedDefault = false, $defaultColor = 'white', $defaultBackgroundColor = 'transparent'){
-		if($forcedShadow){ $nick = '$s'.str_replace(array('$s', '$S'), '', $nick); }
-		$linkProtocol = strtolower(self::$linkProtocol);
+	public static function toHtml($nick, $fontSize = 11, $forcedShadow = false, $forcedDefault = false, $defaultColor = 'white', $defaultBackgroundColor = 'transparent'): string{
+		if($forcedShadow){ $nick = '$s'.str_replace(['$s', '$S'], '', $nick); }
+		$linkProtocol = strtolower((string) self::$linkProtocol);
 		
 		$defaultHTMLColor = $defaultColor;
 		if( empty($defaultColor) ){
@@ -112,8 +71,8 @@ class TmNick {
 		$lastLink = false;
 		$lastLinkTag = false;
 		$stack = self::_parse($nick, $defaultColor);
-		foreach($stack as $k => $ss){
-			$lstClass = $lstStyle = array();
+		foreach($stack as $ss){
+			$lstClass = $lstStyle = [];
 			$prefix = $suffix = '';
 			$preContent = $postContent = '';
 			foreach($ss['tagsOpen'] as $tag => $open){
@@ -157,7 +116,7 @@ class TmNick {
 			}
 			
 			$strHtml .= $prefix;
-			if( !empty($ss['content']) ){
+			if( $ss['content'] !== '' && $ss['content'] !== null ){
 				$strHtml .= '<span class="{$class$}" style="font-size: '.$fontSize.'pt;{$style$}">';
 				$strHtml .= $preContent.'{$content$}'.$postContent;
 				$strHtml .= '</span>';
@@ -169,39 +128,37 @@ class TmNick {
 			$strHtml = str_replace('{$style$}', implode(';', $lstStyle), $strHtml);
 		}
 		
-		$tags = array('h', 'p', 'l');
-		foreach($tags as $k => $tag){
+		$tags = ['h', 'p', 'l'];
+		foreach($tags as $tag){
 			if( isset($ss) and $ss['tagsOpen'][$tag] ){
 				$strHtml .= '</a>';
 			}
 		}
 		
-		$strHtml .= '</span>';
-		
-		return $strHtml;
+		return $strHtml . '</span>';
 	}
 	
 	
 	/**
-	* Affiche une chaine TM en image
+	* Display a TM string as an image
 	*
-	* @param string $nick                 -> La chaine TM pas de limite de longueur, et peut être multiligne
-	* @param string $type                 -> Le type de l'image (gif, jpg, jpeg, png, ico, bmp, wbmp, xpm)
-	* @param int    $fontSize             -> Taille de la police
-	* @param bool   $forceDefault         -> Force la couleur par défaut à être utilise à la place de la mise en forme
-	* @param string $defaultColor         -> La couleur par défaut (la couleur peut être au format HTML, nommé, array RGB, ou TM)
-	* @param string $defaultImgBackground -> Le chemin vers l'image de fond si vous en voulez une
-	* @param array  $arrRelativePosition  -> Tableau assoc avec les index 'x' et 'y', donnant la position du texte par rapport au bord gauche et/ou haut de l'image de fond, ces valeur peuvent être négative, dans ce cas la valeur represente la position depuis le bord droite et/ou bas
+	* @param string $nick                 -> The TM string, no length limit, can be multiline
+	* @param string $type                 -> The image type (gif, jpg, jpeg, png, ico, bmp, wbmp, xpm)
+	* @param int    $fontSize             -> Font size
+	* @param bool   $forceDefault         -> Force the default color to be used instead of formatting
+	* @param string $defaultColor         -> The default color (can be HTML, named, RGB array, or TM format)
+	* @param string $defaultImgBackground -> Path to the background image if you want one
+	* @param array  $arrRelativePosition  -> Assoc array with 'x' and 'y' keys, giving the text position relative to the left and/or top edge of the background image; values can be negative, in which case they represent the position from the right and/or bottom edge
 	* @return bool
 	*/
-	public static function toImg($nick, $type = 'png', $fontSize = 12, $forceDefault = false, $defaultColor = 'white', $defaultImgBackground = null, $arrRelativePosition = array() ){
+	public static function toImg($nick, string $type = 'png', $fontSize = 12, $forceDefault = false, $defaultColor = 'white', $defaultImgBackground = null, $arrRelativePosition = [] ){
 		if(self::_isSupportedImageType($type) === false){
-			$imErr = self::_getErrorRessource('Le type "'.$type.'" n\'est pas supporté.');
+			$imErr = self::_getErrorRessource('The type "'.$type.'" is not supported.');
 			return self::_getImageFromRessource($imErr, 'png');
 		}
 		
 		$res = true;
-		$nickText = self::toText($nick);
+		self::toText($nick);
 		
 		$lines = str_replace('\r\n', '\n', $nick);
 		$lines = str_replace('\r', '\n', $lines);
@@ -281,7 +238,7 @@ class TmNick {
 				$stack = self::_parse($lines[$i]);
 				$xl = $x;
 				
-				foreach($stack as $k => $ss){
+				foreach($stack as $ss){
 					if($forceDefault){
 						$color = $defaultRGBColor;
 					}else{
@@ -304,9 +261,9 @@ class TmNick {
 					$tbox = self::_imagettfbboxextended($fontSize, 0, $fontText, $ss['content']);
 					
 					if($ss['tagsOpen']['s'] === true){
-						imagettftext($im, $fontSize, 0, $xl + $tbox['x'] + 1, $y + $baseline + ($i * ($tbox['height'] + 5)) + 1, $shadowColor, $fontText, $ss['content']);
+						imagettftext($im, $fontSize, 0, $xl + $tbox['x'] + 1, $y + $baseline + ($i * ($tbox['height'] + 5)) + 1, $shadowColor, $fontText, (string) $ss['content']);
 					}
-					imagettftext($im, $fontSize, 0, $xl + $tbox['x'], $y + $baseline + ($i * ($tbox['height'] + 5)), $textColor, $fontText, $ss['content']);
+					imagettftext($im, $fontSize, 0, $xl + $tbox['x'], $y + $baseline + ($i * ($tbox['height'] + 5)), $textColor, $fontText, (string) $ss['content']);
 					
 					$xl += $tbox['width'];
 					
@@ -346,41 +303,44 @@ class TmNick {
 	
 	
 	/**
-	* Convertie une chaine TM en text brut
+	* Convert a TM string to plain text
 	*
-	* @param string $nick -> La chaine TM pas de limite de longueur, et peut être multiligne
+	* @param string $nick -> The TM string, no length limit, can be multiline
 	* @return string
 	*/
-	public static function toText($nick){
+	public static function toText($nick): ?string{
 		
 		if( !is_string($nick) or empty($nick) ){
 			return '';
 		}
 		
-		$nb = preg_match_all(self::$m_pattern, $nick, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE);
+		preg_match_all(self::$m_pattern, $nick, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE);
 		$matches = $matches[0];
 		
 		$strText = '';
 		
 		$lastPos = 0;
-		foreach($matches as $num => $matche){
-			list($code, $pos) = $matche;
+		foreach($matches as $matche){
+			[$code, $pos] = $matche;
 			
-			if($code != '$$'){
+			if($code === '$$'){
+				$strText .= substr($nick, $lastPos, $pos - $lastPos) . '$';
+				$lastPos = $pos + strlen($matche[0]);
+			}
+			else{
 				$strText .= substr($nick, $lastPos, $pos - $lastPos);
 				$lastPos = $pos + strlen($matche[0]);
 			}
 		}
 		
 		$strText .= substr($nick, $lastPos, strlen($nick) - $lastPos);
-		$strText = preg_replace('/(\\[[^\\[\\]]*\\])/', '', $strText);
 		
-		return $strText;
+		return preg_replace('/(\\[[^\\[\\]]*\\])/', '', $strText);
 	}
 	
 	
 	/**
-	* Convertie une couleur au format HTML, TM, array RGB, ou nommé en format HTML
+	* Convert a color in HTML, TM, RGB array, or named format into HTML format
 	*
 	* @param string $color
 	* @return string
@@ -388,20 +348,24 @@ class TmNick {
 	public static function colorToHtml($color){
 		$colorHtml = '#';
 		
-		if( is_string($color) and !empty($color) and strlen($color) == 4 and ($color[0] == '$' or $color[0] == '#') ){
-			$color = preg_replace('/[g-z]/', self::$m_defaultHexaOnError, strtolower($color));
-			$colorHtml .= $color[1];
-			$colorHtml .= $color[1];
-			$colorHtml .= $color[2];
-			$colorHtml .= $color[2];
-			$colorHtml .= $color[3];
-			$colorHtml .= $color[3];
+		if( is_string($color) and !empty($color) and strlen($color) >= 2 and strlen($color) <= 4 and ($color[0] == '$' or $color[0] == '#') ){
+			// TM color code: $ + 1 to 3 hex digits. Missing digits = '0'
+			// (confirmed in-game: $00 -> black, $F0 -> red, $AB -> AABB00)
+			$hex = substr($color, 1);
+			$hex = preg_replace('/[g-z]/', (string) self::$m_defaultHexaOnError, strtolower($hex));
+			$hex = str_pad($hex, 3, '0', STR_PAD_RIGHT);
+			$colorHtml .= $hex[0];
+			$colorHtml .= $hex[0];
+			$colorHtml .= $hex[1];
+			$colorHtml .= $hex[1];
+			$colorHtml .= $hex[2];
+			$colorHtml .= $hex[2];
 		}
 		else if(is_array($color) and count($color) == 3){
 			$colorHtml .= sprintf('#%02X%02X%02X', $color[1], $color[2], $color[3]);
 		}
 		else if(is_string($color) and !empty($color) and strlen($color) == 7 and $color[0] == '#'){
-			$color = preg_replace('/[g-z]/', self::$m_defaultHexaOnError, strtolower($color));
+			$color = preg_replace('/[g-z]/', (string) self::$m_defaultHexaOnError, strtolower($color));
 			$colorHtml = $color;
 		}
 		else{
@@ -414,16 +378,16 @@ class TmNick {
 	
 	
 	/**
-	* Convertie une couleur au format HTML, TM, array RGB, ou nommé en format RGB
+	* Convert a color in HTML, TM, RGB array, or named format into RGB format
 	*
 	* @param string $color
 	* @return string
 	*/
 	public static function colorToRGB($color){
-		$colorRGB = array(0, 0, 0);
+		$colorRGB = [0, 0, 0];
 		
 		if( is_string($color) and !empty($color) and strlen($color) == 4 and ($color[0] == '$' or $color[0] == '#') ){
-			$color = preg_replace('/[g-z]/', self::$m_defaultHexaOnError, strtolower($color));
+			$color = preg_replace('/[g-z]/', (string) self::$m_defaultHexaOnError, strtolower($color));
 			$hex = $color[1];
 			$hex .= $color[1];
 			$colorRGB[0] = hexdec($hex);
@@ -438,7 +402,7 @@ class TmNick {
 			$colorRGB = $color;
 		}
 		else if(is_string($color) and !empty($color) and strlen($color) == 7 and $color[0] == '#'){
-			$color = preg_replace('/[g-z]/', self::$m_defaultHexaOnError, strtolower($color));
+			$color = preg_replace('/[g-z]/', (string) self::$m_defaultHexaOnError, strtolower($color));
 			$hex = $color[1];
 			$hex .= $color[2];
 			$colorRGB[0] = hexdec($hex);
@@ -459,12 +423,10 @@ class TmNick {
 	
 	
 	/**
-	* Retourne le code css nécessaire à la mise en forme du code html
-	*
-	* @return string
-	*/
-	public static function getCss(){
-		$css = '<style type="text/css">
+     * Return the CSS code needed to format the HTML code
+     */
+    public static function getCss(): string{
+		return '<style type="text/css">
 			.tmnick_global {
 				font-style: normal;
 				font-weight: none;
@@ -513,24 +475,22 @@ class TmNick {
 				border-bottom: thin solid Orange;
 			}
 		</style>';
-		
-		return $css;
 	}
 	
 	
 	/**
-	* Enlève tous les codes de trackmania
+	* Remove all trackmania codes
 	*
-	* @param string $str   -> Texte à traiter
-	* @param array $select -> Un ou plusieurs codes à enlever. Par exemple, si on veut enlever seulement le code "$s"
-	* @return string texte sans codes $s, $o, etc ...
+	* @param string $str   -> Text to process
+	* @param array $select -> One or more codes to remove. For example, to remove only the "$s" code
+	* @return string text without $s, $o, etc. codes
 	*/
-	public static function stripNadeoCode($str, $select = array() ){
+	public static function stripNadeoCode($str, $select = [] ): string{
 		if( !empty($select) ){
 			$stripNadeoCode = $select;
 		}
 		else{
-			$stripNadeoCode = array('$w', '$W', '$n', '$N', '$o', '$O', '$i', '$I', '$t', '$T', '$s', '$S', '$g', '$G', '$z', '$Z', '$<');
+			$stripNadeoCode = ['$w', '$W', '$n', '$N', '$o', '$O', '$i', '$I', '$t', '$T', '$s', '$S', '$g', '$G', '$z', '$Z', '$<'];
 		}
 		
 		return str_ireplace($stripNadeoCode, '', $str);
@@ -538,16 +498,15 @@ class TmNick {
 	
 	
 	/**
-	* Parse une chaine TM dans une structure de donnée interne utilisé par les méthode toHtml, toImg, et toText
-	*
-	* @param string $nick la chaine TM pas de limite de longueur, et peut être multiligne
-	* @param string $defaultColor la couleur par défaut (la couleur peut être au format HTML, nommé, array RGB, ou TM)
-	* @return array
-	*/
-	private static function _parse($nick, $defaultColor = 'white'){
+     * Parse a TM string into an internal data structure used by the toHtml, toImg, and toText methods
+     *
+     * @param string $nick the TM string, no length limit, can be multiline
+     * @param string $defaultColor the default color (can be HTML, named, RGB array, or TM format)
+     */
+    private static function _parse($nick, $defaultColor = 'white'): array{
 		
 		if( !is_string($nick) or empty($nick) ){
-			return array();
+			return [];
 		}
 		
 		$defaultHTMLColor = $defaultColor;
@@ -564,29 +523,33 @@ class TmNick {
 		$strContent = '';
 		$lastPos = 0;
 		
-		$tagsOpen = array(
-			'h' => false,
-			'p' => false,
-			'l' => false,
-			'o' => false,
-			'g' => false,
-			't' => false,
-			'w' => false,
-			'm' => false,
-			'n' => false,
-			'i' => false,
-			's' => false,
-			'color' => $defaultColor
-		);
+		$tagsOpen = ['h' => false, 'p' => false, 'l' => false, 'o' => false, 'g' => false, 't' => false, 'w' => false, 'm' => false, 'n' => false, 'i' => false, 's' => false, 'color' => $defaultColor];
 		
-		$stack = array();
-		foreach($matches as $num => $matche){
-			list($code, $pos) = $matche;
+		$stack = [];
+		foreach($matches as $matche){
+			[$code, $pos] = $matche;
+			
+			// Escape "$$" -> literal "$" (before the generic tag check,
+			// otherwise $lastPos doesn't advance and "$$" stays as-is in the text)
+			if($code === '$$'){
+				$strContent = substr($nick, $lastPos, $pos - $lastPos) . '$';
+				if( $strContent !== '' && $strContent !== null ){
+					array_push($stack, ['content' => $strContent, 'tagsOpen' => $tagsOpen]);
+				}
+				$lastPos = $pos + strlen($code);
+				
+				foreach($stack as $s => $st){
+					if( $st['content'] === '' || $st['content'] === null ){
+						unset($stack[$s]);
+					}
+				}
+				continue;
+			}
 			
 			$tag = strtolower(substr($code, 1));
 			$param = null;
-			if(strlen($tag) == 3){
-				// color
+			if(strlen($tag) >= 1 && strlen($tag) <= 3 && ctype_xdigit($tag)){
+				// color (1 to 3 hex digits -- missing digits default to '0' in-game)
 				$param = $tag;
 				$tag = 'color';
 			}
@@ -596,25 +559,15 @@ class TmNick {
 			}
 			
 			$strContent = substr($nick, $lastPos, $pos - $lastPos);
-			if( !empty($strContent) ){
-				array_push($stack, array('content' => $strContent, 'tagsOpen' => $tagsOpen));
+			if( $strContent !== '' && $strContent !== null ){
+				array_push($stack, ['content' => $strContent, 'tagsOpen' => $tagsOpen]);
 			}
 			
 			switch($tag){
-				// raz (close)
+				// reset (close)
 				case 'z':
 					$tagsOpen = array_merge($tagsOpen,
-						array(
-							'o' => false,
-							'g' => false,
-							't' => false,
-							'w' => false,
-							'm' => false,
-							'n' => false,
-							'i' => false,
-							's' => false,
-							'color' => $defaultColor
-						)
+						['o' => false, 'g' => false, 't' => false, 'w' => false, 'm' => false, 'n' => false, 'i' => false, 's' => false, 'color' => $defaultColor]
 					);
 					break;
 				
@@ -665,7 +618,7 @@ class TmNick {
 								
 								$stack[$j]['tagsOpen'][$tag] = $url;
 							}else{
-								// poubelle
+								// discard
 								unset($stack[$j]);
 							}
 						}
@@ -720,7 +673,7 @@ class TmNick {
 			}
 			
 			foreach($stack as $s => $st){
-				if( empty($st['content']) ){
+				if( $st['content'] === '' || $st['content'] === null ){
 					unset($stack[$s]);
 				}
 			}
@@ -729,12 +682,12 @@ class TmNick {
 		}
 		
 		$strContent = substr($nick, $lastPos);
-		if( !empty($strContent) ){
-			array_push($stack, array('content' => $strContent, 'tagsOpen' => $tagsOpen));
+		if( $strContent !== '' && $strContent !== null ){
+			array_push($stack, ['content' => $strContent, 'tagsOpen' => $tagsOpen]);
 		}
 		
-		$tags = array('h', 'p', 'l');
-		foreach($tags as $k => $tag){
+		$tags = ['h', 'p', 'l'];
+		foreach($tags as $tag){
 			if($tagsOpen[$tag]){
 				// close
 				$strLink = '';
@@ -767,7 +720,7 @@ class TmNick {
 						
 						$stack[$j]['tagsOpen'][$tag] = $url;
 					}else{
-						// poubelle
+						// discard
 						unset($stack[$j]);
 					}
 				}
@@ -781,25 +734,22 @@ class TmNick {
 	
 	
 	/**
-	* This function extends imagettfbbox and includes within the returned array
-	* the actual text width and height as well as the x and y coordinates the
-	* text should be drawn from to render correctly.  This currently only works
-	* for an angle of zero and corrects the issue of hanging letters e.g. jpqg
-	*
-	* @param float $size
-	* @param float $angle
-	* @param string $fontfile
-	* @param string $text
-	* @return array
-	*/
-	private static function _imagettfbboxextended($size, $angle, $fontfile, $text){
+     * This function extends imagettfbbox and includes within the returned array
+     * the actual text width and height as well as the x and y coordinates the
+     * text should be drawn from to render correctly.  This currently only works
+     * for an angle of zero and corrects the issue of hanging letters e.g. jpqg
+     *
+     * @param float $size
+     * @param string $text
+     * @return array
+     */
+    private static function _imagettfbboxextended($size, int $angle, string $fontfile, $text){
 		$bbox = imagettfbbox($size, $angle, $fontfile, $text);
 	
 		//calculate x baseline
 		if($bbox[0] >= -1){
 			$bbox['x'] = abs($bbox[0] + 1) * -1;
 		}else{
-			//$bbox['x'] = 0;
 			$bbox['x'] = abs($bbox[0] + 2);
 		}
 	
@@ -823,21 +773,18 @@ class TmNick {
 	
 	
 	/**
-	* Construit une ressource d'image d'erreur affcihant toute les erreur de $errors
+	* Build an error image resource displaying all the errors from $errors
 	*
 	* @param mixed $errors string of error or array of string of error
 	* @return ressource
 	*/
-	private static function _getErrorRessource($errors){
+	private static function _getErrorRessource(string $errors){
 		// $error is an array of error messages, each taking up one line
-		if( is_string($errors) ){
-			$errors = str_replace('\r\n', '\n', $errors);
-			$errors = str_replace('\r', '\n', $errors);
-			$errors = explode('\n', $errors);
-		}
-		
-		$error = array();
-		foreach($errors as $k => $err){
+        $errors = str_replace('\r\n', '\n', $errors);
+        $errors = str_replace('\r', '\n', $errors);
+        $errors = explode('\n', $errors);
+        $error = [];
+		foreach($errors as $err){
 			$err = str_replace('\r\n', '\n', $err);
 			$err = str_replace('\r', '\n', $err);
 			$error = array_merge($error, explode('\n', $err));
@@ -889,72 +836,49 @@ class TmNick {
 	
 	
 	/**
-	* Détermine si le type passé est supporté
-	*
-	* @param string $type type supporté (gif, jpg, jpeg, png, ico, bmp, wbmp, xpm)
-	* @return bool
-	*/
-	private static function _isSupportedImageType($type){
+     * Determine if the given type is supported
+     *
+     * @param string $type supported type (gif, jpg, jpeg, png, ico, bmp, wbmp, xpm)
+     */
+    private static function _isSupportedImageType(string $type): int|false{
 		$type = strtoupper($type);
-		switch($type){
-			case 'GIF':
-				return IMG_GIF;
-				break;
-			case 'JPG':
-				return IMG_JPG;
-				break;
-			case 'JPEG':
-				return IMG_JPEG;
-				break;
-			case 'PNG':
-				return IMG_PNG;
-				break;
-			case 'ICO':
-			case 'BMP':
-			case 'WBMP':
-				return IMG_WBMP;
-				break;
-			case 'XPM':
-				return IMG_XPM;
-				break;
-			default:
-				return false;
-				break;
-		}
+		return match ($type) {
+            'GIF' => IMG_GIF,
+            'JPG' => IMG_JPG,
+            'JPEG' => IMG_JPEG,
+            'PNG' => IMG_PNG,
+            'ICO', 'BMP', 'WBMP' => IMG_WBMP,
+            'XPM' => IMG_XPM,
+            default => false,
+        };
 	}
 	
 	
 	/**
-	* Affiche l'image correspondant à la ressource dans le format souhaité
-	*
-	* @param ressource $im ressource de l'image
-	* @param string $type type de l'image de sortie
-	* @return bool
-	*/
-	private static function _getImageFromRessource($im, $type){
+     * Display the image corresponding to the resource in the desired format
+     *
+     * @param ressource $im image resource
+     * @param string $type output image type
+     */
+    private static function _getImageFromRessource($im, string $type): bool{
 		if( ($imgtype = self::_isSupportedImageType($type)) !== false ){
 			header('Content-type:'.image_type_to_mime_type($imgtype).';');
 			switch($imgtype){
 				case IMG_GIF:
 					return imagegif($im);
-					break;
 				case IMG_JPG:
 				case IMG_JPEG:
 					return imagejpeg($im);
-					break;
 				case IMG_PNG:
 					return imagepng($im);
-					break;
 				case IMG_WBMP:
 					return imagewbmp($im);
-					break;
 				case IMG_XPM:
 					return imagexbm($im);
-					break;
 			}
 		}
 		header('Content-type:'.image_type_to_mime_type(IMG_PNG).';');
-		return imagepng(self::_getErrorRessource('Le format "'.$type.'" n\'est pas supporté.'));
+		return imagepng(self::_getErrorRessource('The format "'.$type.'" is not supported.'));
 	}
 }
 ?>

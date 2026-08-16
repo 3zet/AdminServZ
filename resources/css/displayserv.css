@@ -1,1 +1,431 @@
-/* Global DisplayServ-------------------------------*/.ds-servers-list {	margin: 0;	padding: 0;	-webkit-transition: all .2s ease-in-out;	-moz-transition: all .2s ease-in-out;	-o-transition: all .2s ease-in-out;	transition: all .2s ease-in-out;}.ds-servers-list .ds-server {	position: relative;	list-style: none;	margin: 10px 0;	padding: 10px;	min-height: 160px;	overflow: hidden;	background: #fff;	border: 1px solid #ddd;	-webkit-border-radius: 3px;	-moz-border-radius: 3px;	-o-border-radius: 3px;	border-radius: 3px;}.ds-servers-list .ds-server-join-wrap {	position: absolute;	bottom: -35px;	right: 0;	padding: 0 10px;	background: rgba(0, 0, 0, .75);	-webkit-border-radius: 3px 0 0;	-moz-border-radius: 3px 0 0;	-o-border-radius: 3px 0 0;	border-radius: 3px 0 0;	-webkit-transition: all .2s ease-in-out;	-moz-transition: all .2s ease-in-out;	-o-transition: all .2s ease-in-out;	transition: all .2s ease-in-out;}.ds-servers-list.loading .ds-server-join-wrap {	display: none !important;}.ds-servers-list .ds-server:hover .ds-server-join-wrap {	bottom: 0;}.ds-servers-list .ds-server-join-wrap ul {	margin: 0;	padding: 0;}.ds-servers-list .ds-server-join-wrap ul li {	display: block;	float: left;	list-style: none;	padding: 5px 0 7px;}.ds-servers-list .ds-server-join-wrap ul li + li {	margin-left: 10px;	padding-left: 10px;	border-left: 1px solid #555;}.ds-servers-list .ds-server-join-wrap ul li a {	color: #fff;	font-family: Helvetica, Arial, sans-serif;	font-size: 12px;	text-decoration: none;}.ds-servers-list .ds-server-join-wrap ul li a:hover {	border-bottom: 1px solid #eee;}.ds-servers-list.loading {	opacity: .5;}.ds-servers-list table {	width: 100%;	border-spacing: 0;}.ds-servers-list .ds-header th {	color: #5e9cd5;	font-family: Helvetica, Arial, sans-serif;	font-size: 14px;	font-weight: bold;	min-height: 20px;	font-variant: small-caps;	text-align: left;}.ds-servers-list .ds-header .ds-server-join {	border-left: 1px dotted #636363;	padding-left: 10px;}.ds-servers-list .ds-header .ds-server-join a {	color: #5e9cd5;	font-size: 10px;	font-variant: normal;	text-decoration: none;}.ds-servers-list .ds-header .ds-server-join a:hover {	text-decoration: underline;}.ds-servers-list .ds-content {	margin-top: 10px;	color: #666;	font-family: Helvetica, Arial, sans-serif;	font-size: 12px;}.ds-servers-list .ds-content ul {	margin: 0;	padding: 0;}.ds-servers-list .ds-content ul li {	padding: 0;	list-style: none;	line-height: 18px;}.ds-servers-list .ds-server-currentmap img {	margin-bottom: -3px;}.ds-servers-list .ds-space {	height: 10px;}.ds-servers-list .ds-space td {	border: 1px dotted #ccc;	border-width: 1px 0 0;	height: 10px;}.ds-servers-list tr,.ds-servers-list td,.ds-servers-list th,.ds-servers-list tr:hover,.ds-servers-list td:hover,.ds-servers-list th:hover {	background: none;	cursor: default;}.ds-servers-list td {	vertical-align: top;	text-align: left;}.ds-servers-list .ds-servers-players-list {	height: 125px;	overflow-x: hidden;	overflow-y: auto;}.ds-servers-list .ds-servers-players-list td {	border: 1px solid #f7f7f7;	border-width: 0 0 1px;}.ds-servers-list .ds-servers-players-list td.no-player {	text-align: center;	border: 0;	font-style: italic;}.ds-servers-list .ds-content .ds-part-left {	color: #888;	padding-right: 10px;	border-right: 1px dotted #636363;	text-align: right;	width: 17%;	min-width: 100px;}.ds-servers-list .ds-content .ds-part-middle {	padding-left: 10px;	width: 33%;	min-width: 100px;}.ds-servers-list .ds-content .ds-part-right {	width: 50%;}@media (max-width: 580px) {	.ds-servers-list .ds-header th.middle,	.ds-servers-list .ds-content .ds-part-left {		display: none;	}}@media (max-width: 380px) {	.ds-servers-list .ds-header th.middle,	.ds-servers-list .ds-header th.last,	.ds-servers-list .ds-content .ds-part-left,	.ds-servers-list .ds-content .ds-part-right {		display: none;	}}.ds-servers-list.max-width-580 .ds-header th.middle,.ds-servers-list.max-width-580 .ds-content .ds-part-left,.ds-servers-list.max-width-380 .ds-header th.middle,.ds-servers-list.max-width-380 .ds-header th.last,.ds-servers-list.max-width-380 .ds-content .ds-part-left,.ds-servers-list.max-width-380 .ds-content .ds-part-right {	display: none;}/* Couleurs GameMode & Jeux----------------------------- */.rounds {	color: #ffcc11;}.timeattack {	color: #d1321e;}.team {	color: #aabb00;}.laps {	color: #88aa11;}.stunts {	color: #5600da;}.cup {	color: #ff8c11;}.script,.other {	color: #444;}.maniaplanet {	color: #2277cc;}.tmforever {	color: #ad0000;}.team_-1,.team_0,.team_1 {	display: block;	float: left;	width: 7px;	height: 16px;	margin-right: 5px;	opacity: .8;}.team_-1 {	background: #000;}.team_0 {	background: #00f;}.team_1 {	background: #f00;}/* TmNick------------------------ */.tmnick_global {	font-style: normal;	font-weight: none;	letter-spacing: 0;}.tmnick_normal { letter-spacing: 0; }.tmnick_short { letter-spacing: -1px; }.tmnick_wide { letter-spacing: 2px; }.tmnick_raz { font-style: normal; font-weight: none; letter-spacing: 0; }.tmnick_italic { font-style: italic; }.tmnick_bold { font-weight: bold; letter-spacing: 1px; }.tmnick_upper { text-transform: uppercase; }.tmnick_shadowed { text-shadow: 1px 1px 1px #444; }a.tmnick_internallink, a.tmnick_internallink:visited {	color: inherit;	text-decoration: none;	border-bottom: thin solid Black;}a.tmnick_internallink:hover {	color: inherit;	text-decoration: none;	border-bottom: thin solid Blue;}a.tmnick_internallink_withlogin, a.tmnick_internallink_withlogin:visited  {	color: inherit;	text-decoration: none;	border-bottom: thin solid #f0e68c;}a.tmnick_internallink_withlogin:hover {	color: inherit;	text-decoration: none;	border-bottom: thin solid Gold;}a.tmnick_externallink, a.tmnick_externallink:visited {	color: inherit;	text-decoration: none;	border-bottom: thin solid Black;}a.tmnick_externallink:hover {	color: inherit;	text-decoration: none;	border-bottom: thin solid Orange;}
+/* ============================================================
+   AdminServ — displayserv.css  (redesign)
+   Modern cards with dark/light support and version badges.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap');
+
+
+/* ---- Kontener -------------------------------------------- */
+.ds-servers-list {
+	display: block;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	transition: opacity .25s ease;
+	font-family: 'Outfit', Helvetica, Arial, sans-serif;
+}
+.ds-servers-list.loading {
+	opacity: .45;
+	pointer-events: none;
+}
+
+
+/* ---- Karta serwera --------------------------------------- */
+.ds-server {
+	position: relative;
+	max-width: 960px;
+	margin: 0 auto 14px;
+	background: #fff;
+	border: 1px solid #e2e2e2;
+	border-radius: 12px;
+	overflow: hidden;
+	transition: border-color .2s, box-shadow .15s;
+}
+.ds-server:hover {
+	border-color: #c4c4c4;
+	box-shadow: 0 2px 10px rgba(0,0,0,.06);
+}
+.ds-server.ds-server-offline {
+	opacity: .6;
+}
+
+
+/* ---- Header karty ---------------------------------------- */
+.ds-card-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 13px 16px 11px;
+	border-bottom: 1px solid #ebebeb;
+	background: #fafafa;
+}
+
+
+/* Kropka online/offline */
+.ds-dot {
+	flex-shrink: 0;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	transition: background .3s, box-shadow .3s;
+}
+.ds-dot.online {
+	background: #22c55e;
+	box-shadow: 0 0 0 3px rgba(34,197,94,.18);
+}
+.ds-dot.offline {
+	background: #bbb;
+}
+
+/* Title */
+.ds-title {
+	flex: 1;
+	font-size: 13.5px;
+	font-weight: 600;
+	color: #222;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Badge wersji */
+.ds-version-badge {
+	font-family: 'IBM Plex Mono', monospace;
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: .05em;
+	padding: 2px 8px;
+	border-radius: 5px;
+	border: 1px solid #ddd;
+	background: #f3f3f3;
+	color: #777;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+.ds-version-badge.trackmania {
+	background: #deeffe;
+	border-color: #9ec9f4;
+	color: #175c9e;
+}
+.ds-version-badge.maniaplanet {
+	background: #e2f5e0;
+	border-color: #9ed59a;
+	color: #2e6e28;
+}
+.ds-version-badge.tmforever {
+	background: #fee2e2;
+	border-color: #f4a0a0;
+	color: #9b2626;
+}
+
+
+/* ---- Body: info + gracze --------------------------------- */
+.ds-body {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+}
+
+.ds-info {
+	padding: 13px 16px;
+}
+
+.ds-divider {
+	border: none;
+	border-left: 1px solid #ebebeb;
+	margin: 12px 0;
+	align-self: stretch;
+}
+
+.ds-players {
+	padding: 13px 16px;
+}
+
+
+/* Info rows (Label | Value) */
+.ds-row {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin-bottom: 7px;
+}
+.ds-row:last-child {
+	margin-bottom: 0;
+}
+.ds-label {
+	flex-shrink: 0;
+	width: 70px;
+	font-size: 10.5px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: .07em;
+	color: #aaa;
+}
+.ds-val {
+	font-size: 12.5px;
+	color: #333;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.ds-val.mono {
+	font-family: 'IBM Plex Mono', monospace;
+	font-size: 11.5px;
+	color: #666;
+}
+
+
+/* Status dot inline */
+.ds-status-dot {
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #22c55e;
+	margin-right: 5px;
+	vertical-align: 1px;
+}
+
+
+/* Game mode colors */
+.ds-mode-ta      { color: #c94a1e; }
+.ds-mode-rounds  { color: #b07d00; }
+.ds-mode-team    { color: #3a7d30; }
+.ds-mode-laps    { color: #2060aa; }
+.ds-mode-stunts  { color: #7030b0; }
+.ds-mode-cup     { color: #c06010; }
+.ds-mode-script  { color: #555; }
+.ds-mode-other   { color: #888; }
+
+
+/* Map environment badge */
+.ds-map-env {
+	display: inline-block;
+	font-size: 9.5px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: .06em;
+	padding: 1px 5px;
+	border-radius: 3px;
+	background: #f0f0f0;
+	color: #888;
+	border: 1px solid #e0e0e0;
+	margin-left: 5px;
+	vertical-align: 1px;
+}
+.ds-env-img {
+	margin-left: 5px;
+	vertical-align: -3px;
+	height: 14px;
+	width: auto;
+}
+
+
+/* ---- Sekcja graczy --------------------------------------- */
+.ds-players-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 9px;
+}
+.ds-players-label {
+	font-size: 10.5px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: .07em;
+	color: #aaa;
+}
+.ds-players-count {
+	font-family: 'IBM Plex Mono', monospace;
+	font-size: 11px;
+	font-weight: 500;
+	color: #444;
+	background: #f3f3f3;
+	border: 1px solid #e0e0e0;
+	padding: 1px 8px;
+	border-radius: 20px;
+}
+
+.ds-servers-players-list {
+	max-height: 120px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.ds-player-row {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	padding: 2px 0;
+}
+.ds-player-name {
+	flex: 1;
+	font-size: 12px;
+	color: #333;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.ds-player-spec {
+	font-size: 9.5px;
+	padding: 1px 5px;
+	border-radius: 3px;
+	background: #f0f0f0;
+	color: #999;
+	border: 1px solid #e5e5e5;
+}
+.ds-no-player {
+	font-size: 12px;
+	color: #bbb;
+	font-style: italic;
+	padding: 6px 0;
+}
+
+/* Team dots */
+.ds-team-dot {
+	flex-shrink: 0;
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+}
+.ds-team-dot.ds-team-0 { background: #3b82f6; }
+.ds-team-dot.ds-team-1 { background: #ef4444; }
+.ds-team-dot.ds-team--1 { background: #999; }
+
+
+/* ---- Footer (akcje) -------------------------------------- */
+.ds-footer {
+	display: flex;
+	border-top: 1px solid #ebebeb;
+	overflow: hidden;
+	border-radius: 0 0 12px 12px;
+}
+.ds-action {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	padding: 8px 10px;
+	font-family: 'Outfit', Helvetica, Arial, sans-serif;
+	font-size: 11.5px;
+	font-weight: 500;
+	color: #888;
+	text-decoration: none;
+	background: #fafafa;
+	border: none;
+	transition: background .15s, color .15s;
+	cursor: pointer;
+}
+.ds-action:hover {
+	background: #f0f0f0;
+	color: #333;
+}
+.ds-action + .ds-action {
+	border-left: 1px solid #ebebeb;
+}
+.ds-icon-gamepad,
+.ds-icon-eye,
+.ds-icon-star {
+	font-style: normal;
+	font-size: 13px;
+	line-height: 1;
+}
+
+
+/* ---- Responsive ------------------------------------------ */
+@media (max-width: 580px) {
+	.ds-body {
+		grid-template-columns: 1fr;
+	}
+	.ds-divider {
+		border-left: none;
+		border-top: 1px solid #ebebeb;
+		margin: 0 12px;
+		align-self: auto;
+		height: 0;
+	}
+}
+
+
+/* ============================================================
+   DARK MODE — klasa .ds-dark na kontenerze
+   Use: <div id="myWidget" class="ds-dark"> or
+   add the class via JS based on prefers-color-scheme
+   ============================================================ */
+.ds-dark .ds-server {
+	background: #1a1a1a;
+	border-color: #2e2e2e;
+}
+.ds-dark .ds-server:hover {
+	border-color: #444;
+	box-shadow: 0 2px 14px rgba(0,0,0,.35);
+}
+.ds-dark .ds-card-head {
+	background: #141414;
+	border-bottom-color: #2a2a2a;
+}
+.ds-dark .ds-title       { color: #e8e8e8; }
+.ds-dark .ds-label       { color: #555; }
+.ds-dark .ds-val         { color: #ccc; }
+.ds-dark .ds-val.mono    { color: #888; }
+.ds-dark .ds-version-badge {
+	background: #252525;
+	border-color: #3a3a3a;
+	color: #777;
+}
+.ds-dark .ds-version-badge.trackmania  { background: #0e2a44; border-color: #1a4a72; color: #6eb3f0; }
+.ds-dark .ds-version-badge.maniaplanet { background: #0e2a10; border-color: #1a4a1e; color: #6abe68; }
+.ds-dark .ds-version-badge.tmforever  { background: #2e1010; border-color: #5a1e1e; color: #e07070; }
+.ds-dark .ds-dot.offline { background: #444; }
+.ds-dark .ds-divider     { border-left-color: #2a2a2a; }
+.ds-dark .ds-players-label { color: #555; }
+.ds-dark .ds-players-count { background: #252525; border-color: #3a3a3a; color: #aaa; }
+.ds-dark .ds-map-env     { background: #252525; border-color: #3a3a3a; color: #777; }
+.ds-dark .ds-player-name { color: #ccc; }
+.ds-dark .ds-player-spec { background: #252525; border-color: #333; color: #666; }
+.ds-dark .ds-no-player   { color: #444; }
+.ds-dark .ds-footer      { border-top-color: #2a2a2a; }
+.ds-dark .ds-action      { background: #141414; color: #555; }
+.ds-dark .ds-action:hover{ background: #222; color: #ccc; }
+.ds-dark .ds-action + .ds-action { border-left-color: #2a2a2a; }
+.ds-dark .ds-mode-ta     { color: #e07050; }
+.ds-dark .ds-mode-rounds { color: #d4a020; }
+.ds-dark .ds-mode-team   { color: #60b858; }
+.ds-dark .ds-mode-laps   { color: #5090e0; }
+.ds-dark .ds-mode-stunts { color: #9060d0; }
+.ds-dark .ds-mode-cup    { color: #e08030; }
+.ds-dark .ds-mode-script { color: #888; }
+.ds-dark .ds-mode-other  { color: #666; }
+.ds-dark .ds-team-dot.ds-team-0  { background: #4d88cc; }
+.ds-dark .ds-team-dot.ds-team-1  { background: #cc4444; }
+.ds-dark .ds-team-dot.ds-team--1 { background: #555; }
+
+
+/* ============================================================
+   DARK VARIANTS OF AdminServ THEMES
+   Classes .ds-theme-{name}-dark -- used by AdminServ
+   gdy motyw ma suffix "-dark" (red-dark, blue-dark itp.)
+   ============================================================ */
+
+/* Base dark reset for themes -- always on .ds-dark */
+.ds-dark .ds-server,
+.ds-theme-dark-base .ds-server {
+	background: #111;
+	border-color: #2a2a2a;
+}
+
+
+/* ---- TmNick (bez zmian, tylko przepisane) ----------------- */
+.tmnick_global  { font-style: normal; font-weight: normal; letter-spacing: 0; }
+.tmnick_normal  { letter-spacing: 0; }
+.tmnick_short   { letter-spacing: -1px; }
+.tmnick_wide    { letter-spacing: 2px; }
+.tmnick_raz     { font-style: normal; font-weight: normal; letter-spacing: 0; }
+.tmnick_italic  { font-style: italic; }
+.tmnick_bold    { font-weight: bold; letter-spacing: 1px; }
+.tmnick_upper   { text-transform: uppercase; }
+.tmnick_shadowed{ text-shadow: 1px 1px 1px rgba(0,0,0,.3); }
+
+a.tmnick_internallink,
+a.tmnick_internallink:visited { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(0,0,0,.3); }
+a.tmnick_internallink:hover   { border-bottom-color: blue; }
+
+a.tmnick_internallink_withlogin,
+a.tmnick_internallink_withlogin:visited { color: inherit; text-decoration: none; border-bottom: 1px solid #f0e68c; }
+a.tmnick_internallink_withlogin:hover   { border-bottom-color: gold; }
+
+a.tmnick_externallink,
+a.tmnick_externallink:visited { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(0,0,0,.3); }
+a.tmnick_externallink:hover   { border-bottom-color: orange; }

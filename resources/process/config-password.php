@@ -1,8 +1,8 @@
 <?php
-	// ENREGISTREMENT
+	// SAVE
 	if( isset($_POST['savepassword']) ){
-		$current = md5($_POST['changePasswordCurrent']);
-		$new = md5($_POST['changePasswordNew']);
+		$current = md5((string) $_POST['changePasswordCurrent']);
+		$new = md5((string) $_POST['changePasswordNew']);
 		if( isset($_SESSION['adminserv']['path']) ){ $adminservPath = $_SESSION['adminserv']['path']; }else{ $adminservPath = null; }
 		$pathConfig = $adminservPath.'config/';
 		

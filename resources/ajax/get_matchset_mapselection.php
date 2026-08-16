@@ -10,16 +10,16 @@
 	
 	// DATA
 	if( !isset($_SESSION['adminserv']['matchset_maps_selected']) ){
-		// Retourne "Aucune map"
+		// Return "No map"
 		AdminServ::saveMatchSettingSelection();
 	}
 	else{
-		// Enlever une map de la sélection
+		// Remove a map from the selection
 		if( isset($_GET['remove']) ){
 			$removeSelection = intval($_GET['remove']);
 			$mapsSelection = $_SESSION['adminserv']['matchset_maps_selected'];
 			
-			// Liste
+			// List
 			if( isset($mapsSelection['lst']) && is_array($mapsSelection['lst']) && count($mapsSelection['lst']) > 0 ){
 				foreach($mapsSelection['lst'] as $id => $values){
 					if($id == $removeSelection){

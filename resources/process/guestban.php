@@ -6,14 +6,14 @@
 		}
 		else{
 			$data['gameDataDirectory'] = $client->getResponse();
-			$data['playlistDirectory'] = Folder::read($data['gameDataDirectory'].'Config', array(), array(), intval(AdminServConfig::RECENT_STATUS_PERIOD * 3600) );
+			$data['playlistDirectory'] = Folder::read($data['gameDataDirectory'].'Config', [], [], intval(AdminServConfig::RECENT_STATUS_PERIOD * 3600) );
 		}
 	}
 	
 	// ACTIONS
-	// Vider la liste
+	// Clear the list
 	if( isset($_GET['clean']) ){
-		$clean = strtolower($_GET['clean']);
+		$clean = strtolower((string) $_GET['clean']);
 		if($clean == 'banlist'){
 			if( !$client->query('CleanBanList') ){
 				AdminServ::error();
@@ -47,10 +47,10 @@
 			}
 		}
 	}
-	// Blacklister
+	// Blacklist
 	else if( isset($_POST['blackListPlayer']) ){
-		// Création du tableau de joueurs à blacklister
-		$blackListPlayer = array();
+		// Build the list of players to blacklist
+		$blackListPlayer = [];
 		if( isset($_POST['banlist']) && count($_POST['banlist']) > 0 ){
 			$blackListPlayer = array_merge($blackListPlayer, $_POST['banlist']);
 		}
@@ -62,9 +62,8 @@
 		}
 		$blackListPlayer = array_unique($blackListPlayer);
 		
-		// BlackList de toutes les listes
-		if( count($blackListPlayer) > 0 ){
-			foreach($blackListPlayer as $player){
+		// Blacklist from all lists
+		foreach($blackListPlayer as $player){
 				if( !$client->query('BlackList', $player) ){
 					AdminServ::error();
 					break;
@@ -73,9 +72,8 @@
 					AdminServLogs::add('action', 'Blacklist player: '.$player);
 				}
 			}
-		}
 	}
-	// Retirer un joueur d'une ou plusieurs listes
+	// Remove a player from one or more lists
 	else if( isset($_POST['removeList']) ){
 		if( isset($_POST['banlist']) && count($_POST['banlist']) > 0 ){
 			foreach($_POST['banlist'] as $player){
@@ -124,11 +122,11 @@
 	}
 	
 	
-	// AJOUTER
+	// ADD
 	else if( isset($_POST['addPlayer']) ){
 		// Variables
 		$addPlayerList = $_POST['addPlayerList'];
-		$addPlayerLogin = strtolower( trim($_POST['addPlayerLogin']) );
+		$addPlayerLogin = strtolower( trim((string) $_POST['addPlayerLogin']) );
 		$addPlayerTypeList = $_POST['addPlayerTypeList'];
 		
 		// PlayerLogin
@@ -138,9 +136,9 @@
 			$playerlogin = $addPlayerLogin;
 		}
 		
-		// Requête
+		// Request
 		if($playerlogin != Utils::t('Player login') ){
-			// Inviter
+			// Invite
 			if($addPlayerTypeList == 'guestlist'){
 				if( !$client->query('AddGuest', $playerlogin) ){
 					AdminServ::error();
@@ -149,7 +147,7 @@
 					AdminServLogs::add('action', 'Add guest player: '.$playerlogin);
 				}
 			}
-			// Blacklister
+			// Blacklist
 			else if($addPlayerTypeList == 'blacklist'){
 				if( !$client->query('BlackList', $playerlogin) ){
 					AdminServ::error();
@@ -162,11 +160,11 @@
 	}
 	
 	
-	// PLAYLISTS LOCAL
+	// LOCAL PLAYLISTS
 	else if( isset($_POST['savePlaylist']) && isset($_POST['playlist']) && count($_POST['playlist'] > 0) ){
 		$i = 0;
 		foreach($_POST['playlist'] as $playlist){
-			$playlistEx = explode('|', $playlist);
+			$playlistEx = explode('|', (string) $playlist);
 			$type = $playlistEx[0];
 			$filename = $playlistEx[1];
 			
@@ -198,7 +196,7 @@
 	else if( isset($_POST['loadPlaylist']) && isset($_POST['playlist']) && count($_POST['playlist'] > 0) ){
 		$i = 0;
 		foreach($_POST['playlist'] as $playlist){
-			$playlistEx = explode('|', $playlist);
+			$playlistEx = explode('|', (string) $playlist);
 			$type = $playlistEx[0];
 			$filename = $playlistEx[1];
 			
@@ -229,7 +227,7 @@
 	}
 	else if( isset($_POST['deletePlaylist']) && isset($_POST['playlist']) && count($_POST['playlist'] > 0) ){
 		foreach($_POST['playlist'] as $playlist){
-			$playlistEx = explode('|', $playlist);
+			$playlistEx = explode('|', (string) $playlist);
 			$filename = $playlistEx[1];
 			
 			if( !File::delete($data['gameDataDirectory'].'Config/'.$filename) ){
@@ -244,7 +242,6 @@
 		Utils::redirection(false, '?p='.USER_PAGE);
 	}
 	else if( isset($_POST['createPlaylistValid']) && isset($_POST['createPlaylistName']) && $_POST['createPlaylistName'] != null ){
-		// Fichier
 		$filename = Str::replaceChars($_POST['createPlaylistName']);
 		
 		// Guestlist
@@ -271,11 +268,11 @@
 		Utils::redirection(false, '?p='.USER_PAGE);
 	}
 	
-	// LECTURE
-	$client->addCall('GetBanList', array(AdminServConfig::LIMIT_PLAYERS_LIST, 0) );
-	$client->addCall('GetBlackList', array(AdminServConfig::LIMIT_PLAYERS_LIST, 0) );
-	$client->addCall('GetGuestList', array(AdminServConfig::LIMIT_PLAYERS_LIST, 0) );
-	$client->addCall('GetIgnoreList', array(AdminServConfig::LIMIT_PLAYERS_LIST, 0) );
+	// READ
+	$client->addCall('GetBanList', [AdminServConfig::LIMIT_PLAYERS_LIST, 0] );
+	$client->addCall('GetBlackList', [AdminServConfig::LIMIT_PLAYERS_LIST, 0] );
+	$client->addCall('GetGuestList', [AdminServConfig::LIMIT_PLAYERS_LIST, 0] );
+	$client->addCall('GetIgnoreList', [AdminServConfig::LIMIT_PLAYERS_LIST, 0] );
 	if( !$client->multiquery() ){
 		AdminServ::error();
 	}
@@ -291,7 +288,7 @@
 		$data['ignorelist']['count'] = count($data['ignorelist']['list']);
 	}
 	
-	// Liste des joueurs présent sur le serveur
+	// List of players present on the server
 	$data['players']['listOptions'] = AdminServUI::getPlayerList();
 	$data['players']['count'] = AdminServ::getNbPlayers();
 ?>

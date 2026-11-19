@@ -419,15 +419,26 @@ textarea.width1, textarea.width2, textarea.width3 {
 	height: auto !important;
 	line-height: normal !important;
 }
+.section-index .cadre .content:has(> #map_thumbnail) table.current_map { width: 100% !important; }
 .section-index .cadre #map_thumbnail {
 	position: static !important;
 	float: none !important;
+	display: block !important;
 	width: auto !important;
 	max-width: 100% !important;
 	margin: 8px 0 0 0 !important;
+	padding: 8px !important;
+	min-width: 0 !important;
+	min-height: 0 !important;
+	box-sizing: border-box !important;
+	text-align: center !important;
+	border-width: 1px !important;
+	border-radius: 8px !important;
 }
 .section-index .cadre #map_thumbnail img {
-	max-width: 100% !important;
+	display: inline-block !important;
+	width: 100% !important;
+	max-width: 256px !important;
 	height: auto !important;
 }
 .section-index #playerlist {

@@ -367,5 +367,6 @@ $translate = [
     'Script parameters' => 'Parametry skryptu',
     'Value' => 'Wartość',
     'The server already exist! Change the name.' => 'Taki serwer już jest ! Zmień nazwę.',
+    'The maps folder is read-only for AdminServ.' => 'Folder z mapami jest dla AdminServ tylko do odczytu.',
 ];
 ?>

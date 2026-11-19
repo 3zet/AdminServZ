@@ -61,7 +61,7 @@
 				<fieldset class="srvopts_advanced">
 					<legend><img src="<?php echo AdminServConfig::$PATH_RESOURCES; ?>images/16/options.png" alt="" /><?php echo Utils::t('Advanced'); ?></legend>
 					<table>
-						<?php if (SERVER_VERSION_NAME == 'TmForever' && ($data['srvOpt']['IsP2PUpload'] ?? null) !== null): ?>
+						<?php if (!isMpApi() && ($data['srvOpt']['IsP2PUpload'] ?? null) !== null): ?>
 							<tr>
 								<td class="key"><label for="IsP2PUpload"><?php echo Utils::t('P2P Upload'); ?></label></td>
 								<td class="value col2"><input class="text" type="checkbox" name="IsP2PUpload" id="IsP2PUpload"<?php if (($data['srvOpt']['IsP2PUpload'] ?? 0) != 0): echo ' checked="checked"'; endif; ?> value="" /></td>
@@ -137,7 +137,7 @@
 							<td class="key"><label for="AllowMapDownload"><?php echo Utils::t('Map download'); ?></label></td>
 							<td class="value" colspan="4">
 								<input class="text" type="checkbox" name="AllowMapDownload" id="AllowMapDownload"<?php
-									if (SERVER_VERSION_NAME == 'TmForever' && ($data['srvOpt']['AllowChallengeDownload'] ?? 0) != 0): echo ' checked="checked"';
+									if (!isMpApi() && ($data['srvOpt']['AllowChallengeDownload'] ?? 0) != 0): echo ' checked="checked"';
 									elseif (isMpApi() && ($data['srvOpt']['AllowMapDownload'] ?? 0) != 0): echo ' checked="checked"';
 									endif; ?> value="" />
 							</td>

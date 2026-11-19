@@ -411,6 +411,9 @@ class AdminServUI {
 		
 		if( class_exists('ExtensionConfig') && isset(ExtensionConfig::$GAMEMODES) && count(ExtensionConfig::$GAMEMODES) > 0 ){
 			foreach(ExtensionConfig::$GAMEMODES as $gameModeId => $gameModeName){
+				// Cup nie istnieje w TmForever/TmUnited/TmClassic (potwierdzone zywym testem XML-RPC:
+				// GetCupPointsLimit/GetCupNbWinners/GetCupWarmUpDuration/GetRoundCustomPoints - wszystkie -506)
+				if( $gameModeName === 'Cup' && !isMpApi() ){ continue; }
 				$selected = ($gameModeId == $currentGameMode) ? ' selected="selected"' : null;
 				$out .= '<option value="'.$gameModeId.'"'.$selected.'>'.$gameModeName.'</option>';
 			}
@@ -503,6 +506,7 @@ class AdminServUI {
 		global $data;
 		
 		if (class_exists('Folder')) {
+			$showOptions = $showOptions && defined('IS_LOCAL_WRITABLE') && IS_LOCAL_WRITABLE;
 			$data += ['folders' => [], 'currentPath' => $currentPath, 'parentPath' => null, 'showOptions' => $showOptions];
 			
 			// List of folders

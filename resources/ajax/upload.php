@@ -21,6 +21,8 @@
 	// DATA
 	if( AdminServ::initialize() ){
 		// Path
+		// $localPath:  folder AdminServ writes to itself (null = let the game server write via WriteFile)
+		// $serverPath: the same folder as the game server sees it (absolute, or relative to "Maps" for WriteFile)
 		$mapDirectoryPath = AdminServ::getMapsDirectoryPath();
 		if($path === null){
 			$path = $mapDirectoryPath;
@@ -28,11 +30,20 @@
 		if( !str_ends_with((string) $path, '/')){
 			$path = $path.'/';
 		}
-		if( !file_exists($path) ){
-			$path = null;
-			if( defined('AdminServConfig::UPLOAD_ONLINE_FOLDER') && AdminServConfig::UPLOAD_ONLINE_FOLDER != null ){
-				$path = AdminServConfig::UPLOAD_ONLINE_FOLDER;
-			}
+		$localPath = null;
+		$serverPath = null;
+		if( is_dir($path) && is_writable($path) ){
+			$localPath = $path;
+			$serverPath = AdminServ::toServerPath($path);
+		}
+		else if( is_dir($path) && ($relativePath = AdminServ::toMapsRelativePath($path)) !== null ){
+			$serverPath = $relativePath;
+		}
+		else if( defined('AdminServConfig::UPLOAD_ONLINE_FOLDER') && AdminServConfig::UPLOAD_ONLINE_FOLDER != null ){
+			$serverPath = AdminServConfig::UPLOAD_ONLINE_FOLDER;
+		}
+		else{
+			$serverPath = '';
 		}
 
 		// Callback function for replacing special characters
@@ -42,7 +53,7 @@
 
 		// Game -- InsertMap/AddMap valid for MP and TM2020
 		// TmForever uses InsertChallenge/AddChallenge
-		if(SERVER_VERSION_NAME == 'TmForever'){
+		if(!isMpApi()){
 			$queries = ['insert' => 'InsertChallenge', 'add' => 'AddChallenge', 'type' => $type];
 		}
 		else{
@@ -61,11 +72,11 @@
 		}
 
 		// Save the file
-		$result = FileUploader::saveUploadedFileToManiaPlanetServer($client, $path, $queries, AdminServConfig::$ALLOWED_EXTENSIONS, $sizeLimit, 'replaceFilename');
+		$result = FileUploader::saveUploadedFileToManiaPlanetServer($client, $localPath, $serverPath, $queries, AdminServConfig::$ALLOWED_EXTENSIONS, $sizeLimit, 'replaceFilename');
 
 		// Save the MatchSettings -- SaveMatchSettings exists in MP and TM2020
 		if($mset && SERVER_MATCHSET && $type != 'local' && isset($result['success']) && $result['success'] == true){
-			if( !$client->query('SaveMatchSettings', $mapDirectoryPath.SERVER_MATCHSET) ){
+			if( !$client->query('SaveMatchSettings', AdminServ::toServerPath($mapDirectoryPath.SERVER_MATCHSET)) ){
 				$result['error'] = '['.$client->getErrorCode().'] '.$client->getErrorMessage();
 			}
 		}

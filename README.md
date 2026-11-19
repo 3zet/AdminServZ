@@ -1,6 +1,6 @@
 # AdminServZ
 
-WebInterface to manage Trackmania Forever, ManiaPlanet, and Trackmania 2020 (TM2020) dedicated servers.
+WebInterface to manage Trackmania and Maniaplanet dedicated servers.
 
 ## Introduction
 
@@ -27,6 +27,7 @@ I decided to continue maintaining AdminServ because the codebase was stuck on ol
 
 - **New looks** — refreshed the style and added new dark variants of all themes
 - **Native TM2020 support**, including a dedicated Script Manager and inline script settings editor
+- **Native Classic TM support**, now you can manage even TMO/TMS/TMN/TMU servers!
 - **New Results tab** — live standings view, handy for tournaments and events
 - **Full chat formatting** — chat messages now render with the same formatting as in-game (colors, styles, etc.)
 - **Mobile-first redesign** — the whole interface, including tables, forms, and navigation, now works properly on phones

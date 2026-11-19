@@ -1,19 +1,49 @@
 <?php
 define('ADMINSERV_TIMER', false);
-define('ADMINSERV_VERSION', '3.0');
+define('ADMINSERV_VERSION', '2.1.2-tm2020');
 
 /**
- * Helper: true for ManiaPlanet and TM2020 (everything except TmForever)
+ * Wersje gry bez terminologii "Map" (uzywaja "Challenge"), bez Script mode,
+ * bez trybu Cup w GameInfos i bez Script na pozycji 0 w enumie GameMode.
+ * Potwierdzone empirycznie (zywe testy XML-RPC) dla wszystkich czterech tytulow.
+ */
+const LEGACY_CHALLENGE_VERSIONS = ['TmForever', 'TmUnited', 'TmNationsESWC', 'TmSunrise', 'TmOriginal'];
+
+/**
+ * Wersje TMO/TMSX/TMN (wspolny binarny TrackManiaServer.exe /game=X, identyczne
+ * API - 140/140 metod XML-RPC identyczne, potwierdzone zywym testem).
+ */
+const TM_CLASSIC_VERSIONS = ['TmNationsESWC', 'TmSunrise', 'TmOriginal'];
+
+/**
+ * Helper: true dla ManiaPlanet i TM2020 (wszystko poza starymi tytulami
+ * korzystajacymi z terminologii "Challenge" zamiast "Map")
  */
 function isMpApi(): bool {
-	return defined('SERVER_VERSION_NAME') && SERVER_VERSION_NAME !== 'TmForever';
+	return defined('SERVER_VERSION_NAME') && !in_array(SERVER_VERSION_NAME, LEGACY_CHALLENGE_VERSIONS, true);
 }
 
 /**
- * Helper: true only for TM2020 (Name === 'Trackmania')
+ * Helper: true tylko dla TM2020 (Name === 'Trackmania')
  */
 function isTM2020(): bool {
 	return defined('SERVER_VERSION_NAME') && SERVER_VERSION_NAME === 'Trackmania';
+}
+
+/**
+ * Helper: true dla TMO / TMSX / TMN ESWC (wspolny binarny serwer 2006,
+ * identyczne API dla wszystkich trzech tytulow)
+ */
+function isTmClassic(): bool {
+	return defined('SERVER_VERSION_NAME') && in_array(SERVER_VERSION_NAME, TM_CLASSIC_VERSIONS, true);
+}
+
+/**
+ * Helper: true tylko dla TM United (bez Forever) - ma GetSystemInfo (okrojony),
+ * manialinki, ignore list, billing; nadal brak Map/Script/Cup jak w TmClassic.
+ */
+function isTmUnited(): bool {
+	return defined('SERVER_VERSION_NAME') && SERVER_VERSION_NAME === 'TmUnited';
 }
 
 
@@ -154,6 +184,8 @@ class AdminServ {
 			define('SERVER_XMLRPC_PORT', ServerConfig::$SERVERS[SERVER_NAME]['port'] ?? 0);
 			define('SERVER_MATCHSET', ServerConfig::$SERVERS[SERVER_NAME]['matchsettings'] ?? '');
 			define('SERVER_MAPS_BASEPATH', ServerConfig::$SERVERS[SERVER_NAME]['mapsbasepath'] ?? '');
+			define('SERVER_REMOTE_ROOT', ServerConfig::$SERVERS[SERVER_NAME]['remoteroot'] ?? '');
+			define('SERVER_LOCAL_ROOT', ServerConfig::$SERVERS[SERVER_NAME]['localroot'] ?? '');
 			define('SERVER_ADMINLEVEL', serialize( ServerConfig::$SERVERS[SERVER_NAME]['adminlevel'] ?? []));
 			
 			// CONNECTION
@@ -191,12 +223,12 @@ class AdminServ {
 									define('API_VERSION', $getVersion['ApiVersion'] ?? '');
 								}
 
-								// SystemInfo
+								// SystemInfo (TmClassic: metoda GetSystemInfo nie istnieje, $getSystemInfo bedzie pusta [])
 								$getSystemInfo = $queriesData['GetSystemInfo'];
-								define('SERVER_LOGIN', $getSystemInfo['ServerLogin']);
-								define('SERVER_PUBLISHED_IP', $getSystemInfo['PublishedIp']);
-								define('SERVER_PORT', $getSystemInfo['Port']);
-								define('SERVER_P2P_PORT', $getSystemInfo['P2PPort']);
+								define('SERVER_LOGIN', $getSystemInfo['ServerLogin'] ?? '');
+								define('SERVER_PUBLISHED_IP', $getSystemInfo['PublishedIp'] ?? '');
+								define('SERVER_PORT', $getSystemInfo['Port'] ?? null);
+								define('SERVER_P2P_PORT', $getSystemInfo['P2PPort'] ?? 0);
 								if( isMpApi() ){
 									define('SERVER_TITLE', $getSystemInfo['TitleId'] ?? '');
 									define('IS_SERVER', $getSystemInfo['IsServer'] ?? false);
@@ -236,7 +268,7 @@ class AdminServ {
 								}
 								
 								// TmForever
-								if(SERVER_VERSION_NAME == 'TmForever'){
+								if(!isMpApi()){
 									array_shift(ExtensionConfig::$GAMEMODES);
 									$stuntsGameMode = array_pop(ExtensionConfig::$GAMEMODES);
 									$CupGameMode = array_pop(ExtensionConfig::$GAMEMODES);
@@ -302,7 +334,7 @@ class AdminServ {
 		$out = Utils::t('No game mode available');
 
 		if( class_exists('ExtensionConfig') && isset(ExtensionConfig::$GAMEMODES) && count(ExtensionConfig::$GAMEMODES) > 0 ){
-			if($getManual && defined('SERVER_VERSION_NAME') && SERVER_VERSION_NAME == 'TmForever'){
+			if($getManual && defined('SERVER_VERSION_NAME') && !isMpApi()){
 				$gameMode--;
 				if( isset(ExtensionConfig::$GAMEMODES[$gameMode]) ){
 					$out = ExtensionConfig::$GAMEMODES[$gameMode];
@@ -392,7 +424,7 @@ class AdminServ {
 		$out = [];
 		
 		// GAME
-		if(SERVER_VERSION_NAME == 'TmForever'){
+		if(!isMpApi()){
 			$queryName = ['getMapInfo' => 'GetCurrentChallengeInfo'];
 		}
 		else{
@@ -402,7 +434,7 @@ class AdminServ {
 		// REQUESTS
 		$client->addCall($queryName['getMapInfo']);
 		if( AdminServAdminLevel::isType('Admin') ){
-			$client->addCall('GetMapsDirectory');
+			$client->addCall(isMpApi() ? 'GetMapsDirectory' : 'GetTracksDirectory');
 		}
 		// TM2020: GetGameMode() doesn't exist
 		if( isTM2020() ){
@@ -456,30 +488,26 @@ class AdminServ {
 			// Initialize the map thumbnail
 			$out['map']['thumb'] = null;
 
-			// Ensure the required data exists and is a string
-			if (
-				isset($queriesData['GetMapsDirectory'], $currentMapInfo['FileName']) &&
-				is_string($queriesData['GetMapsDirectory']) &&
-				is_string($currentMapInfo['FileName'])
-			) {
-				$mapFileName = $queriesData['GetMapsDirectory'] . $currentMapInfo['FileName'];
-
-				if (file_exists($mapFileName)) {
-					if (SERVER_VERSION_NAME === 'TmForever') {
+			$mapsDirectory = $queriesData['GetMapsDirectory'] ?? $queriesData['GetTracksDirectory'] ?? null;
+			if( is_string($mapsDirectory) && $mapsDirectory !== '' && isset($currentMapInfo['FileName']) && is_string($currentMapInfo['FileName']) ){
+				$mapFileName = self::translateServerPath($mapsDirectory) . $currentMapInfo['FileName'];
+				
+				// Files are readable only when AdminServ shares the filesystem with the game server
+				if( is_file($mapFileName) ){
+					if( !isMpApi() ){
 						$Gbx = new GBXChallengeFetcher($mapFileName, false, true);
-					} else {
+					}
+					else{
 						$Gbx = new GBXChallMapFetcher(false, true);
 						$Gbx->processFile($mapFileName);
 					}
-
-					// Safely encode the thumbnail if it exists
 					$out['map']['thumb'] = isset($Gbx->thumbnail) ? base64_encode((string) $Gbx->thumbnail) : null;
 				}
-			} else {
-				// Log an error or handle the unexpected data type gracefully
-				error_log('Invalid map directory or filename: ' . json_encode($queriesData) . ' | ' . json_encode($currentMapInfo));
 			}
-
+			else if( AdminServAdminLevel::isType('Admin') ){
+				error_log('Invalid map directory or filename: '.json_encode($mapsDirectory).' | '.json_encode($currentMapInfo['FileName'] ?? null));
+			}
+			
 			
 			$out['map']['callvote']['login'] = $queriesData['GetCurrentCallVote']['CallerLogin'];
 			$out['map']['callvote']['cmdname'] = $queriesData['GetCurrentCallVote']['CmdName'];
@@ -799,7 +827,7 @@ class AdminServ {
 		
 		// Method depending on the game
 		if($cmd != 'ForceEndRound'){
-			if(SERVER_VERSION_NAME == 'TmForever'){
+			if(!isMpApi()){
 				$queries = ['restartMap' => 'RestartChallenge', 'nextMap' => 'NextChallenge', 'getCurrentMapIndex' => 'GetCurrentChallengeIndex', 'setNextMapIndex' => 'SetNextChallengeIndex'];
 			}else{
 				$queries = ['restartMap' => 'RestartMap', 'nextMap' => 'NextMap', 'getCurrentMapIndex' => 'GetCurrentMapIndex', 'setNextMapIndex' => 'SetNextMapIndex'];
@@ -939,7 +967,7 @@ class AdminServ {
 	* @return array
 	*/
 	public static function getServerOptionsStruct(){
-		if(SERVER_VERSION_NAME == 'TmForever'){
+		if(!isMpApi()){
 			$keys = ['allowMapDownload' => 'AllowChallengeDownload'];
 		}
 		else{
@@ -1196,7 +1224,7 @@ class AdminServ {
 		else{ $NextForceShowAllOpponents = intval($_POST['NextForceShowAllOpponentsValue']); }
 		
 		$out = ['GameMode' => intval($_POST['NextGameMode']), 'ChatTime' => TimeDate::secToMillisec( intval($_POST['NextChatTime'] - 8) ), 'RoundsPointsLimit' => intval($_POST['NextRoundsPointsLimit']), 'RoundCustomPoints' => intval($_POST['NextRoundCustomPoints']), 'RoundsUseNewRules' => array_key_exists('NextRoundsUseNewRules', $_POST), 'RoundsForcedLaps' => intval($_POST['NextRoundsForcedLaps']), 'RoundsPointsLimitNewRules' => intval($_POST['NextRoundsPointsLimit']), 'TimeAttackLimit' => TimeDate::secToMillisec( intval($_POST['NextTimeAttackLimit']) ), 'TimeAttackSynchStartPeriod' => TimeDate::secToMillisec( intval($_POST['NextTimeAttackSynchStartPeriod']) ), 'TeamPointsLimit' => intval($_POST['NextTeamPointsLimit']), 'TeamMaxPoints' => intval($_POST['NextTeamMaxPoints']), 'TeamUseNewRules' => array_key_exists('NextTeamUseNewRules', $_POST), 'TeamPointsLimitNewRules' => intval($_POST['NextTeamPointsLimit']), 'LapsNbLaps' => intval($_POST['NextLapsNbLaps']), 'LapsTimeLimit' => TimeDate::secToMillisec( intval($_POST['NextLapsTimeLimit']) ), 'FinishTimeout' => $FinishTimeout, 'AllWarmUpDuration' => intval($_POST['NextAllWarmUpDuration']), 'DisableRespawn' => $DisableRespawn, 'ForceShowAllOpponents' => $NextForceShowAllOpponents, 'CupPointsLimit' => intval($_POST['NextCupPointsLimit']), 'CupRoundsPerMap' => intval($_POST['NextCupRoundsPerMap']), 'CupNbWinners' => intval($_POST['NextCupNbWinners']), 'CupWarmUpDuration' => intval($_POST['NextCupWarmUpDuration'])];
-		if(SERVER_VERSION_NAME != 'TmForever'){
+		if(isMpApi()){
 			$out += ['ScriptName' => $_POST['NextScriptName']];
 		}
 		
@@ -1338,8 +1366,76 @@ class AdminServ {
 	}
 	
 	
+	/** Game server "Maps" folder as seen by AdminServ, without mapsbasepath */
+	private static ?string $localMapsRoot = null;
+	
+	
 	/**
-	* Get the path of the "Maps" folder
+	* Convert a path reported by the game server into the path visible to AdminServ
+	* (see 'remoteroot' and 'localroot' in the server config)
+	*
+	* @param string $path -> Path returned by the game server
+	* @return string with trailing slash
+	*/
+	public static function translateServerPath($path){
+		$path = Str::toSlash((string) $path);
+		if( !str_ends_with($path, '/') ){ $path .= '/'; }
+		
+		if( SERVER_REMOTE_ROOT !== '' && SERVER_LOCAL_ROOT !== '' ){
+			$remote = rtrim(Str::toSlash(SERVER_REMOTE_ROOT), '/').'/';
+			$local = rtrim(Str::toSlash(SERVER_LOCAL_ROOT), '/').'/';
+			if( str_starts_with($path, $remote) ){
+				$path = $local.substr($path, strlen($remote));
+			}
+		}
+		
+		return $path;
+	}
+	
+	
+	/**
+	* Convert a path visible to AdminServ back into the path used by the game server.
+	* Use it for every path sent over XML-RPC (AddMap, SaveMatchSettings, etc.)
+	*
+	* @param string $path -> Local path (file or folder)
+	* @return string
+	*/
+	public static function toServerPath($path){
+		$path = Str::toSlash((string) $path);
+		
+		if( SERVER_REMOTE_ROOT !== '' && SERVER_LOCAL_ROOT !== '' ){
+			$remote = rtrim(Str::toSlash(SERVER_REMOTE_ROOT), '/').'/';
+			$local = rtrim(Str::toSlash(SERVER_LOCAL_ROOT), '/').'/';
+			if( str_starts_with($path, $local) ){
+				$path = $remote.substr($path, strlen($local));
+			}
+		}
+		
+		return $path;
+	}
+	
+	
+	/**
+	* Get a local path relative to the game server's "Maps" folder (as WriteFile expects it)
+	*
+	* @param string $path -> Local path inside the "Maps" folder
+	* @return string or null if the path is outside the "Maps" folder
+	*/
+	public static function toMapsRelativePath($path){
+		$path = Str::toSlash((string) $path);
+		if( self::$localMapsRoot === null ){
+			self::getMapsDirectoryPath();
+		}
+		
+		if( self::$localMapsRoot !== null && str_starts_with($path, self::$localMapsRoot) ){
+			return substr($path, strlen(self::$localMapsRoot));
+		}
+		return null;
+	}
+	
+	
+	/**
+	* Get the path of the "Maps" folder as seen by AdminServ
 	*
 	* @global resource $client -> The client must be initialized
 	* @return string
@@ -1348,7 +1444,7 @@ class AdminServ {
 		global $client;
 		$out = null;
 		
-		if(SERVER_VERSION_NAME == 'TmForever'){
+		if(!isMpApi()){
 			$queryName = 'GetTracksDirectory';
 		}
 		else{
@@ -1359,8 +1455,8 @@ class AdminServ {
 			$out = '['.$client->getErrorCode().'] '.$client->getErrorMessage();
 		}
 		else{
-			$out = Str::toSlash( $client->getResponse() );
-			if( !str_ends_with($out, '/')){ $out .= '/'; }
+			$out = self::translateServerPath( $client->getResponse() );
+			self::$localMapsRoot = $out;
 			if(SERVER_MAPS_BASEPATH){
 				$out .= Str::toSlash(SERVER_MAPS_BASEPATH);
 				if( !str_ends_with($out, '/')){ $out .= '/'; }
@@ -1410,7 +1506,7 @@ class AdminServ {
 		$out = [];
 		
 		// Methods
-		if(SERVER_VERSION_NAME == 'TmForever'){
+		if(!isMpApi()){
 			$queryName = ['mapList' => 'GetChallengeList', 'mapIndex' => 'GetCurrentChallengeIndex'];
 		}
 		else{
@@ -1500,7 +1596,7 @@ class AdminServ {
 		$out = [];
 		
 		// Methods
-		if(SERVER_VERSION_NAME == 'TmForever'){
+		if(!isMpApi()){
 			$queryName = ['mapList' => 'GetChallengeList'];
 		}
 		else{
@@ -1606,7 +1702,7 @@ class AdminServ {
 					foreach($cacheMissingFiles as $file => $values){
 						// Data
 						$processFile = mb_convert_encoding($file, 'ISO-8859-1');
-						if(SERVER_VERSION_NAME == 'TmForever'){
+						if(!isMpApi()){
 							$Gbx = new GBXChallengeFetcher($path.$processFile);
 						}
 						else{
@@ -1823,7 +1919,8 @@ class AdminServ {
 	public static function saveMatchSettings($filename, $struct){
 		$out = false;
 		
-		if(SERVER_VERSION_NAME == 'TmForever'){
+		// <challenge> tag confirmed live on TmForever; assumed (not live-tested) for TmClassic/TmUnited
+		if(!isMpApi()){
 			$mapField = 'challenge';
 		}
 		else{
@@ -1874,18 +1971,29 @@ class AdminServ {
 				$map = $playlist->appendChild($map);
 				$file = $xml->createElement('file', $dataFile);
 				$file = $map->appendChild($file);
-				if(SERVER_VERSION_NAME == 'TmForever'){
+				if(!isMpApi()){
 					$ident = $xml->createElement('ident', $dataIdent);
 					$ident = $map->appendChild($ident);
 				}
 			}
 		}
 		
-		if( !$xml->save($filename) ){
-			$out = Utils::t('Saving XML file error');
+		// Write locally when possible, otherwise let the game server write the file
+		$directory = dirname((string) $filename);
+		if( is_dir($directory) && is_writable($directory) ){
+			$out = ($xml->save($filename) !== false) ? true : Utils::t('Saving XML file error');
+		}
+		else if( ($relativePath = self::toMapsRelativePath($filename)) !== null ){
+			global $client;
+			if( !$client->query('WriteFile', $relativePath, new IXR_Base64($xml->saveXML())) ){
+				$out = '['.$client->getErrorCode().'] '.$client->getErrorMessage();
+			}
+			else{
+				$out = true;
+			}
 		}
 		else{
-			$out = true;
+			$out = Utils::t('Saving XML file error');
 		}
 		
 		return $out;
@@ -1912,7 +2020,7 @@ class AdminServ {
 			// Gameinfos
 			if( in_array('gameinfos', $list) ){
 				$fields = ['game_mode' => 'GameMode', 'chat_time' => 'ChatTime', 'finishtimeout' => 'FinishTimeout', 'allwarmupduration' => 'AllWarmUpDuration', 'disablerespawn' => 'DisableRespawn', 'forceshowallopponents' => 'ForceShowAllOpponents', 'rounds_pointslimit' => 'RoundsPointsLimit', 'rounds_custom_points' => 'RoundCustomPoints', 'rounds_usenewrules' => 'RoundsUseNewRules', 'rounds_forcedlaps' => 'RoundsForcedLaps', 'rounds_pointslimitnewrules' => 'RoundsPointsLimitNewRules', 'team_pointslimit' => 'TeamPointsLimit', 'team_maxpoints' => 'TeamMaxPoints', 'team_usenewrules' => 'TeamUseNewRules', 'team_pointslimitnewrules' => 'TeamPointsLimitNewRules', 'timeattack_limit' => 'TimeAttackLimit', 'timeattack_synchstartperiod' => 'TimeAttackSynchStartPeriod', 'laps_nblaps' => 'LapsNbLaps', 'laps_timelimit' => 'LapsTimeLimit', 'cup_pointslimit' => 'CupPointsLimit', 'cup_roundsperchallenge' => 'CupRoundsPerMap', 'cup_nbwinners' => 'CupNbWinners', 'cup_warmupduration' => 'CupWarmUpDuration'];
-				if(SERVER_VERSION_NAME != 'TmForever'){
+				if(isMpApi()){
 					$fields['script_name'] = 'ScriptName';
 				}
 				
@@ -1969,7 +2077,7 @@ class AdminServ {
 					$out['StartIndex'] = $fieldStartIndex->item(0)->nodeValue;
 				}
 				
-				$mapsField = (SERVER_VERSION_NAME == 'TmForever') ? 'challenge' : 'map';
+				$mapsField = (!isMpApi()) ? 'challenge' : 'map';
 				$fieldMaps = $xml->getElementsByTagName($mapsField);
 				
 				foreach($fieldMaps as $map){
@@ -2015,7 +2123,7 @@ class AdminServ {
 			foreach($maps as $mapFileName){
 				if( in_array(File::getDoubleExtension($mapFileName), AdminServConfig::$MAP_EXTENSION) ){
 					// Data
-					if(SERVER_VERSION_NAME == 'TmForever'){
+					if(!isMpApi()){
 						$Gbx = new GBXChallengeFetcher($path.Str::toSlash($mapFileName));
 					}
 					else{

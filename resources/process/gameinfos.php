@@ -45,7 +45,7 @@
 			if(SERVER_MATCHSET){
 				$mapsDirectory = AdminServ::getMapsDirectoryPath();
 				if( array_key_exists('SaveCurrentMatchSettings', $_POST) ){
-					if( !$client->query('SaveMatchSettings', $mapsDirectory . SERVER_MATCHSET) ){
+					if( !$client->query('SaveMatchSettings', AdminServ::toServerPath($mapsDirectory . SERVER_MATCHSET)) ){
 						AdminServ::error();
 					}
 				}

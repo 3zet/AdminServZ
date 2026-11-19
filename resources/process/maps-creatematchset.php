@@ -95,7 +95,7 @@
 		$struct['startindex'] = 1;
 		$maps = $_SESSION['adminserv']['matchset_maps_selected']['lst'];
 		if( isset($maps) && is_array($maps) && !empty($maps) ){
-			$mapsField = (SERVER_VERSION_NAME == 'TmForever') ? 'challenge' : 'map';
+			$mapsField = (!isMpApi()) ? 'challenge' : 'map';
 			foreach($maps as $values){
 				$struct[$mapsField][$values['UId']] = $values['FileName'];
 			}
@@ -110,7 +110,7 @@
 			$action = Utils::t('The MatchSettings "!matchSettingName" was successfully created in the folder', ['!matchSettingName' => $matchSettingName]).' : '.$data['mapsDirectoryPath'].$args['directory'];
 			AdminServ::info($action);
 			AdminServLogs::add('action', $action);
-			Utils::redirection(false, '?p='.USER_PAGE .$hasDirectory);
+			Utils::redirection(false, '?p='.USER_PAGE .$data['hasDirectory']);
 		}
 	}
 	else{

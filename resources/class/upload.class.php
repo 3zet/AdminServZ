@@ -201,7 +201,7 @@ class UploadedFileForm {
 		$str64 = new IXR_Base64($str);
 		
 		if( !$client->query('WriteFile', $filename, $str64) ){
-			$out = '['.$client->getErrorCode().'] '.$client->getErrorMessage().'opuet';
+			$out = '['.$client->getErrorCode().'] '.$client->getErrorMessage();
 		}
 		
 		return $out;
@@ -221,12 +221,12 @@ class UploadedFileForm {
 		
 		if($queries['type'] == 'insert'){
 			if( !$client->query($queries['insert'], $filename) ){
-				$out = '['.$client->getErrorCode().'] '.$client->getErrorMessage().'insert';
+				$out = '['.$client->getErrorCode().'] '.$client->getErrorMessage();
 			}
 		}
 		else{
 			if( !$client->query($queries['add'], $filename) ){
-				$out = '['.$client->getErrorCode().'] '.$client->getErrorMessage().'add';
+				$out = '['.$client->getErrorCode().'] '.$client->getErrorMessage();
 			}
 		}
 		
@@ -443,12 +443,12 @@ class FileUploader {
 	* Save the sent file to a folder on a Maniaplanet server
 	*
 	* @param resource $client           -> The XMLRPC client resource
-	* @param string   $uploadDirectory  -> Path of the destination folder
-	* @param bool     $replaceOldFile   -> Replace existing files with the same name? No by default
+	* @param string   $localDirectory   -> Writable local destination folder, or null to write through the game server (WriteFile)
+	* @param string   $serverDirectory  -> The destination folder as the game server sees it
 	* @param function $filenameFunction -> The function that processes the filename
 	* @return array('success' => true) or array('error' => 'error message')
 	*/
-	public function handleUploadManiaPlanetServer($client, string $uploadDirectory, $queries, $filenameFunction = null): array{
+	public function handleUploadManiaPlanetServer($client, ?string $localDirectory, string $serverDirectory, $queries, $filenameFunction = null): array{
 		// If the client is initialized
 		if (!$client->socket || $client->protocol == 0) {
 			return ['error' => Utils::t('Client not initialized')];
@@ -483,14 +483,15 @@ class FileUploader {
 		
 		// Save the file
 		$error = false;
-		$pathToFile = $uploadDirectory.$filename.'.'.$ext;
-		if( file_exists($uploadDirectory) ){
-			if( ($result = $this->file->save($pathToFile)) !== true ){
+		$fileName = $filename.'.'.$ext;
+		$serverPathToFile = $serverDirectory.$fileName;
+		if( $localDirectory !== null ){
+			if( ($result = $this->file->save($localDirectory.$fileName)) !== true ){
 				$error = true;
 			}
 		}
 		else{
-			if( ($result = $this->file->writeMap($client, $pathToFile)) !== true ){
+			if( ($result = $this->file->writeMap($client, $serverPathToFile)) !== true ){
 				$error = true;
 			}
 		}
@@ -498,7 +499,7 @@ class FileUploader {
 		if(!$error){
 			// Add/insert the map
 			if( isset($_GET['type']) && $_GET['type'] != 'local' ){
-				$out = $this->file->saveMap($client, $pathToFile, $queries);
+				$out = $this->file->saveMap($client, $serverPathToFile, $queries);
 			}
 			// Local upload only
 			else{
@@ -561,16 +562,17 @@ class FileUploader {
 	* Save the sent file to a Maniaplanet dedicated server
 	*
 	* @param resource $client            -> The XMLRPC client resource
-	* @param string   $uploadDirectory   -> Path of the destination folder
+	* @param string   $localDirectory    -> Writable local destination folder, or null to write through the game server
+	* @param string   $serverDirectory   -> The destination folder as the game server sees it
 	* @param array    $queries           -> Queries to run and the type of list addition: array('insert' => 'InsertMap', 'add' => 'AddMap', 'type' => 'add')
 	* @param array    $allowedExtensions -> Allowed extensions: array('jpg', 'png', 'gif');
 	* @param int      $sizeLimit         -> Upload size limit (equal to or lower than the PHP config)
 	* @param function $filenameFunction  -> The function that processes the filename
 	* @return array('success' => true) or array('error' => 'error message')
 	*/
-	public static function saveUploadedFileToManiaPlanetServer($client, $uploadDirectory, $queries, $allowedExtensions = [], $sizeLimit = 10485760, $filenameFunction = null){
+	public static function saveUploadedFileToManiaPlanetServer($client, $localDirectory, $serverDirectory, $queries, $allowedExtensions = [], $sizeLimit = 10485760, $filenameFunction = null){
 		$uploader = new FileUploader($allowedExtensions, $sizeLimit);
-		return $uploader->handleUploadManiaPlanetServer($client, $uploadDirectory, $queries, $filenameFunction);
+		return $uploader->handleUploadManiaPlanetServer($client, $localDirectory, $serverDirectory, $queries, $filenameFunction);
 	}
 }
 ?>

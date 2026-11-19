@@ -6,7 +6,7 @@
 		
 		$newServerList = [];
 		foreach($list as $listServerName){
-			$newServerList[$listServerName] = ['address' => $serverList[$listServerName]['address'], 'port' => $serverList[$listServerName]['port'], 'mapsbasepath' => $serverList[$listServerName]['mapsbasepath'] ?? '', 'matchsettings' => $serverList[$listServerName]['matchsettings'], 'adminlevel' => $serverList[$listServerName]['adminlevel']];
+			$newServerList[$listServerName] = ['address' => $serverList[$listServerName]['address'], 'port' => $serverList[$listServerName]['port'], 'mapsbasepath' => $serverList[$listServerName]['mapsbasepath'] ?? '', 'matchsettings' => $serverList[$listServerName]['matchsettings'], 'remoteroot' => $serverList[$listServerName]['remoteroot'] ?? '', 'localroot' => $serverList[$listServerName]['localroot'] ?? '', 'adminlevel' => $serverList[$listServerName]['adminlevel']];
 		}
 		
 		AdminServServerConfig::saveServerConfig([], -1, $newServerList);

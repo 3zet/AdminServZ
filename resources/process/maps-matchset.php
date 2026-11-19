@@ -2,7 +2,7 @@
 	// ACTIONS
 	if( isset($_POST['saveMatchset']) && isset($_POST['matchset']) && count($_POST['matchset']) > 0 ){
 		foreach($_POST['matchset'] as $matchset){
-			if( !$client->query('SaveMatchSettings', $data['mapsDirectoryPath'].$matchset) ){
+			if( !$client->query('SaveMatchSettings', AdminServ::toServerPath($data['mapsDirectoryPath'].$matchset)) ){
 				AdminServ::error();
 			}
 			else{
@@ -13,7 +13,7 @@
 	}
 	else if( isset($_POST['loadMatchset']) && isset($_POST['matchset']) && count($_POST['matchset']) > 0 ){
 		foreach($_POST['matchset'] as $matchset){
-			if( !$client->query('LoadMatchSettings', $data['mapsDirectoryPath'].$matchset) ){
+			if( !$client->query('LoadMatchSettings', AdminServ::toServerPath($data['mapsDirectoryPath'].$matchset)) ){
 				AdminServ::error();
 			}
 			else{
@@ -24,7 +24,7 @@
 	}
 	else if( isset($_POST['addMatchset']) && isset($_POST['matchset']) && count($_POST['matchset']) > 0 ){
 		foreach($_POST['matchset'] as $matchset){
-			if( !$client->query('AppendPlaylistFromMatchSettings', $data['mapsDirectoryPath'].$matchset) ){
+			if( !$client->query('AppendPlaylistFromMatchSettings', AdminServ::toServerPath($data['mapsDirectoryPath'].$matchset)) ){
 				AdminServ::error();
 			}
 			else{
@@ -35,7 +35,7 @@
 	}
 	else if( isset($_POST['insertMatchset']) && isset($_POST['matchset']) && count($_POST['matchset']) > 0 ){
 		foreach($_POST['matchset'] as $matchset){
-			if( !$client->query('InsertPlaylistFromMatchSettings', $data['mapsDirectoryPath'].$matchset) ){
+			if( !$client->query('InsertPlaylistFromMatchSettings', AdminServ::toServerPath($data['mapsDirectoryPath'].$matchset)) ){
 				AdminServ::error();
 			}
 			else{

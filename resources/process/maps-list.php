@@ -2,7 +2,7 @@
 	// GAME VERSION
 	// RemoveChallengeList / ChooseNextChallengeList — TmForever
 	// RemoveMapList       / ChooseNextMapList        — ManiaPlanet + TM2020
-	if(SERVER_VERSION_NAME == 'TmForever'){
+	if(!isMpApi()){
 		$queries = ['removeMap' => 'RemoveChallengeList', 'chooseNextMap' => 'ChooseNextChallengeList'];
 	}
 	else{

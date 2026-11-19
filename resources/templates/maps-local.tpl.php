@@ -71,13 +71,13 @@
 						<span class="selected-files-title"><?php echo Utils::t('For the selection'); ?></span>
 						<span class="selected-files-count">(0)</span>
 						<div class="selected-files-option">
-							<?php if (AdminServAdminLevel::hasPermission('maps_local_delete')): ?>
+							<?php if (IS_LOCAL_WRITABLE && AdminServAdminLevel::hasPermission('maps_local_delete')): ?>
 								<input class="button dark" type="submit" name="deleteMap" id="deleteMap" value="<?php echo Utils::t('Delete'); ?>" data-confirm="<?php echo Utils::t('Do you really want to remove this selection?'); ?>" />
 							<?php endif; ?>
-							<?php if (AdminServAdminLevel::hasPermission('maps_local_move')): ?>
+							<?php if (IS_LOCAL_WRITABLE && AdminServAdminLevel::hasPermission('maps_local_move')): ?>
 								<input class="button dark" type="button" name="moveMap" id="moveMap" value="<?php echo Utils::t('Move'); ?>" />
 							<?php endif; ?>
-							<?php if (AdminServAdminLevel::hasPermission('maps_local_rename')): ?>
+							<?php if (IS_LOCAL_WRITABLE && AdminServAdminLevel::hasPermission('maps_local_rename')): ?>
 								<input class="button dark" type="button" name="renameMap" id="renameMap" value="<?php echo Utils::t('Rename'); ?>" />
 							<?php endif; ?>
 							<?php if (AdminServAdminLevel::hasPermission('maps_local_download')): ?>
@@ -93,13 +93,13 @@
 					</div>
 				</div>
 			<?php endif; ?>
-			<?php if (AdminServAdminLevel::hasPermission('maps_local_rename')): ?>
+			<?php if (IS_LOCAL_WRITABLE && AdminServAdminLevel::hasPermission('maps_local_rename')): ?>
 				<div id="form-rename-map" class="option-form" hidden="hidden"
 					data-cancel="<?php echo Utils::t('Cancel'); ?>"
 					data-rename="<?php echo Utils::t('Rename'); ?>"
 					data-autorename="<?php echo Utils::t('Replace the special characters'); ?>"></div>
 			<?php endif; ?>
-			<?php if (AdminServAdminLevel::hasPermission('maps_local_move')): ?>
+			<?php if (IS_LOCAL_WRITABLE && AdminServAdminLevel::hasPermission('maps_local_move')): ?>
 				<div id="form-move-map" class="option-form" hidden="hidden"
 					data-cancel="<?php echo Utils::t('Cancel'); ?>"
 					data-move="<?php echo Utils::t('Move'); ?>"

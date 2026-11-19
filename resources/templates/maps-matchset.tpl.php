@@ -58,7 +58,7 @@
 						<span class="selected-files-title"><?php echo Utils::t('For the selection'); ?></span>
 						<span class="selected-files-count">(0)</span>
 						<div class="selected-files-option">
-							<?php if (AdminServAdminLevel::hasPermission('maps_matchsettings_delete')): ?>
+							<?php if (IS_LOCAL_WRITABLE && AdminServAdminLevel::hasPermission('maps_matchsettings_delete')): ?>
 								<input class="button dark" type="submit" name="deleteMatchset" id="deleteMatchset" value="<?php echo Utils::t('Delete'); ?>" />
 							<?php endif; ?>
 							<?php if (AdminServAdminLevel::hasPermission('maps_matchsettings_edit')): ?>

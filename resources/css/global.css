@@ -817,13 +817,17 @@ footer {
    ============================================================ */
 .current_map { float: left; width: 70%; }
 #map_enviro img { margin: 0 0 -3px 5px; }
+/* Thumbnail sits inside the "Current map" content box, to the right of the table */
+.content:has(> #map_thumbnail) { position: relative; }
+.content:has(> #map_thumbnail) .current_map { width: calc(100% - 160px); table-layout: fixed; }
+.current_map td.value { overflow-wrap: anywhere; word-break: break-all; }
+.current_map td.value#map_name, .current_map td.value#map_author { word-break: normal; }
 #map_thumbnail {
 	position: absolute; top: 0; right: 0;
 	padding: 8px;
-	min-width: 128px; min-height: 128px;
 	background: #fff; border: 1px solid #e4e4e4;
 	border-width: 0 0 1px 1px;
-	border-radius: 0 8px;
+	border-radius: 0 0 0 8px;
 }
 #map_thumbnail img { display: block; width: 128px; }
 #map_currentcallvote { display: block; width: 157%; height: 35px; line-height: 35px; }

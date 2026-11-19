@@ -2,7 +2,7 @@
 	// GAME VERSION
 	// InsertChallenge / AddChallenge — TmForever
 	// InsertMap       / AddMap       — ManiaPlanet + TM2020 (identical)
-	if(SERVER_VERSION_NAME == 'TmForever'){
+	if(!isMpApi()){
 		$queries = ['insert' => 'InsertChallenge', 'add' => 'AddChallenge'];
 	}
 	else{
@@ -12,7 +12,7 @@
 	// ACTIONS
 	if( isset($_POST['addMap']) && isset($_POST['map']) && count($_POST['map']) > 0 ){
 		foreach($_POST['map'] as $map){
-			if( !$client->query($queries['add'], $data['mapsDirectoryPath'].$map) ){
+			if( !$client->query($queries['add'], AdminServ::toServerPath($data['mapsDirectoryPath'].$map)) ){
 				AdminServ::error();
 			}
 			else{
@@ -22,7 +22,7 @@
 	}
 	else if( isset($_POST['insertMap']) && isset($_POST['map']) && count($_POST['map']) > 0 ){
 		foreach($_POST['map'] as $map){
-			if( !$client->query($queries['insert'], $data['mapsDirectoryPath'].$map) ){
+			if( !$client->query($queries['insert'], AdminServ::toServerPath($data['mapsDirectoryPath'].$map)) ){
 				AdminServ::error();
 			}
 			else{
@@ -69,7 +69,7 @@
 			$i++;
 		}
 
-		Utils::redirection(false, '?p='.USER_PAGE .$hasDirectory);
+		Utils::redirection(false, '?p='.USER_PAGE .$data['hasDirectory']);
 	}
 	else if( isset($_POST['renameAutoValid']) && isset($_POST['map']) && count($_POST['map']) > 0 && isset($_POST['renameMapList']) && count($_POST['renameMapList']) > 0 ){
 		$i = 0;
@@ -85,7 +85,7 @@
 			$i++;
 		}
 
-		Utils::redirection(false, '?p='.USER_PAGE .$hasDirectory);
+		Utils::redirection(false, '?p='.USER_PAGE .$data['hasDirectory']);
 	}
 	else if( isset($_POST['moveMapValid']) && isset($_POST['moveDirectoryList']) && isset($_POST['map']) && count($_POST['map']) > 0 ){
 		if($_POST['moveDirectoryList'] == '.'){
@@ -106,7 +106,7 @@
 			}
 		}
 
-		Utils::redirection(false, '?p='.USER_PAGE .$hasDirectory);
+		Utils::redirection(false, '?p='.USER_PAGE .$data['hasDirectory']);
 	}
 	else if( isset($_POST['deleteMap']) && isset($_POST['map']) && count($_POST['map']) > 0 ){
 		foreach($_POST['map'] as $map){
@@ -120,13 +120,13 @@
 			}
 		}
 
-		Utils::redirection(false, '?p='.USER_PAGE .$hasDirectory);
+		Utils::redirection(false, '?p='.USER_PAGE .$data['hasDirectory']);
 	}
 
 	// Save MatchSettings -- SaveMatchSettings available in MP and TM2020
 	if( (isset($_POST['addMap']) || isset($_POST['insertMap'])) && SERVER_MATCHSET ){
 		if( isset($_POST['SaveCurrentMatchSettings']) && array_key_exists('SaveCurrentMatchSettings', $_POST) ){
-			if( !$client->query('SaveMatchSettings', $data['mapsDirectoryPath'] . SERVER_MATCHSET) ){
+			if( !$client->query('SaveMatchSettings', AdminServ::toServerPath($data['mapsDirectoryPath'] . SERVER_MATCHSET)) ){
 				AdminServ::error();
 			}
 		}

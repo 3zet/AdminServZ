@@ -411,9 +411,8 @@ class AdminServUI {
 		
 		if( class_exists('ExtensionConfig') && isset(ExtensionConfig::$GAMEMODES) && count(ExtensionConfig::$GAMEMODES) > 0 ){
 			foreach(ExtensionConfig::$GAMEMODES as $gameModeId => $gameModeName){
-				// Cup nie istnieje w TmForever/TmUnited/TmClassic (potwierdzone zywym testem XML-RPC:
-				// GetCupPointsLimit/GetCupNbWinners/GetCupWarmUpDuration/GetRoundCustomPoints - wszystkie -506)
-				if( $gameModeName === 'Cup' && !isMpApi() ){ continue; }
+				// Cup only exists since TmForever (the Cup methods fault with -506 on the 2006-2007 servers)
+				if( $gameModeName === 'Cup' && isPreForever() ){ continue; }
 				$selected = ($gameModeId == $currentGameMode) ? ' selected="selected"' : null;
 				$out .= '<option value="'.$gameModeId.'"'.$selected.'>'.$gameModeName.'</option>';
 			}
@@ -453,7 +452,7 @@ class AdminServUI {
 		global $client;
 		$out = '<option value="null">'.Utils::t('No player available').'</option>';
 		
-		if( !$client->query('GetPlayerList', AdminServConfig::LIMIT_PLAYERS_LIST, 0, 1) ){
+		if( !$client->query('GetPlayerList', ...playerListArgs()) ){
 			AdminServ::error();
 		}
 		else{

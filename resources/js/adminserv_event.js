@@ -485,8 +485,17 @@ $(document).ready(function(){
 				}
 			});
 			
-			// Script Settings -- inline (TM2020): load on page start
+			// Script Settings -- inline (ManiaPlanet and TM2020): load on page start
 			getScriptSettings();
+
+			// "Script settings" link in the Script game mode block: jump to the inline section
+			$('#getScriptSettings').click(function(event){
+				event.preventDefault();
+				var $section = $('#tm2020-script-settings');
+				if( $section.length && !$section.attr('hidden') ){
+					$('html, body').animate({scrollTop: $section.offset().top - 20}, 'fast');
+				}
+			});
 
 			// Script Settings -- inline save
 			$(document).on('click', '#inlineScriptSettingsSaveBtn', function(){

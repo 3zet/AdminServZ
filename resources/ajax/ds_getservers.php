@@ -1,4 +1,6 @@
 <?php
+	// JSON endpoint: PHP notices must never reach the response body (they still go to the error log)
+	ini_set('display_errors', '0');
 	// AUTHENTICATION
 	$LEVEL = 'User';
 
@@ -53,16 +55,18 @@
 						// Server version -- detect the type before the multicall
 						$client->query('GetVersion');
 						$version = $client->getResponse();
-						$versionName = $version['Name']; // 'TmForever' | 'ManiaPlanet' | 'Trackmania'
+						$versionName = $version['Name'] ?? ''; // 'TmForever' | 'ManiaPlanet' | 'Trackmania' | pre-Forever titles
+						// Challenge-era servers: TmForever and the 2006-2007 titles (TmUnited, TmNationsESWC, TmSunrise, TmOriginal)
+						$isChallengeApi = in_array($versionName, ['TmForever', 'TmUnited', 'TmNationsESWC', 'TmSunrise', 'TmOriginal'], true);
 
 						$out['servers'][$serverId]['version']['name'] = $versionName;
 
 						// Link protocol
-						$linkProtocol = ($versionName == 'TmForever') ? 'tmtp' : 'maniaplanet';
+						$linkProtocol = $isChallengeApi ? 'tmtp' : 'maniaplanet';
 						$out['servers'][$serverId]['version']['protocol'] = $linkProtocol;
 
 						// Map info method name
-						$queryName = ['getMapInfo' => ($versionName == 'TmForever') ? 'GetCurrentChallengeInfo' : 'GetCurrentMapInfo'];
+						$queryName = ['getMapInfo' => $isChallengeApi ? 'GetCurrentChallengeInfo' : 'GetCurrentMapInfo'];
 
 						// Requests -- GetGameMode replaced by GetModeScriptInfo for TM2020
 						$client->addCall('GetServerName');
@@ -83,14 +87,14 @@
 
 						$out['servers'][$serverId]['name'] = TmNick::toHtml($queriesData['GetServerName'], 10, true, false, '#999');
 
-						// Login + Title
+						// Login + Title (pre-Forever servers have no GetSystemInfo, so no login to join with)
 						$system = $queriesData['GetSystemInfo'];
-						$out['servers'][$serverId]['serverlogin'] = $system['ServerLogin'];
-						$title = ($versionName != 'TmForever') ? ($system['TitleId'] ?? null) : null;
+						$out['servers'][$serverId]['serverlogin'] = $system['ServerLogin'] ?? '';
+						$title = !$isChallengeApi ? ($system['TitleId'] ?? null) : null;
 						$out['servers'][$serverId]['version']['title'] = $title;
 
 						// Status
-						$out['servers'][$serverId]['status'] = $queriesData['GetStatus']['Name'];
+						$out['servers'][$serverId]['status'] = $queriesData['GetStatus']['Name'] ?? '';
 
 						// GameMode -- TM2020 is always in Script mode
 						if($versionName == 'Trackmania'){
@@ -103,14 +107,14 @@
 							$out['servers'][$serverId]['gamemode'] = 'Script ('.$scriptShort.')';
 						}
 						else{
-							// ManiaPlanet / TmForever — oryginalna logika
-							$gameMode = $queriesData['GetGameMode'];
+							// ManiaPlanet / challenge-era servers
+							$gameMode = (int) ($queriesData['GetGameMode'] ?? 0);
 							// LOCAL array for displayserv reading only (NOT ExtensionConfig::$GAMEMODES,
 							// because that config is also used by the save dropdown in Game Infos and has
 							// its own, DIFFERENT numbering that works correctly for SetGameInfos -- don't touch).
 							$gameModeListNameRead = ['Script', 'Rounds', 'TimeAttack', 'Team', 'Laps', 'Stunts', 'Cup'];
-							if($versionName == 'TmForever'){
-								// TMF: GetGameMode returns raw Rounds(0),TimeAttack(1),Team(2),Laps(3),Stunts(4),Cup(5)
+							if($isChallengeApi){
+								// TMF and older: GetGameMode returns raw Rounds(0),TimeAttack(1),Team(2),Laps(3),Stunts(4),Cup(5)
 								// -- with no Script mode at 0, hence the +1 correction for READING only (displayserv).
 								$gameMode++;
 							}
@@ -129,7 +133,7 @@
 
 						// Map
 						$currentMapInfo = $queriesData[$queryName['getMapInfo']];
-						$currentMapEnv = $currentMapInfo['Environnement'];
+						$currentMapEnv = $currentMapInfo['Environnement'] ?? '';
 						if($currentMapEnv == 'Speed'){ $currentMapEnv = 'Desert'; }
 						else if($currentMapEnv == 'Alpine'){ $currentMapEnv = 'Snow'; }
 						$currentMapEnvFile = null;
@@ -137,7 +141,7 @@
 						if( file_exists('../../'.$pathToEnvFile) ){
 							$currentMapEnvFile = $pathToEnvFile;
 						}
-						$out['servers'][$serverId]['map']['name'] = TmNick::toHtml(htmlspecialchars((string) $currentMapInfo['Name'], ENT_QUOTES, 'UTF-8'), 10, true, false, '#999');
+						$out['servers'][$serverId]['map']['name'] = TmNick::toHtml(htmlspecialchars((string) ($currentMapInfo['Name'] ?? ''), ENT_QUOTES, 'UTF-8'), 10, true, false, '#999');
 						$out['servers'][$serverId]['map']['env']['name'] = $currentMapEnv;
 						$out['servers'][$serverId]['map']['env']['filename'] = $currentMapEnvFile;
 
@@ -152,7 +156,8 @@
 								$isSpectator = $player['SpectatorStatus'] ?? $player['IsSpectator'] ?? 0;
 								$playerStatus = ($isSpectator != 0) ? Utils::t('Spectator') : Utils::t('Player');
 
-								if($player['TeamId'] == 0){ $teamName = Utils::t('Blue'); }
+								$player['TeamId'] ??= -1;
+					if($player['TeamId'] == 0){ $teamName = Utils::t('Blue'); }
 								else if($player['TeamId'] == 1){ $teamName = Utils::t('Red'); }
 								else{ $teamName = Utils::t('Spectator'); }
 
@@ -177,7 +182,7 @@
 						// Count players
 						$maxPlayers = $queriesData['GetMaxPlayers'];
 						$out['players'][$serverId]['count']['current'] = $countPlayerList;
-						$out['players'][$serverId]['count']['max'] = $maxPlayers['NextValue'];
+						$out['players'][$serverId]['count']['max'] = $maxPlayers['NextValue'] ?? 0;
 					}
 				}
 

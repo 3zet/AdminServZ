@@ -1,4 +1,6 @@
 <?php
+	// JSON endpoint: PHP notices must never reach the response body (they still go to the error log)
+	ini_set('display_errors', '0');
 	// INCLUDES
 	session_start();
 	$configPath = '../../'.$_SESSION['adminserv']['path'].'config/';

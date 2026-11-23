@@ -4,7 +4,7 @@
 		// Variables
 		$struct = AdminServ::getGameInfosStructFromPOST();
 
-		// TM2020 : SetGameInfos n'existe pas — on passe directement par SetScriptName
+		// TM2020 has no SetGameInfos: only the script name can be changed
 		if( isTM2020() ){
 			$newScript = trim((string)($_POST['NextScriptName'] ?? ''));
 			if( $newScript !== '' ){
@@ -14,7 +14,16 @@
 			}
 		}
 		else{
-			// Requests
+			// Pre-Forever servers only get the fields their own GameInfos struct has;
+			// FinishTimeout is set separately there
+			if( isPreForever() && $client->query('GetNextGameInfo') ){
+				$finishTimeout = $struct['FinishTimeout'];
+				$struct = array_intersect_key($struct, (array) $client->getResponse());
+				if( !$client->query('SetFinishTimeout', $finishTimeout) ){
+					AdminServ::error();
+				}
+			}
+
 			if(!$client->query('SetGameInfos', $struct) && $client->getErrorMessage() != 'Script not allowed for this title.'){
 				AdminServ::error();
 			}
@@ -30,7 +39,7 @@
 			}
 
 			// RoundCustomPoints
-			if( isset($_POST['NextRoundCustomPoints']) && $_POST['NextRoundCustomPoints'] != null){
+			if( !isPreForever() && isset($_POST['NextRoundCustomPoints']) && $_POST['NextRoundCustomPoints'] != null){
 				$NextRoundCustomPoints = explode(',', (string) $_POST['NextRoundCustomPoints']);
 				$NextRoundCustomPointsArray = [];
 				foreach($NextRoundCustomPoints as $point){

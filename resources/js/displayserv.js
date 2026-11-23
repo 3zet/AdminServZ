@@ -174,16 +174,23 @@
             }
             $card.find('.ds-server-currentmap').html((srv.map && srv.map.name ? srv.map.name : '') + envHtml);
 
-            // Join / spectate / favourite links
+            // Join / spectate / favourite links (pre-Forever servers report no login: hide them)
             var titleSuffix = vtitle ? '@' + vtitle : '';
-            if(settings.links.join){
-              $card.find('.ds-server-join').attr('href', vproto + '://#join=' + srv.serverlogin + titleSuffix);
+            var $links = $card.find('.ds-server-join, .ds-server-spectate, .ds-server-favourite');
+            if(!srv.serverlogin){
+              $links.hide();
             }
-            if(settings.links.spectate){
-              $card.find('.ds-server-spectate').attr('href', vproto + '://#spectate=' + srv.serverlogin + titleSuffix);
-            }
-            if(settings.links.addfavourite){
-              $card.find('.ds-server-favourite').attr('href', vproto + '://#addfavourite=' + srv.serverlogin + titleSuffix);
+            else{
+              $links.show();
+              if(settings.links.join){
+                $card.find('.ds-server-join').attr('href', vproto + '://#join=' + srv.serverlogin + titleSuffix);
+              }
+              if(settings.links.spectate){
+                $card.find('.ds-server-spectate').attr('href', vproto + '://#spectate=' + srv.serverlogin + titleSuffix);
+              }
+              if(settings.links.addfavourite){
+                $card.find('.ds-server-favourite').attr('href', vproto + '://#addfavourite=' + srv.serverlogin + titleSuffix);
+              }
             }
 
             // --- Players ---

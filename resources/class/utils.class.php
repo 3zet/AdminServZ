@@ -183,7 +183,7 @@ abstract class Utils {
 		}
 		else{
 			if( !isset($_SESSION['lang']) ){
-				$_SESSION['lang'] = substr((string) $_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+				$_SESSION['lang'] = substr((string) ($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? 'en'), 0, 2);
 			}
 		}
 		

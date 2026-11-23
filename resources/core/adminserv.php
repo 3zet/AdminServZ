@@ -3,47 +3,59 @@ define('ADMINSERV_TIMER', false);
 define('ADMINSERV_VERSION', '2.1.2-tm2020');
 
 /**
- * Wersje gry bez terminologii "Map" (uzywaja "Challenge"), bez Script mode,
- * bez trybu Cup w GameInfos i bez Script na pozycji 0 w enumie GameMode.
- * Potwierdzone empirycznie (zywe testy XML-RPC) dla wszystkich czterech tytulow.
+ * Game versions that say "Challenge" instead of "Map", have no Script mode
+ * and no Script at position 0 of the GameMode enum (confirmed with live XML-RPC tests).
  */
 const LEGACY_CHALLENGE_VERSIONS = ['TmForever', 'TmUnited', 'TmNationsESWC', 'TmSunrise', 'TmOriginal'];
 
 /**
- * Wersje TMO/TMSX/TMN (wspolny binarny TrackManiaServer.exe /game=X, identyczne
- * API - 140/140 metod XML-RPC identyczne, potwierdzone zywym testem).
+ * TMO / TMS / TMN-ESWC: one 2006 server binary selected with /game=X,
+ * identical XML-RPC API (140/140 methods, confirmed with a live test).
  */
 const TM_CLASSIC_VERSIONS = ['TmNationsESWC', 'TmSunrise', 'TmOriginal'];
 
 /**
- * Helper: true dla ManiaPlanet i TM2020 (wszystko poza starymi tytulami
- * korzystajacymi z terminologii "Challenge" zamiast "Map")
+ * True for ManiaPlanet and TM2020 (everything except the "Challenge" era titles)
  */
 function isMpApi(): bool {
 	return defined('SERVER_VERSION_NAME') && !in_array(SERVER_VERSION_NAME, LEGACY_CHALLENGE_VERSIONS, true);
 }
 
 /**
- * Helper: true tylko dla TM2020 (Name === 'Trackmania')
+ * True only for TM2020 (Name === 'Trackmania')
  */
 function isTM2020(): bool {
 	return defined('SERVER_VERSION_NAME') && SERVER_VERSION_NAME === 'Trackmania';
 }
 
 /**
- * Helper: true dla TMO / TMSX / TMN ESWC (wspolny binarny serwer 2006,
- * identyczne API dla wszystkich trzech tytulow)
+ * True for TMO / TMS / TMN-ESWC (shared 2006 server binary)
  */
 function isTmClassic(): bool {
 	return defined('SERVER_VERSION_NAME') && in_array(SERVER_VERSION_NAME, TM_CLASSIC_VERSIONS, true);
 }
 
 /**
- * Helper: true tylko dla TM United (bez Forever) - ma GetSystemInfo (okrojony),
- * manialinki, ignore list, billing; nadal brak Map/Script/Cup jak w TmClassic.
+ * True only for TM United (not Forever): has a reduced GetSystemInfo, manialinks,
+ * ignore list and billing, but like TmClassic no Map/Script/Cup.
  */
 function isTmUnited(): bool {
 	return defined('SERVER_VERSION_NAME') && SERVER_VERSION_NAME === 'TmUnited';
+}
+
+/** Pre-Forever servers (2006-2007): smaller API, list getters take exactly (max, start) */
+function isPreForever(): bool {
+	return isTmClassic() || isTmUnited();
+}
+
+/** Largest list size requested from the server (pre-Forever servers fault on large requests) */
+function listLimit(int $limit): int {
+	return isPreForever() ? min($limit, 100) : $limit;
+}
+
+/** Arguments for GetPlayerList: the 3rd "struct version" argument only exists since TmForever */
+function playerListArgs(): array {
+	return isPreForever() ? [listLimit(AdminServConfig::LIMIT_PLAYERS_LIST), 0] : [AdminServConfig::LIMIT_PLAYERS_LIST, 0, 1];
 }
 
 
@@ -223,7 +235,7 @@ class AdminServ {
 									define('API_VERSION', $getVersion['ApiVersion'] ?? '');
 								}
 
-								// SystemInfo (TmClassic: metoda GetSystemInfo nie istnieje, $getSystemInfo bedzie pusta [])
+								// SystemInfo (TmClassic has no GetSystemInfo: $getSystemInfo is an empty array)
 								$getSystemInfo = $queriesData['GetSystemInfo'];
 								define('SERVER_LOGIN', $getSystemInfo['ServerLogin'] ?? '');
 								define('SERVER_PUBLISHED_IP', $getSystemInfo['PublishedIp'] ?? '');
@@ -444,11 +456,13 @@ class AdminServ {
 		}
 		$client->addCall('GetServerName');
 		$client->addCall('GetStatus');
-		$client->addCall('GetCurrentCallVote');
+		if( !isPreForever() ){
+			$client->addCall('GetCurrentCallVote');
+		}
 		if( AdminServAdminLevel::isType('SuperAdmin') ){
 			$client->addCall('GetNetworkStats');
 		}
-		$client->addCall('GetPlayerList', [AdminServConfig::LIMIT_PLAYERS_LIST, 0, 1] );
+		$client->addCall('GetPlayerList', playerListArgs() );
 		
 		if( !$client->multiquery() ){
 			$out['error'] = Utils::t('Client not initialized');
@@ -480,10 +494,11 @@ class AdminServ {
 			
 			// CurrentMapInfo
 			$currentMapInfo = $queriesData[$queryName['getMapInfo']];
-			$out['map']['name'] = TmNick::toHtml($currentMapInfo['Name'], 10, true, false, '#999');
-			$out['map']['uid'] = $currentMapInfo['UId'];
-			$out['map']['author'] = $currentMapInfo['Author'];
-			$out['map']['enviro'] = $currentMapInfo['Environnement'];
+			$out['map']['name'] = TmNick::toHtml((string) ($currentMapInfo['Name'] ?? ''), 10, true, false, '#999');
+			$out['map']['uid'] = $currentMapInfo['UId'] ?? '';
+			// Pre-Forever challenge info has no Author
+			$out['map']['author'] = $currentMapInfo['Author'] ?? '-';
+			$out['map']['enviro'] = $currentMapInfo['Environnement'] ?? '';
 			
 			// Initialize the map thumbnail
 			$out['map']['thumb'] = null;
@@ -509,9 +524,9 @@ class AdminServ {
 			}
 			
 			
-			$out['map']['callvote']['login'] = $queriesData['GetCurrentCallVote']['CallerLogin'];
-			$out['map']['callvote']['cmdname'] = $queriesData['GetCurrentCallVote']['CmdName'];
-			$out['map']['callvote']['cmdparam'] = $queriesData['GetCurrentCallVote']['CmdParam'];
+			$out['map']['callvote']['login'] = $queriesData['GetCurrentCallVote']['CallerLogin'] ?? '';
+			$out['map']['callvote']['cmdname'] = $queriesData['GetCurrentCallVote']['CmdName'] ?? '';
+			$out['map']['callvote']['cmdparam'] = $queriesData['GetCurrentCallVote']['CmdParam'] ?? '';
 			
 			// TeamScores (team mode)
 			if( self::isGameMode('Team', $out['srv']['gameModeId']) ){
@@ -523,7 +538,7 @@ class AdminServ {
 			
 			$out['srv']['name'] = TmNick::toHtml($queriesData['GetServerName'], 10, true, false, '#999');
 			
-			$out['srv']['status'] = $queriesData['GetStatus']['Name'];
+			$out['srv']['status'] = $queriesData['GetStatus']['Name'] ?? '';
 			
 			// NetworkStats
 			if( isset($queriesData['GetNetworkStats']) && count($queriesData['GetNetworkStats']) > 0 ){
@@ -545,7 +560,7 @@ class AdminServ {
 			$countPlayerList = count($playerList);
 			
 			if( $countPlayerList > 0 ){
-				$client->query('GetCurrentRanking', AdminServConfig::LIMIT_PLAYERS_LIST, 0);
+				$client->query('GetCurrentRanking', listLimit(AdminServConfig::LIMIT_PLAYERS_LIST), 0);
 				$rankingList = $client->GetResponse();
 				$rankingKeyList = ['Rank', 'BestTime', 'BestCheckpoints', 'Score', 'NbrLapsFinished', 'LadderScore'];
 				$i = 0;
@@ -554,7 +569,7 @@ class AdminServ {
 					$out['ply'][$i]['NickName'] = TmNick::toHtml(htmlspecialchars((string) $player['NickName'], ENT_QUOTES, 'UTF-8'), 10, true);
 					$out['ply'][$i]['Login'] = $player['Login'];
 					
-					if($player['SpectatorStatus'] != 0){ $playerStatus = Utils::t('Spectator'); }else{ $playerStatus = Utils::t('Player'); }
+					if( ($player['SpectatorStatus'] ?? $player['IsSpectator'] ?? 0) != 0 ){ $playerStatus = Utils::t('Spectator'); }else{ $playerStatus = Utils::t('Player'); }
 					$out['ply'][$i]['PlayerStatus'] = $playerStatus;
 					
 					// Others
@@ -562,7 +577,7 @@ class AdminServ {
 					$out['ply'][$i]['TeamId'] = $player['TeamId'];
 					if($player['TeamId'] == 0){ $teamName = Utils::t('Blue'); }else if($player['TeamId'] == 1){ $teamName = Utils::t('Red'); }else{ $teamName = Utils::t('Spectator'); }
 					$out['ply'][$i]['TeamName'] = $teamName;
-					$out['ply'][$i]['SpectatorStatus'] = $player['SpectatorStatus'];
+					$out['ply'][$i]['SpectatorStatus'] = $player['SpectatorStatus'] ?? (int) ($player['IsSpectator'] ?? 0);
 					
 					// Rankings
 					foreach($rankingKeyList as $rankName){
@@ -570,6 +585,7 @@ class AdminServ {
 							$out['ply'][$i][$rankName] = $rankingList[$i][$rankName];
 						}
 					}
+					$player['LadderRanking'] ??= -1;
 					if($player['LadderRanking'] == -1){
 						$player['LadderRanking'] = Utils::t('Not rated');
 					}
@@ -680,7 +696,7 @@ class AdminServ {
 
 		// GetCurrentRanking: 0 as limit returns an empty list -- use a sensible limit
 		if($maxInfos === null){
-			$maxInfos = AdminServConfig::LIMIT_PLAYERS_LIST;
+			$maxInfos = listLimit(AdminServConfig::LIMIT_PLAYERS_LIST);
 		}
 
 		// Detect the current game mode / script name -- decides which columns to show
@@ -790,7 +806,7 @@ class AdminServ {
 		global $client;
 		$out = 0;
 		
-		if( !$client->query('GetPlayerList', AdminServConfig::LIMIT_PLAYERS_LIST, 0, 1) ){
+		if( !$client->query('GetPlayerList', ...playerListArgs()) ){
 			self::error();
 		}
 		else{
@@ -948,7 +964,10 @@ class AdminServ {
 			else{
 				$out['CurrentVehicleNetQualityName'] = isset($out['CurrentVehicleNetQuality']) ? Utils::t('Fast') : null;
 			}
-			$out['BuddyNotification'] = $queriesData['GetBuddyNotification'];
+			// null = not supported by this server (pre-Forever)
+			$out['BuddyNotification'] = is_bool($queriesData['GetBuddyNotification']) ? $queriesData['GetBuddyNotification'] : null;
+			$out['HideServer'] ??= null;
+			$out['AutoSaveReplays'] ??= null;
 			if(SERVER_VERSION_NAME == 'ManiaPlanet'){
 				$out['DisableHorns'] = $queriesData['AreHornsDisabled'];
 			}
@@ -974,9 +993,10 @@ class AdminServ {
 			$keys = ['allowMapDownload' => 'AllowMapDownload'];
 		}
 		
-		$out = ['Name' => stripslashes((string) $_POST['Name']), 'Comment' => stripslashes((string) $_POST['Comment']), 'Password' => trim((string) $_POST['Password']), 'PasswordForSpectator' => trim((string) $_POST['PasswordForSpectator']), 'NextMaxPlayers' => intval($_POST['NextMaxPlayers']), 'NextMaxSpectators' => intval($_POST['NextMaxSpectators']), 'IsP2PUpload' => array_key_exists('IsP2PUpload', $_POST), 'IsP2PDownload' => array_key_exists('IsP2PDownload', $_POST), 'NextLadderMode' => intval($_POST['NextLadderMode']), 'NextVehicleNetQuality' => intval($_POST['NextVehicleNetQuality']), 'NextCallVoteTimeOut' => TimeDate::secToMillisec( intval($_POST['NextCallVoteTimeOut']) ), 'CallVoteRatio' => (double)$_POST['CallVoteRatio'], $keys['allowMapDownload'] => array_key_exists('AllowMapDownload', $_POST), 'AutoSaveReplays' => array_key_exists('AutoSaveReplays', $_POST), 'HideServer' => (int)array_key_exists('HideServer', $_POST), 'BuddyNotification' => array_key_exists('BuddyNotification', $_POST)];
+		$out = ['Name' => stripslashes((string) ($_POST['Name'] ?? '')), 'Comment' => stripslashes((string) ($_POST['Comment'] ?? '')), 'Password' => trim((string) ($_POST['Password'] ?? '')), 'PasswordForSpectator' => trim((string) ($_POST['PasswordForSpectator'] ?? '')), 'NextMaxPlayers' => intval($_POST['NextMaxPlayers'] ?? 0), 'NextMaxSpectators' => intval($_POST['NextMaxSpectators'] ?? 0), 'IsP2PUpload' => array_key_exists('IsP2PUpload', $_POST), 'IsP2PDownload' => array_key_exists('IsP2PDownload', $_POST), 'NextLadderMode' => intval($_POST['NextLadderMode'] ?? 0), 'NextVehicleNetQuality' => intval($_POST['NextVehicleNetQuality'] ?? 0), 'NextCallVoteTimeOut' => TimeDate::secToMillisec( intval($_POST['NextCallVoteTimeOut'] ?? 0) ), 'CallVoteRatio' => (double) ($_POST['CallVoteRatio'] ?? -1), $keys['allowMapDownload'] => array_key_exists('AllowMapDownload', $_POST), 'AutoSaveReplays' => array_key_exists('AutoSaveReplays', $_POST), 'HideServer' => (int)array_key_exists('HideServer', $_POST), 'BuddyNotification' => array_key_exists('BuddyNotification', $_POST)];
 		if(SERVER_VERSION_NAME == 'ManiaPlanet'){
-			$out['ClientInputsMaxLatency'] = ($_POST['ClientInputsMaxLatency'] == 'more') ? $_POST['ClientInputsMaxLatencyValue'] : $_POST['ClientInputsMaxLatency'];
+			$clientInputsMaxLatency = $_POST['ClientInputsMaxLatency'] ?? 0;
+			$out['ClientInputsMaxLatency'] = ($clientInputsMaxLatency == 'more') ? intval($_POST['ClientInputsMaxLatencyValue'] ?? 0) : intval($clientInputsMaxLatency);
 			$out['DisableHorns'] = array_key_exists('DisableHorns', $_POST);
 		}
 		
@@ -993,12 +1013,23 @@ class AdminServ {
 		global $client;
 		$out = false;
 		
+		$hideServer = $struct['HideServer'] ?? null;
+		$buddyNotification = $struct['BuddyNotification'] ?? null;
+		
+		// Pre-Forever servers only get the fields their own GetServerOptions struct has
+		if( isPreForever() && $client->query('GetServerOptions') ){
+			$struct = array_intersect_key($struct, (array) $client->getResponse());
+		}
+		
 		if( !$client->query('SetServerOptions', $struct) ){
 			self::error();
 		}
+		else if( isPreForever() ){
+			$out = true;
+		}
 		else{
-			$client->addCall('SetHideServer', [$struct['HideServer']] );
-			$client->addCall('SetBuddyNotification', ['', $struct['BuddyNotification']] );
+			$client->addCall('SetHideServer', [$hideServer] );
+			$client->addCall('SetBuddyNotification', ['', $buddyNotification] );
 			if(SERVER_VERSION_NAME == 'ManiaPlanet'){
 				$client->addCall('SetClientInputsMaxLatency', [$struct['ClientInputsMaxLatency']] );
 				$client->addCall('DisableHorns', [$struct['DisableHorns']] );
@@ -1134,7 +1165,7 @@ class AdminServ {
 		}
 
 		// Game
-		if(SERVER_VERSION_NAME == 'TmForever'){
+		if(!isMpApi()){
 			$queries = ['CupRoundsPerMap' => 'GetCupRoundsPerChallenge'];
 		}
 		else{
@@ -1143,6 +1174,10 @@ class AdminServ {
 
 		// Requests
 		$client->addCall('GetGameInfos');
+		if( isPreForever() ){
+			// FinishTimeout isn't part of the pre-Forever GameInfos struct
+			$client->addCall('GetFinishTimeout');
+		}
 		$client->addCall('GetAllWarmUpDuration');
 		$client->addCall('GetDisableRespawn');
 		$client->addCall('GetForceShowAllOpponents');
@@ -1165,35 +1200,34 @@ class AdminServ {
 			$currGamInf = $queriesData['GetGameInfos']['CurrentGameInfos'];
 			$nextGamInf = $queriesData['GetGameInfos']['NextGameInfos'];
 			
+			// Settings missing on older servers stay null (their methods fault and come back as [])
+			$pair = function($query) use ($queriesData){
+				return [$queriesData[$query]['CurrentValue'] ?? null, $queriesData[$query]['NextValue'] ?? null];
+			};
+			
+			if( isPreForever() ){
+				[$currGamInf['FinishTimeout'], $nextGamInf['FinishTimeout']] = $pair('GetFinishTimeout');
+			}
+			
 			// WarmUp count
-			$currGamInf['AllWarmUpDuration'] = $queriesData['GetAllWarmUpDuration']['CurrentValue'];
-			$nextGamInf['AllWarmUpDuration'] = $queriesData['GetAllWarmUpDuration']['NextValue'];
-			
-			$currGamInf['DisableRespawn'] = $queriesData['GetDisableRespawn']['CurrentValue'];
-			$nextGamInf['DisableRespawn'] = $queriesData['GetDisableRespawn']['NextValue'];
-			
-			$currGamInf['ForceShowAllOpponents'] = $queriesData['GetForceShowAllOpponents']['CurrentValue'];
-			$nextGamInf['ForceShowAllOpponents'] = $queriesData['GetForceShowAllOpponents']['NextValue'];
+			[$currGamInf['AllWarmUpDuration'], $nextGamInf['AllWarmUpDuration']] = $pair('GetAllWarmUpDuration');
+			[$currGamInf['DisableRespawn'], $nextGamInf['DisableRespawn']] = $pair('GetDisableRespawn');
+			[$currGamInf['ForceShowAllOpponents'], $nextGamInf['ForceShowAllOpponents']] = $pair('GetForceShowAllOpponents');
 			
 			// ScriptName
 			$currGamInf['ScriptName'] = null;
 			$nextGamInf['ScriptName'] = null;
 			if(SERVER_VERSION_NAME == 'ManiaPlanet'){
-				$currGamInf['ScriptName'] = $queriesData['GetScriptName']['CurrentValue'];
-				$nextGamInf['ScriptName'] = $queriesData['GetScriptName']['NextValue'];
+				[$currGamInf['ScriptName'], $nextGamInf['ScriptName']] = $pair('GetScriptName');
 			}
 			
 			// Cup mode
-			$currGamInf['CupPointsLimit'] = $queriesData['GetCupPointsLimit']['CurrentValue'];
-			$nextGamInf['CupPointsLimit'] = $queriesData['GetCupPointsLimit']['NextValue'];
-			$currGamInf['CupRoundsPerMap'] = $queriesData[$queries['CupRoundsPerMap']]['CurrentValue'];
-			$nextGamInf['CupRoundsPerMap'] = $queriesData[$queries['CupRoundsPerMap']]['NextValue'];
-			$currGamInf['CupNbWinners'] = $queriesData['GetCupNbWinners']['CurrentValue'];
-			$nextGamInf['CupNbWinners'] = $queriesData['GetCupNbWinners']['NextValue'];
-			$currGamInf['CupWarmUpDuration'] = $queriesData['GetCupWarmUpDuration']['CurrentValue'];
-			$nextGamInf['CupWarmUpDuration'] = $queriesData['GetCupWarmUpDuration']['NextValue'];
+			[$currGamInf['CupPointsLimit'], $nextGamInf['CupPointsLimit']] = $pair('GetCupPointsLimit');
+			[$currGamInf['CupRoundsPerMap'], $nextGamInf['CupRoundsPerMap']] = $pair($queries['CupRoundsPerMap']);
+			[$currGamInf['CupNbWinners'], $nextGamInf['CupNbWinners']] = $pair('GetCupNbWinners');
+			[$currGamInf['CupWarmUpDuration'], $nextGamInf['CupWarmUpDuration']] = $pair('GetCupWarmUpDuration');
 			
-			$RoundCustomPoints = implode(',', $queriesData['GetRoundCustomPoints']);
+			$RoundCustomPoints = implode(',', (array) ($queriesData['GetRoundCustomPoints'] ?? []));
 			$currGamInf['RoundCustomPoints'] = $RoundCustomPoints;
 			$nextGamInf['RoundCustomPoints'] = $RoundCustomPoints;
 			
@@ -1210,22 +1244,28 @@ class AdminServ {
      * Return the structure for saving the game info
      */
     public static function getGameInfosStructFromPOST(): array{
-		if($_POST['NextFinishTimeoutValue'] < 2){
-			if($_POST['NextFinishTimeout'] == 0){ $FinishTimeout = 0; }
-			else if($_POST['NextFinishTimeout'] == 1){ $FinishTimeout = 1; }
-		}
-		else{ $FinishTimeout = TimeDate::secToMillisec( intval($_POST['NextFinishTimeoutValue']) ); }
-		if( array_key_exists('NextDisableRespawn', $_POST) === true ){ $DisableRespawn = false; }
-		else{ $DisableRespawn = true; }
-		if($_POST['NextForceShowAllOpponentsValue'] < 2){
-			if($_POST['NextForceShowAllOpponents'] == 0){ $NextForceShowAllOpponents = 0; }
-			else if($_POST['NextForceShowAllOpponents'] == 1){ $NextForceShowAllOpponents = 1; }
-		}
-		else{ $NextForceShowAllOpponents = intval($_POST['NextForceShowAllOpponentsValue']); }
+		$post = fn(string $key, $default = 0) => $_POST[$key] ?? $default;
 		
-		$out = ['GameMode' => intval($_POST['NextGameMode']), 'ChatTime' => TimeDate::secToMillisec( intval($_POST['NextChatTime'] - 8) ), 'RoundsPointsLimit' => intval($_POST['NextRoundsPointsLimit']), 'RoundCustomPoints' => intval($_POST['NextRoundCustomPoints']), 'RoundsUseNewRules' => array_key_exists('NextRoundsUseNewRules', $_POST), 'RoundsForcedLaps' => intval($_POST['NextRoundsForcedLaps']), 'RoundsPointsLimitNewRules' => intval($_POST['NextRoundsPointsLimit']), 'TimeAttackLimit' => TimeDate::secToMillisec( intval($_POST['NextTimeAttackLimit']) ), 'TimeAttackSynchStartPeriod' => TimeDate::secToMillisec( intval($_POST['NextTimeAttackSynchStartPeriod']) ), 'TeamPointsLimit' => intval($_POST['NextTeamPointsLimit']), 'TeamMaxPoints' => intval($_POST['NextTeamMaxPoints']), 'TeamUseNewRules' => array_key_exists('NextTeamUseNewRules', $_POST), 'TeamPointsLimitNewRules' => intval($_POST['NextTeamPointsLimit']), 'LapsNbLaps' => intval($_POST['NextLapsNbLaps']), 'LapsTimeLimit' => TimeDate::secToMillisec( intval($_POST['NextLapsTimeLimit']) ), 'FinishTimeout' => $FinishTimeout, 'AllWarmUpDuration' => intval($_POST['NextAllWarmUpDuration']), 'DisableRespawn' => $DisableRespawn, 'ForceShowAllOpponents' => $NextForceShowAllOpponents, 'CupPointsLimit' => intval($_POST['NextCupPointsLimit']), 'CupRoundsPerMap' => intval($_POST['NextCupRoundsPerMap']), 'CupNbWinners' => intval($_POST['NextCupNbWinners']), 'CupWarmUpDuration' => intval($_POST['NextCupWarmUpDuration'])];
+		$FinishTimeout = 0;
+		if( intval($post('NextFinishTimeoutValue')) < 2 ){
+			$FinishTimeout = (intval($post('NextFinishTimeout')) == 1) ? 1 : 0;
+		}
+		else{ $FinishTimeout = TimeDate::secToMillisec( intval($post('NextFinishTimeoutValue')) ); }
+		$DisableRespawn = !array_key_exists('NextDisableRespawn', $_POST);
+		$NextForceShowAllOpponents = 0;
+		if( intval($post('NextForceShowAllOpponentsValue')) < 2 ){
+			$NextForceShowAllOpponents = (intval($post('NextForceShowAllOpponents')) == 1) ? 1 : 0;
+		}
+		else{ $NextForceShowAllOpponents = intval($post('NextForceShowAllOpponentsValue')); }
+		
+		$out = ['GameMode' => intval($post('NextGameMode')), 'ChatTime' => TimeDate::secToMillisec( intval($post('NextChatTime', 8)) - 8 ), 'RoundsPointsLimit' => intval($post('NextRoundsPointsLimit')), 'RoundCustomPoints' => intval($post('NextRoundCustomPoints')), 'RoundsUseNewRules' => array_key_exists('NextRoundsUseNewRules', $_POST), 'RoundsForcedLaps' => intval($post('NextRoundsForcedLaps')), 'RoundsPointsLimitNewRules' => intval($post('NextRoundsPointsLimit')), 'TimeAttackLimit' => TimeDate::secToMillisec( intval($post('NextTimeAttackLimit')) ), 'TimeAttackSynchStartPeriod' => TimeDate::secToMillisec( intval($post('NextTimeAttackSynchStartPeriod')) ), 'TeamPointsLimit' => intval($post('NextTeamPointsLimit')), 'TeamMaxPoints' => intval($post('NextTeamMaxPoints')), 'TeamUseNewRules' => array_key_exists('NextTeamUseNewRules', $_POST), 'TeamPointsLimitNewRules' => intval($post('NextTeamPointsLimit')), 'LapsNbLaps' => intval($post('NextLapsNbLaps')), 'LapsTimeLimit' => TimeDate::secToMillisec( intval($post('NextLapsTimeLimit')) ), 'FinishTimeout' => $FinishTimeout, 'AllWarmUpDuration' => intval($post('NextAllWarmUpDuration')), 'DisableRespawn' => $DisableRespawn, 'ForceShowAllOpponents' => $NextForceShowAllOpponents, 'CupPointsLimit' => intval($post('NextCupPointsLimit')), 'CupRoundsPerMap' => intval($post('NextCupRoundsPerMap')), 'CupNbWinners' => intval($post('NextCupNbWinners')), 'CupWarmUpDuration' => intval($post('NextCupWarmUpDuration'))];
 		if(isMpApi()){
-			$out += ['ScriptName' => $_POST['NextScriptName']];
+			$out += ['ScriptName' => (string) $post('NextScriptName', '')];
+		}
+		else{
+			// TmForever names this field after challenges
+			$out['CupRoundsPerChallenge'] = $out['CupRoundsPerMap'];
+			unset($out['CupRoundsPerMap']);
 		}
 		
 		return $out;
@@ -1526,20 +1566,20 @@ class AdminServ {
 			if( $countMapList > 0 ){
 				$i = 0;
 				foreach($mapList as $map){
-					$name = htmlspecialchars((string) $map['Name'], ENT_QUOTES, 'UTF-8');
+					$name = htmlspecialchars((string) ($map['Name'] ?? ''), ENT_QUOTES, 'UTF-8');
 					$out['lst'][$i]['Name'] = TmNick::toHtml($name, 10, true);
 					
 					// Environment
-					$env = $map['Environnement'];
+					$env = $map['Environnement'] ?? '';
 					if($env == 'Speed'){ $env = 'Desert'; }else if($env == 'Alpine'){ $env = 'Snow'; }
 					$out['lst'][$i]['Environment'] = $env;
 					
-					// Others
-					$out['lst'][$i]['UId'] = $map['UId'];
-					$out['lst'][$i]['FileName'] = $map['FileName'];
-					$out['lst'][$i]['Author'] = $map['Author'];
-					$out['lst'][$i]['GoldTime'] = TimeDate::format($map['GoldTime']);
-					$out['lst'][$i]['CopperPrice'] = $map['CopperPrice'];
+					// Others (pre-Forever challenge info has no Author)
+					$out['lst'][$i]['UId'] = $map['UId'] ?? '';
+					$out['lst'][$i]['FileName'] = $map['FileName'] ?? '';
+					$out['lst'][$i]['Author'] = $map['Author'] ?? '-';
+					$out['lst'][$i]['GoldTime'] = TimeDate::format($map['GoldTime'] ?? 0);
+					$out['lst'][$i]['CopperPrice'] = $map['CopperPrice'] ?? 0;
 					if(SERVER_VERSION_NAME == 'ManiaPlanet'){
 						$out['lst'][$i]['Type']['Name'] = self::formatScriptName($map['MapType']);
 						$out['lst'][$i]['Type']['FullName'] = $map['MapType'];
@@ -1615,34 +1655,34 @@ class AdminServ {
 				foreach($mapList as $map){
 					switch($field){
 						case 'Name':
-							$name = htmlspecialchars((string) $map['Name'], ENT_QUOTES, 'UTF-8');
+							$name = htmlspecialchars((string) ($map['Name'] ?? ''), ENT_QUOTES, 'UTF-8');
 							$out[] = TmNick::toHtml($name, 10, true);
 							break;
 						case 'Environment':
-							$env = $map['Environnement'];
+							$env = $map['Environnement'] ?? '';
 							if($env == 'Speed'){ $env = 'Desert'; }else if($env == 'Alpine'){ $env = 'Snow'; }
 							$out[] = $env;
 							break;
 						case 'UId':
-							$out[] = $map['UId'];
+							$out[] = $map['UId'] ?? '';
 							break;
 						case 'FileName':
-							$out[] = $map['FileName'];
+							$out[] = $map['FileName'] ?? '';
 							break;
 						case 'Author':
-							$out[] = $map['Author'];
+							$out[] = $map['Author'] ?? '-';
 							break;
 						case 'GoldTime':
-							$out[] = TimeDate::format($map['GoldTime']);
+							$out[] = TimeDate::format($map['GoldTime'] ?? 0);
 							break;
 						case 'CopperPrice':
-							$out[] = $map['CopperPrice'];
+							$out[] = $map['CopperPrice'] ?? 0;
 							break;
 						case 'MapType':
-							$out[] = $map['MapType'];
+							$out[] = $map['MapType'] ?? '';
 							break;
 						case 'MapStyle':
-							$out[] = $map['MapStyle'];
+							$out[] = $map['MapStyle'] ?? '';
 							break;
 					}
 					$i++;

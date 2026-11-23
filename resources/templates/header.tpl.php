@@ -129,7 +129,8 @@
 								<?php endif; ?>
 							</ul>
 							<ul class="menu-right">
-								<?php if (AdminServAdminLevel::hasAccess('link_access_server')): ?>
+								<?php /* Pre-Forever servers don't report their login, so there is nothing to join */ ?>
+								<?php if (AdminServAdminLevel::hasAccess('link_access_server') && defined('SERVER_LOGIN') && SERVER_LOGIN !== ''): ?>
 									<?php if (defined('IS_RELAY') && IS_RELAY): ?>
 										<li class="accesslink"><a tabindex="7" class="button light" href="<?php echo AdminServ::getProtocolLink('#spectate='.SERVER_LOGIN); ?>"><?php echo Utils::t('Access relay'); ?></a></li>
 									<?php else: ?>

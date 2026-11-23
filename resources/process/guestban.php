@@ -269,10 +269,13 @@
 	}
 	
 	// READ
-	$client->addCall('GetBanList', [AdminServConfig::LIMIT_PLAYERS_LIST, 0] );
-	$client->addCall('GetBlackList', [AdminServConfig::LIMIT_PLAYERS_LIST, 0] );
-	$client->addCall('GetGuestList', [AdminServConfig::LIMIT_PLAYERS_LIST, 0] );
-	$client->addCall('GetIgnoreList', [AdminServConfig::LIMIT_PLAYERS_LIST, 0] );
+	$listLimit = listLimit(AdminServConfig::LIMIT_PLAYERS_LIST);
+	$client->addCall('GetBanList', [$listLimit, 0] );
+	$client->addCall('GetBlackList', [$listLimit, 0] );
+	$client->addCall('GetGuestList', [$listLimit, 0] );
+	if( !isTmClassic() ){
+		$client->addCall('GetIgnoreList', [$listLimit, 0] );
+	}
 	if( !$client->multiquery() ){
 		AdminServ::error();
 	}
@@ -281,7 +284,7 @@
 		$data['banlist']['list'] = $queriesData['GetBanList'];
 		$data['blacklist']['list'] = $queriesData['GetBlackList'];
 		$data['guestlist']['list'] = $queriesData['GetGuestList'];
-		$data['ignorelist']['list'] = $queriesData['GetIgnoreList'];
+		$data['ignorelist']['list'] = $queriesData['GetIgnoreList'] ?? [];
 		$data['banlist']['count'] = count($data['banlist']['list']);
 		$data['blacklist']['count'] = count($data['blacklist']['list']);
 		$data['guestlist']['count'] = count($data['guestlist']['list']);

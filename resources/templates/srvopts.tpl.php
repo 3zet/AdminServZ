@@ -129,10 +129,12 @@
 								</td>
 							</tr>
 						<?php endif; ?>
+						<?php if (isset($data['srvOpt']['HideServer'])): ?>
 						<tr>
 							<td class="key"><label for="HideServer"><?php echo Utils::t('Hidden server'); ?></label></td>
 							<td class="value" colspan="4"><input class="text" type="checkbox" name="HideServer" id="HideServer"<?php if ($data['srvOpt']['HideServer'] != 0): echo ' checked="checked"'; endif; ?> value="" /></td>
 						</tr>
+						<?php endif; ?>
 						<tr>
 							<td class="key"><label for="AllowMapDownload"><?php echo Utils::t('Map download'); ?></label></td>
 							<td class="value" colspan="4">
@@ -142,14 +144,18 @@
 									endif; ?> value="" />
 							</td>
 						</tr>
+						<?php if (isset($data['srvOpt']['AutoSaveReplays'])): ?>
 						<tr<?php if (AdminServAdminLevel::isType('Admin') && !AdminServAdminLevel::isType('SuperAdmin')): echo ' hidden="hidden"'; endif; ?>>
 							<td class="key"><label for="AutoSaveReplays"><?php echo Utils::t('Replays auto save'); ?></label></td>
 							<td class="value" colspan="4"><input class="text" type="checkbox" name="AutoSaveReplays" id="AutoSaveReplays"<?php if ($data['srvOpt']['AutoSaveReplays'] != 0): echo ' checked="checked"'; endif; ?> value="" /></td>
 						</tr>
+						<?php endif; ?>
+						<?php if (isset($data['srvOpt']['BuddyNotification'])): ?>
 						<tr>
 							<td class="key"><label for="BuddyNotification"><?php echo Utils::t('Buddy notification'); ?></label></td>
 							<td class="value" colspan="4"><input class="text" type="checkbox" name="BuddyNotification" id="BuddyNotification"<?php if ($data['srvOpt']['BuddyNotification'] != 0): echo ' checked="checked"'; endif; ?> value="" /></td>
 						</tr>
+						<?php endif; ?>
 						<?php if (isMpApi() && isset($data['srvOpt']['DisableHorns'])): ?>
 							<tr>
 								<td class="key"><label for="DisableHorns"><?php echo Utils::t('Disable horns'); ?></label></td>

@@ -1,12 +1,19 @@
 <section class="cadre left section-guestban">
 	<form method="post" action="?p=<?php echo USER_PAGE; ?>">
 
-	<?php foreach ([
-		'banlist'    => ['label' => 'Banlist',    'checkName' => 'checkAllBanlist',    'cols' => 4, 'hasIp' => true, 'hasClient' => true],
-		'blacklist'  => ['label' => 'Blacklist',  'checkName' => 'checkAllBlacklist',  'cols' => 2, 'hasIp' => false, 'hasClient' => false],
-		'guestlist'  => ['label' => 'Guestlist',  'checkName' => 'checkAllGuestlist',  'cols' => 2, 'hasIp' => false, 'hasClient' => false],
-		'ignorelist' => ['label' => 'Ignorelist', 'checkName' => 'checkAllIgnorelist', 'cols' => 2, 'hasIp' => false, 'hasClient' => false],
-	] as $listKey => $listMeta): ?>
+	<?php
+		$guestbanLists = [
+			'banlist'    => ['label' => 'Banlist',    'checkName' => 'checkAllBanlist',    'cols' => 4, 'hasIp' => true, 'hasClient' => true],
+			'blacklist'  => ['label' => 'Blacklist',  'checkName' => 'checkAllBlacklist',  'cols' => 2, 'hasIp' => false, 'hasClient' => false],
+			'guestlist'  => ['label' => 'Guestlist',  'checkName' => 'checkAllGuestlist',  'cols' => 2, 'hasIp' => false, 'hasClient' => false],
+			'ignorelist' => ['label' => 'Ignorelist', 'checkName' => 'checkAllIgnorelist', 'cols' => 2, 'hasIp' => false, 'hasClient' => false],
+		];
+		// TMO / TMS / TMN-ESWC have no ignore list
+		if (isTmClassic()) {
+			unset($guestbanLists['ignorelist']);
+		}
+	?>
+	<?php foreach ($guestbanLists as $listKey => $listMeta): ?>
 
 		<div id="<?php echo $listKey; ?>">
 			<h1><?php echo $listMeta['label']; ?><?php if ($data[$listKey]['count'] > 0): echo ' ('.$data[$listKey]['count'].')'; endif; ?></h1>

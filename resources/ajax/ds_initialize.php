@@ -1,4 +1,6 @@
 <?php
+	// JSON endpoint: PHP notices must never reach the response body (they still go to the error log)
+	ini_set('display_errors', '0');
 	// ISSET
 	if( isset($_GET['cfg']) ){ $path_cfg = $_GET['cfg']; }else{ $path_cfg = null; }
 	

@@ -144,8 +144,8 @@
 	</table>
 </fieldset>
 
-<?php if (isTM2020() && isMpApi()): ?>
-<!-- Script Settings inline -- TM2020 (filled in via JS/AJAX) -->
+<?php if (isMpApi()): ?>
+<!-- Script Settings inline -- ManiaPlanet and TM2020 (filled in via JS/AJAX) -->
 <fieldset id="tm2020-script-settings" class="gameinfos_script_settings_inline" hidden="hidden">
 	<legend>
 		<img src="<?php echo AdminServConfig::$PATH_RESOURCES; ?>images/16/options.png" alt="" />
@@ -154,7 +154,7 @@
 	</legend>
 	<div id="inlineScriptSettings"></div>
 </fieldset>
-<?php endif; /* isTM2020 && isMpApi */ ?>
+<?php endif; /* isMpApi */ ?>
 
 <?php if (isTM2020() && AdminServAdminLevel::isType('Admin')): ?>
 <!-- Dialog: Script Manager (TM2020) -->

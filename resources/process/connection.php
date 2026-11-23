@@ -1,4 +1,11 @@
 <?php
+	// 'get_password' can be left in the session by an unfinished visit to /config/
+	// (e.g. config files copied in instead of finishing the password wizard).
+	// Once servers are configured the flag is stale: drop it instead of blocking login forever.
+	if( isset($_SESSION['adminserv']['get_password']) && class_exists('ServerConfig') && AdminServServerConfig::hasServer() ){
+		unset($_SESSION['adminserv']['get_password']);
+	}
+
 	// If a password is requested for online config
 	if( !isset($_SESSION['adminserv']['check_password']) && !isset($_SESSION['adminserv']['get_password']) ){
 		// Check that a config exists, otherwise create it

@@ -17,7 +17,7 @@
 				</td>
 				<td class="preview">
 					<?php if (($data['gameInfos']['next']['GameMode'] ?? 0) == 0): ?>
-						<a id="getScriptSettings" href=""
+						<a id="getScriptSettings" href="#tm2020-script-settings"
 							data-infotext="<?php echo Utils::t('Script settings updated.'); ?>">
 							<?php echo Utils::t('Script settings'); ?>
 						</a>
@@ -28,48 +28,6 @@
 	</table>
 </fieldset>
 
-<?php if (!isTM2020() && ($data['gameInfos']['next']['GameMode'] ?? 0) == 0): ?>
-	<div id="getScriptSettingsDialog"
-		data-title="<?php echo Utils::t('Script settings'); ?>"
-		data-cancel="<?php echo Utils::t('Cancel'); ?>"
-		data-save="<?php echo Utils::t('Save'); ?>"
-		hidden="hidden">
-		<div id="dialogScriptInfo">
-			<h2><?php echo Utils::t('Script info'); ?></h2>
-			<div class="content">
-				<table>
-					<tbody>
-						<tr>
-							<td class="key"><?php echo Utils::t('Name'); ?></td>
-							<td class="value" id="dialogScriptInfoName"></td>
-						</tr>
-						<tr>
-							<td class="key"><?php echo Utils::t('Compatible map types'); ?></td>
-							<td class="value" id="dialogScriptInfoCompatibleMapTypes"></td>
-						</tr>
-						<tr class="dialogScriptInfoDesc" hidden="hidden">
-							<td class="key"><?php echo Utils::t('Description'); ?></td>
-							<td class="value" id="dialogScriptInfoDesc"></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
-		<div id="dialogScriptSettings">
-			<h2><?php echo Utils::t('Script parameters'); ?></h2>
-			<table>
-				<thead>
-					<tr>
-						<th class="thleft"><?php echo Utils::t('Name'); ?></th>
-						<th><?php echo Utils::t('Value'); ?></th>
-						<th class="thright"><?php echo Utils::t('Description'); ?></th>
-					</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
-		</div>
-	</div>
-<?php endif; /* !isTM2020 && GameMode==0 */ ?>
 <?php endif; /* isMpApi */ ?>
 
 <?php if (!isTM2020()): ?>

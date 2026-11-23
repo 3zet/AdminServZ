@@ -257,11 +257,12 @@ abstract class TimeDate {
 	* @return string
 	*/
 	public static function format($millisec){
+		$millisec = intval($millisec);
 		$cen = intval( ($millisec % 1000) / 10 );
 		if($cen < 10){
 			$cen = '0'.$cen;
 		}
-		$sec = intval( ($millisec / 1000) % 60 );
+		$sec = intdiv($millisec, 1000) % 60;
 		if($sec < 10){
 			$sec = '0'.$sec;
 		}
